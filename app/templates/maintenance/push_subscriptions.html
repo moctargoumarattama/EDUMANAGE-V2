@@ -1,0 +1,48 @@
+{% extends "maintenance/base_maintenance.html" %}
+
+{% block title %}Push subscriptions | Maintenance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <div class="page-kicker">Notifications</div>
+        <h1 class="page-title fs-2">Abonnements aux alertes</h1>
+        <p class="page-subtitle">Consultez les abonnements aux notifications et desactivez ceux qui ne doivent plus recevoir d alertes.</p>
+    </div>
+    <a class="btn btn-outline-light" href="{{ url_for('maintenance.dashboard') }}">
+        <i class="bi bi-arrow-left me-2"></i>Retour
+    </a>
+</div>
+
+<div class="d-flex flex-column gap-3">
+    {% for sub in subscriptions %}
+    <div class="tech-card">
+        <div class="d-flex justify-content-between flex-wrap gap-3">
+            <div>
+                <div class="fw-semibold">
+                    {{ sub.eleve.nom_complet if sub.eleve else 'Utilisateur inconnu' }}
+                    <span class="text-secondary">#{{ sub.eleve_id }}</span>
+                </div>
+                <div class="small text-secondary mt-2">Adresse d envoi: {{ sub.endpoint[:120] }}{% if sub.endpoint|length > 120 %}...{% endif %}</div>
+                <div class="small text-secondary mt-2">Ajoute le {{ sub.date_creation.strftime('%d/%m/%Y a %H:%M') if sub.date_creation else '-' }}</div>
+            </div>
+            <div class="text-end">
+                <div class="status-pill {{ 'status-ok' if sub.active else 'status-danger' }}">
+                    <i class="bi bi-bell"></i>{{ 'Active' if sub.active else 'Inactive' }}
+                </div>
+                {% if sub.active %}
+                <div class="mt-3">
+                    <button class="btn btn-outline-danger btn-sm" data-url="{{ url_for('maintenance.desactiver_push_subscription', subscription_id=sub.id) }}" data-result-id="push-result-{{ sub.id }}" data-payload='{{ {}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                        Desactiver l abonnement
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div id="push-result-{{ sub.id }}" class="result-box"></div>
+    </div>
+    {% else %}
+    <div class="tech-card text-secondary">Aucun abonnement aux notifications n est enregistre.</div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,114 @@
+Le compte de test maintenance est prêt.
+
+Identifiants :
+
+Email : maintenance.test@edumanage.local
+Mot de passe : Maintenance123!
+
+
+
+
+
+
+
+--------------------------------------------------------
+Pour faire fonctionner Google Login dans ce projet, il faut créer des identifiants OAuth Google puis les mettre dans les variables d’environnement que ton app lit déjà.
+
+**1. Créer les clés Google**
+Va dans Google Cloud Console:
+
+`https://console.cloud.google.com/`
+
+Puis:
+
+1. Crée ou choisis un projet.
+2. Va dans `APIs & Services` → `OAuth consent screen`.
+3. Configure l’écran de consentement.
+4. Va dans `Credentials` → `Create credentials` → `OAuth client ID`.
+5. Choisis `Web application`.
+
+**2. Mettre les URLs autorisées**
+
+Dans `Authorized JavaScript origins`, ajoute:
+
+```text
+http://192.168.11.101:5000
+http://localhost:5000
+```
+
+Dans `Authorized redirect URIs`, ajoute exactement:
+
+```text
+http://192.168.11.101:5000/auth/google/authorized
+http://localhost:5000/auth/google/authorized
+```
+
+J’ai vérifié dans ton app: Flask-Dance crée bien cette route:
+
+```text
+/auth/google/authorized -> google.authorized
+```
+
+**3. Ajouter les variables dans PowerShell**
+
+Pour tester maintenant dans le terminal:
+
+```powershell
+$env:GOOGLE_OAUTH_CLIENT_ID="ton_client_id_google"
+$env:GOOGLE_OAUTH_CLIENT_SECRET="ton_client_secret_google"
+python run.py
+```
+
+Si tu lances avec ton venv:
+
+```powershell
+$env:GOOGLE_OAUTH_CLIENT_ID="ton_client_id_google"
+$env:GOOGLE_OAUTH_CLIENT_SECRET="ton_client_secret_google"
+.venv\Scripts\python.exe run.py
+```
+
+**4. Vérifier**
+
+Au redémarrage, ton code active Google ici:
+
+[app/__init__.py](C:\Users\hp\Desktop\EDUMANAGE\app\__init__.py):613
+
+Il faut que les deux variables existent:
+
+```python
+GOOGLE_OAUTH_CLIENT_ID
+GOOGLE_OAUTH_CLIENT_SECRET
+```
+
+Elles sont lues ici:
+
+[app/config.py](C:\Users\hp\Desktop\EDUMANAGE\app\config.py):61
+
+**Important**
+
+Si tu utilises `http://192.168.11.101:5000/login`, Google doit avoir exactement `http://192.168.11.101:5000/auth/google/authorized` dans les redirect URIs. Si tu mets seulement `localhost`, ça ne marchera pas depuis ton téléphone ou un autre PC sur le réseau.
+
+Après ça, clique sur `Continuer avec Google`. Si tout est bon, Google redirige vers ton app, puis ton app envoie vers:
+
+```text
+/auth/google/callback
+```
+
+
+
+
+
+
+
+
+
+Rôle	Email	Mot de passe
+Admin	admin@ecole.ne	admin123
+Enseignant	prof@ecole.ne	prof123
+Étudiant / Élève	eleve@edumanage.local	eleve123
+Maintenance	maintenance@ecole.ne	maintenance123
+Maintenance test	maintenance.test@edumanage.local	Maintenance123!
+
+
+Rôle	Email	Mot de passe
+Admin	admin@edumanage.local	admin123

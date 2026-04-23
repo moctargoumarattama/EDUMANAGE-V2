@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Progression des élèves | LabeeB Arabic{% endblock %}
+
+{% block extra_css %}
+<style>
+.score-chip.updated {
+    animation: flash-update 0.5s ease;
+}
+
+@keyframes flash-update {
+    0% { background: #fef9c3; }
+    100% { background: rgba(0, 0, 0, 0); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="teacher-progress-shell">
+    <div class="page-header teacher-progress-header">
+        <div class="teacher-progress-intro">
+            <span class="teacher-progress-kicker">
+                <i class="bi bi-mortarboard-fill"></i>
+                Suivi enseignant
+            </span>
+            <h1 class="h3 fw-bold mb-1">Progression des élèves</h1>
+            <p class="text-muted mb-0">Vue pédagogique par cours, avec complétion, scores et activité récente.</p>
+        </div>
+        <a href="{{ url_for('courses.liste') }}" class="btn btn-outline-platform teacher-progress-catalog-button">
+            <i class="bi bi-book me-2"></i>Catalogue des cours
+        </a>
+    </div>
+
+    {% if cours_data %}
+        <div class="d-grid gap-4 teacher-progress-course-list">
+            {% for bloc in cours_data %}
+                <article class="card-platform p-4 teacher-progress-course-card">
+                    <div class="page-header mb-3 teacher-progress-course-header">
+                        <div class="teacher-progress-course-title">
+                            <h2 class="h5 fw-bold mb-1">{{ bloc.cours.nom }}</h2>
+                            <p class="text-muted small mb-0 teacher-progress-course-meta">
+                                <span class="badge-niveau badge-{{ bloc.cours.niveau }}">{{ bloc.cours.niveau }}</span>
+                                <span class="teacher-progress-course-count">{{ bloc.total_eleves }} élève(s)</span>
+                            </p>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 teacher-progress-course-actions">
+                            <a href="{{ url_for('courses.detail', cours_id=bloc.cours.id) }}" class="btn btn-outline-platform btn-sm">
+                                Voir le cours
+                            </a>
+                            <a href="{{ url_for('progress.api_cours', cours_id=bloc.cours.id) }}" class="btn btn-outline-platform btn-sm">
+                                Statistiques du cours
+                            </a>
+                        </div>
+                    </div>
+
+                    {% if bloc.total_eleves %}
+                        <div class="teacher-progress-summary-grid">
+                            <article class="teacher-progress-summary-card">
+                                <span class="teacher-progress-summary-label">Élèves inscrits</span>
+                                <strong class="teacher-progress-summary-value">{{ bloc.total_eleves }}</strong>
+                            </article>
+                            <article class="teacher-progress-summary-card">
+                                <span class="teacher-progress-summary-label">Progression moyenne</span>
+                                <strong class="teacher-progress-summary-value">{{ bloc.moyenne_progression }}%</strong>
+                            </article>
+                            <article class="teacher-progress-summary-card">
+                                <span class="teacher-progress-summary-label">Score moyen</span>
+                                <strong class="teacher-progress-summary-value">
+                                    {% if bloc.moyenne_score is not none %}{{ bloc.moyenne_score }}%{% else %}-{% endif %}
+                                </strong>
+                            </article>
+                            <article class="teacher-progress-summary-card">
+                                <span class="teacher-progress-summary-label">Élèves actifs</span>
+                                <strong class="teacher-progress-summary-value">{{ bloc.eleves_actifs }}</strong>
+                            </article>
+                        </div>
+
+                        <div class="teacher-progress-footnote">
+                            <div class="teacher-progress-footnote-copy">
+                                <span class="teacher-progress-summary-label">Dernière activité</span>
+                                <strong>
+                                    {% if bloc.latest_activity %}
+                                        {{ bloc.latest_activity.strftime('%d/%m/%Y %H:%M') }}
+                                    {% else %}
+                                        Aucune activité récente
+                                    {% endif %}
+                                </strong>
+                            </div>
+                            <div class="teacher-progress-footnote-copy">
+                                <span class="teacher-progress-summary-label">Détail des étudiants</span>
+                                <strong>Disponible dans “Statistiques du cours”</strong>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="empty-state">
+                            <i class="bi bi-people fs-1 d-block mb-2 opacity-25"></i>
+                            Aucun élève n'est encore inscrit à ce cours.
+                        </div>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="card-platform empty-state teacher-progress-course-card">
+            <i class="bi bi-journal-x fs-1 d-block mb-3 opacity-25"></i>
+            Aucun cours enseignant n'est encore disponible.
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

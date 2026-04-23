@@ -1,0 +1,321 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications | LabeeB Arabic{% endblock %}
+
+{% block extra_css %}
+<style>
+.notification-page-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1.8fr) minmax(280px, 0.95fr);
+}
+
+.notification-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.notification-card {
+    border: 1px solid rgba(108, 60, 225, 0.12);
+    border-radius: 20px;
+    background: #fff;
+    padding: 1rem 1.1rem;
+    box-shadow: 0 16px 40px rgba(28, 12, 60, 0.05);
+}
+
+.notification-card.is-unread {
+    border-color: rgba(108, 60, 225, 0.28);
+    box-shadow: 0 18px 44px rgba(76, 29, 149, 0.1);
+}
+
+.notification-card__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.notification-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.notification-card__icon {
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(108, 60, 225, 0.1);
+    color: var(--primary);
+    font-size: 1.2rem;
+}
+
+.notification-card__body {
+    margin-left: 3.75rem;
+}
+
+.notification-unread-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.28rem 0.65rem;
+    border-radius: 999px;
+    background: rgba(108, 60, 225, 0.12);
+    color: var(--primary-dark);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.notification-empty {
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    border: 1px dashed rgba(108, 60, 225, 0.2);
+    border-radius: 22px;
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.badge-history-list,
+.notification-pref-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.badge-history-item,
+.notification-pref-item {
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 0.95rem 1rem;
+    background: #fff;
+}
+
+.badge-history-item {
+    display: flex;
+    gap: 0.85rem;
+    align-items: center;
+}
+
+.badge-history-item img {
+    width: 52px;
+    height: 52px;
+    object-fit: cover;
+    border-radius: 16px;
+    background: rgba(108, 60, 225, 0.08);
+}
+
+@media (max-width: 992px) {
+    .notification-page-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .notification-card__body {
+        margin-left: 0;
+        margin-top: 0.85rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section
+    class="notification-page-shell"
+    data-notification-inbox="true"
+    data-notification-stream-limit="10"
+>
+    <div class="page-header mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Notifications{% if unread_count %} ({{ unread_count }} non lues){% endif %}</h1>
+            <p class="text-muted mb-0">
+                {% if current_user.role == 'admin' %}
+                    Retrouvez ici les alertes support et les demandes de reinitialisation.
+                {% else %}
+                    Lecons publiees, corrections, badges et support au meme endroit.
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            {% if current_user.role == 'eleve' %}
+                <button
+                    type="button"
+                    class="btn btn-outline-platform"
+                    data-enable-push-notifications="true"
+                >
+                    <i class="bi bi-phone-vibrate me-2"></i>Activer le push web
+                </button>
+            {% endif %}
+            <button
+                type="button"
+                class="btn btn-primary-platform"
+                data-mark-all-notifications="true"
+            >
+                <i class="bi bi-check2-all me-2"></i>Tout marquer comme lu
+            </button>
+        </div>
+    </div>
+
+    <div class="notification-page-grid">
+        <section class="d-grid gap-3">
+            <div class="card-platform p-4">
+                <div class="page-header mb-3">
+                    <div>
+                        <h2 class="h5 fw-bold mb-1">Inbox</h2>
+                        <p class="text-muted mb-0">Les dernieres activites importantes de votre espace.</p>
+                    </div>
+                    <span class="badge text-bg-light" data-notification-count-label="true">{{ unread_count }} non lues</span>
+                </div>
+
+                <div class="notification-list" data-notification-inbox-list="true">
+                    {% if serialized_notifications %}
+                        {% for notification in serialized_notifications %}
+                            {% set icon_class = 'bi-book' if notification.type == 'lesson_published' else 'bi-check-circle' if notification.type == 'exercise_corrected' else 'bi-award' if notification.type == 'badge_unlocked' else 'bi-chat-left-text' if notification.type == 'support_request' else 'bi-alarm' %}
+                            <article class="notification-card {% if not notification.is_read %}is-unread{% endif %}" data-notification-card="{{ notification.id }}">
+                                <div class="notification-card__header">
+                                    <div class="notification-card__meta">
+                                        <span class="notification-card__icon"><i class="bi {{ icon_class }}"></i></span>
+                                        <div>
+                                            <div class="fw-semibold">{{ notification.title }}</div>
+                                            <div class="small text-muted">{{ notification.relative_time }}</div>
+                                        </div>
+                                    </div>
+                                    {% if not notification.is_read %}
+                                        <span class="notification-unread-pill">Nouveau</span>
+                                    {% endif %}
+                                </div>
+                                <div class="notification-card__body">
+                                    <p class="mb-2">{{ notification.message }}</p>
+                                    <a href="{{ notification.open_url }}" class="btn btn-sm btn-outline-platform">
+                                        {% if notification.type == 'exercise_corrected' %}
+                                            Voir le resultat
+                                        {% elif notification.type == 'lesson_published' %}
+                                            Ouvrir la lecon
+                                        {% elif notification.type == 'badge_unlocked' %}
+                                            Voir les badges
+                                        {% elif notification.type == 'support_request' %}
+                                            Ouvrir le support
+                                        {% else %}
+                                            Ouvrir
+                                        {% endif %}
+                                    </a>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                        <div class="notification-empty">
+                            <i class="bi bi-bell-slash fs-1 d-block mb-2 opacity-25"></i>
+                            Aucune notification pour le moment.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+
+        <aside class="d-grid gap-3">
+            {% if current_user.role == 'eleve' %}
+                <div class="card-platform p-4">
+                    <div class="page-header mb-3">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1">Support interne</h2>
+                            <p class="text-muted mb-0">Discutez avec l administration depuis un seul fil conserve dans le temps.</p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('notifications.support_thread_guest') }}" class="btn btn-outline-platform w-100">
+                        Ouvrir mon fil de support
+                    </a>
+                </div>
+
+                <div class="card-platform p-4" id="preferences">
+                    <div class="page-header mb-3">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1">Preferences</h2>
+                            <p class="text-muted mb-0">Le push web reste optionnel par type d evenement.</p>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ url_for('notifications.preferences') }}" class="notification-pref-list">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {% for pref in notification_preferences %}
+                            <label class="notification-pref-item">
+                                <div class="d-flex justify-content-between gap-3 align-items-start">
+                                    <div>
+                                        <div class="fw-semibold">{{ pref.label }}</div>
+                                        <div class="small text-muted">Inbox activee. Push web configurable.</div>
+                                    </div>
+                                    <div class="form-check form-switch m-0">
+                                        <input
+                                            class="form-check-input"
+                                            type="checkbox"
+                                            name="{{ pref.type }}:push"
+                                            {% if pref.push_enabled %}checked{% endif %}
+                                        >
+                                    </div>
+                                </div>
+                            </label>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary-platform">Enregistrer</button>
+                    </form>
+                </div>
+
+                <div class="card-platform p-4" id="badges">
+                    <div class="page-header mb-3">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1">Badges recents</h2>
+                            <p class="text-muted mb-0">Historique des {{ badge_history_days }} derniers jours.</p>
+                        </div>
+                    </div>
+                    <div class="badge-history-list">
+                        {% if badge_history %}
+                            {% for earned in badge_history %}
+                                <div class="badge-history-item">
+                                    <img src="{{ earned.badge.image_url or url_for('static', filename='icons/icon-192.png') }}" alt="">
+                                    <div>
+                                        <div class="fw-semibold">{{ earned.badge.name }}</div>
+                                        <div class="small text-muted">{{ earned.badge.description }}</div>
+                                        <div class="small text-muted mt-1">{{ earned.date_earned.strftime('%d/%m/%Y %H:%M') }}</div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="notification-empty py-4">
+                                <i class="bi bi-award fs-1 d-block mb-2 opacity-25"></i>
+                                Aucun badge debloque recemment.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% elif current_user.role == 'admin' %}
+                <div class="card-platform p-4">
+                    <div class="page-header mb-3">
+                        <div>
+                            <h2 class="h5 fw-bold mb-1">Support et reinitialisations</h2>
+                            <p class="text-muted mb-0">{{ support_thread_count }} fil(s) actif(s) pour les etudiants.</p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('notifications.admin_support_threads') }}" class="btn btn-primary-platform w-100 mb-3">
+                        Ouvrir le centre support
+                    </a>
+                    <div class="badge-history-list">
+                        {% if support_thread_summaries %}
+                            {% for thread in support_thread_summaries %}
+                                <a href="{{ thread.open_url }}" class="badge-history-item text-decoration-none text-reset">
+                                    <div>
+                                        <div class="fw-semibold">{{ thread.student_name }}</div>
+                                        <div class="small text-muted">{{ thread.student_email }}</div>
+                                        <div class="small text-muted mt-1">{{ thread.last_message }}</div>
+                                        <div class="small text-muted mt-1">{{ thread.last_activity_label }}</div>
+                                    </div>
+                                </a>
+                            {% endfor %}
+                        {% else %}
+                            <div class="notification-empty py-4">
+                                <i class="bi bi-chat-left-text fs-1 d-block mb-2 opacity-25"></i>
+                                Aucun fil support pour le moment.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+{% endblock %}

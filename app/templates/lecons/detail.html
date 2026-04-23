@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lecon.titre }} | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{{ url_for('courses.detail', cours_id=cours.id) }}" class="text-decoration-none small text-muted">
+            <i class="bi bi-arrow-left me-1"></i>Retour au cours
+        </a>
+        <h1 class="h3 fw-bold mt-2 mb-1">{{ lecon.titre }}</h1>
+        <p class="text-muted mb-0">
+            {{ cours.nom }}{% if lecon.duree_minutes %} | {{ lecon.duree_minutes }} min{% endif %}
+        </p>
+    </div>
+    {% if can_manage %}
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{{ url_for('lessons.modifier', lecon_id=lecon.id) }}" class="btn btn-outline-platform">
+                <i class="bi bi-pencil-square me-2"></i>Modifier
+            </a>
+            <a href="{{ url_for('quiz.nouvelle_question', lecon_id=lecon.id) }}" class="btn btn-primary-platform">
+                <i class="bi bi-patch-question me-2"></i>Ajouter une question
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<div class="content-shell with-sidebar">
+    <section class="d-grid gap-3">
+        <div class="card-platform p-4">
+            <h2 class="h5 fw-bold mb-3">Contenu de la leçon</h2>
+
+            {% if video_embed_url %}
+                <div
+                    class="ratio ratio-16x9 mb-4 lesson-video-shell"
+                    data-video-embed-url="{{ video_embed_url }}"
+                    data-video-autoplay-url="{{ video_autoplay_url }}"
+                    data-video-title="{{ lecon.titre }}"
+                >
+                    <button type="button" class="btn btn-dark w-100 h-100 rounded-3 lesson-video-launch">
+                        <span class="d-flex h-100 w-100 flex-column align-items-center justify-content-center gap-2 px-4 text-center">
+                            <i class="bi bi-play-circle-fill fs-1" aria-hidden="true"></i>
+                            <span class="fw-semibold">Lancer la vidéo</span>
+                            <span class="small text-white-50">Le lecteur YouTube se charge seulement si vous le demandez.</span>
+                        </span>
+                    </button>
+                    <noscript>
+                        <iframe
+                            src="{{ video_embed_url }}"
+                            loading="lazy"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen
+                            title="{{ lecon.titre }}"
+                            class="rounded-3"
+                        ></iframe>
+                    </noscript>
+                </div>
+                {% if video_watch_url %}
+                    <div class="mb-4">
+                        <a href="{{ video_watch_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-platform btn-sm lesson-video-open">
+                            <i class="bi bi-box-arrow-up-right me-2"></i>Ouvrir dans YouTube
+                        </a>
+                    </div>
+                {% endif %}
+            {% elif lecon.video_url %}
+                <video controls class="w-100 rounded-3 mb-4">
+                    <source src="{{ lecon.video_url }}" type="video/mp4">
+                </video>
+            {% endif %}
+
+            {% if lecon.pdf_url %}
+                <div class="mb-4">
+                    <a href="{{ asset_url(lecon.pdf_url) }}" download class="btn btn-outline-platform">
+                        <i class="bi bi-file-earmark-arrow-down me-2"></i>Télécharger le PDF
+                    </a>
+                </div>
+            {% endif %}
+
+            {% if lecon.audio_url %}
+                <div class="mb-4">
+                    <audio controls class="w-100">
+                        <source src="{{ asset_url(lecon.audio_url) }}">
+                    </audio>
+                </div>
+            {% endif %}
+
+            {% if lecon.contenu_texte %}
+                <div class="arabic-content">{{ lecon.contenu_texte|safe }}</div>
+            {% else %}
+                <p class="text-muted mb-0">Le contenu texte sera ajouté prochainement.</p>
+            {% endif %}
+        </div>
+
+        <div class="card-platform p-4">
+            <div class="page-header mb-3">
+                <div>
+                    <h2 class="h5 fw-bold mb-1">Quiz de compréhension</h2>
+                    <p class="text-muted mb-0">{{ lecon.questions|length }} question(s)</p>
+                </div>
+            </div>
+
+            {% if lecon.questions %}
+                {% if peut_repondre %}
+                    <form id="quizForm" method="POST" action="{{ url_for('quiz.repondre', lecon_id=lecon.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="d-grid gap-4">
+                            {% for question in lecon.questions %}
+                                <section>
+                                    <h3 class="h6 fw-bold mb-3">{{ loop.index }}. {{ question.texte }}</h3>
+                                    <div class="choix-group">
+                                        {% for choix in question.choix %}
+                                            <div class="quiz-choice">
+                                                <input type="radio" name="question_{{ question.id }}" id="choix_{{ choix.id }}" value="{{ choix.id }}">
+                                                <label class="choix-label" for="choix_{{ choix.id }}">{{ choix.texte }}</label>
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                </section>
+                            {% endfor %}
+                        </div>
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary-platform">
+                                <i class="bi bi-check2-circle me-2"></i>Valider le quiz
+                            </button>
+                        </div>
+                    </form>
+                    <div id="quizFeedback" class="mt-4"></div>
+                {% elif quiz_resultats %}
+                    <div class="alert alert-info">
+                        Quiz déjà complété. Score : <strong>{{ quiz_resultats.score_percent }}%</strong>
+                    </div>
+                    <div id="quizFeedback" class="d-grid gap-3">
+                        {% for detail in quiz_resultats.details %}
+                            <div class="result-card {% if detail.est_correct %}correct{% else %}incorrect{% endif %}">
+                                <div class="fw-semibold mb-1">{{ detail.texte_question }}</div>
+                                <div class="small mb-1">Votre réponse : {{ detail.choix_selectionne }}</div>
+                                <div class="small">Bonne réponse : {{ detail.texte_bonne_reponse }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p class="text-muted mb-0">Le quiz apparaîtra ici dès qu'un apprenant accédera à cette leçon.</p>
+                {% endif %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-ui-checks-grid fs-1 d-block mb-2 opacity-25"></i>
+                    Aucune question n'a encore été ajoutée à cette leçon.
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <aside class="d-grid gap-3">
+        <div class="card-platform p-4">
+            <h2 class="h5 fw-bold mb-3">Résumé</h2>
+            <div class="info-list">
+                <div class="info-item">
+                    <span class="info-label">Cours</span>
+                    <span class="info-value">{{ cours.nom }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Niveau</span>
+                    <span class="info-value"><span class="badge-niveau badge-{{ cours.niveau }}">{{ cours.niveau }}</span></span>
+                </div>
+                {% if progression %}
+                    <div class="info-item">
+                        <span class="info-label">Dernière vue</span>
+                        <span class="info-value">{{ progression.date_vue.strftime('%d/%m/%Y %H:%M') if progression.date_vue else '-' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Score quiz</span>
+                        <span class="info-value">
+                            {{ progression.pourcentage_score if progression.pourcentage_score is not none else '-' }}{% if progression.pourcentage_score is not none %}%{% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if can_manage %}
+            <div class="card-platform p-4">
+                <h2 class="h5 fw-bold mb-3">Gestion</h2>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('lessons.modifier', lecon_id=lecon.id) }}" class="btn btn-outline-platform">
+                        <i class="bi bi-pencil-square me-2"></i>Modifier la leçon
+                    </a>
+                    <form method="POST" action="{{ url_for('lessons.supprimer', lecon_id=lecon.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-trash me-2"></i>Supprimer la leçon
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}

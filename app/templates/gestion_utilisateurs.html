@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Utilisateurs | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="admin-users-shell admin-page-shell">
+<div class="page-header">
+    <div class="admin-page-heading">
+        <h1 class="h3 fw-bold mb-1">Utilisateurs de la plateforme</h1>
+        <p class="text-muted mb-0">Gerez les comptes admin, enseignant, eleve et maintenance dans une vue coherente.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('main.valider_comptes') }}" class="btn btn-outline-platform">
+            <i class="bi bi-shield-check me-2"></i>Valider les comptes
+            {% if pending_students_count %}
+                <span class="ms-1">({{ pending_students_count }})</span>
+            {% endif %}
+        </a>
+        <a href="{{ url_for('main.creer_utilisateur') }}" class="btn btn-primary-platform">
+            <i class="bi bi-person-plus me-2"></i>Creer un utilisateur
+        </a>
+    </div>
+</div>
+
+{% if utilisateurs %}
+<div class="row g-3">
+    {% for utilisateur in utilisateurs %}
+        {% set initials_source = utilisateur.prenom or utilisateur.nom or utilisateur.email %}
+        {% set role_class = 'badge-role-admin' if utilisateur.role == 'admin' else 'badge-role-enseignant' if utilisateur.role == 'enseignant' else 'badge-role-maintenance' if utilisateur.role == 'maintenance' else 'badge-role-eleve' %}
+        {% set is_protected_role = utilisateur.role in ['admin', 'maintenance'] %}
+        {% set is_blocked = utilisateur.statut == 'bloque' %}
+        <div class="col-12 col-lg-6">
+            <div class="card-platform p-4 h-100">
+                <div class="d-flex justify-content-between align-items-start gap-3 user-card-head">
+                    <div class="d-flex align-items-center gap-3 admin-inline-safe">
+                        <span class="avatar-chip">{{ initials_source[:1]|upper }}</span>
+                        <div class="admin-text-safe">
+                            <h2 class="h6 fw-bold mb-1">{{ ((utilisateur.prenom or '') ~ ' ' ~ (utilisateur.nom or '')).strip() or utilisateur.email }}</h2>
+                            <div class="small text-muted">{{ utilisateur.email }}</div>
+                        </div>
+                    </div>
+                    <span class="badge-role {{ role_class }}">{{ utilisateur.role }}</span>
+                </div>
+
+                <div class="user-card-meta">
+                    <div class="user-meta-item">
+                        <span class="user-meta-label">Telephone</span>
+                        <span class="user-meta-value">{{ utilisateur.telephone or "-" }}</span>
+                    </div>
+                    <div class="user-meta-item">
+                        <span class="user-meta-label">Statut</span>
+                        <span class="user-meta-value">{{ utilisateur.statut }}</span>
+                    </div>
+                    <div class="user-meta-item">
+                        <span class="user-meta-label">Cree le</span>
+                        <span class="user-meta-value">{{ utilisateur.date_creation.strftime('%d/%m/%Y') if utilisateur.date_creation else "-" }}</span>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 flex-wrap mt-4">
+                    <a href="{{ url_for('main.modifier_utilisateur', user_id=utilisateur.id) }}" class="btn btn-outline-platform">
+                        <i class="bi bi-pencil-square me-2"></i>Modifier
+                    </a>
+                    {% if is_protected_role %}
+                        <span class="btn btn-outline-secondary disabled" aria-disabled="true">
+                            <i class="bi bi-shield-lock me-2"></i>Compte protege
+                        </span>
+                    {% else %}
+                        {% set toggle_action_url = url_for('main.debloquer_utilisateur' if is_blocked else 'main.bloquer_utilisateur', user_id=utilisateur.id) %}
+                        {% set toggle_confirm_message = 'Debloquer cet utilisateur ?' if is_blocked else 'Bloquer cet utilisateur ? Il ne pourra plus se connecter tant qu il n est pas debloque.' %}
+                        <form method="POST" action="{{ toggle_action_url }}" data-confirm-message="{{ toggle_confirm_message }}" onsubmit="return confirm(this.dataset.confirmMessage);">
+                            {{ delete_form.hidden_tag() }}
+                            <button type="submit" class="btn {{ 'btn-outline-success' if is_blocked else 'btn-outline-warning' }}">
+                                <i class="bi {{ 'bi-unlock me-2' if is_blocked else 'bi-lock me-2' }}"></i>{{ 'Debloquer' if is_blocked else 'Bloquer' }}
+                            </button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.supprimer_utilisateur', user_id=utilisateur.id) }}" onsubmit="return confirm('Supprimer definitivement cet utilisateur ? Cette action est irreversible.');">
+                            {{ delete_form.hidden_tag() }}
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="bi bi-trash3 me-2"></i>Supprimer
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card-platform empty-state">
+    <i class="bi bi-people fs-1 d-block mb-3 opacity-25"></i>
+    Aucun utilisateur trouve.
+</div>
+{% endif %}
+</section>
+{% endblock %}

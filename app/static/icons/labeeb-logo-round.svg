@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">LabeeB Arabic round logo</title>
+  <desc id="desc">Warm premium round logo with Arabic-inspired arch, crescent, star, and open book.</desc>
+  <defs>
+    <radialGradient id="bgGlow" cx="34%" cy="24%" r="78%">
+      <stop offset="0%" stop-color="#8F6BFF"/>
+      <stop offset="42%" stop-color="#6E42DA"/>
+      <stop offset="100%" stop-color="#40206F"/>
+    </radialGradient>
+    <linearGradient id="goldRing" x1="15%" x2="85%" y1="10%" y2="90%">
+      <stop offset="0%" stop-color="#FFE9B4"/>
+      <stop offset="46%" stop-color="#EFB154"/>
+      <stop offset="100%" stop-color="#C98222"/>
+    </linearGradient>
+    <linearGradient id="bookFill" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFF9EC"/>
+      <stop offset="100%" stop-color="#F1D49D"/>
+    </linearGradient>
+    <linearGradient id="bookShade" x1="50%" x2="50%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFDFA1"/>
+      <stop offset="100%" stop-color="#D88D2E"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="18" stdDeviation="16" flood-color="#261046" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <g filter="url(#softShadow)">
+    <circle cx="256" cy="256" r="230" fill="url(#bgGlow)"/>
+    <circle cx="256" cy="256" r="229" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2"/>
+  </g>
+
+  <circle cx="256" cy="256" r="204" fill="none" stroke="url(#goldRing)" stroke-width="12"/>
+  <circle cx="256" cy="256" r="186" fill="none" stroke="rgba(255,248,231,0.22)" stroke-width="2.5"/>
+
+  <ellipse cx="256" cy="142" rx="124" ry="54" fill="rgba(255,255,255,0.08)"/>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M170 298V214c0-44 38-80 86-80s86 36 86 80v84" stroke="#FFF1CB" stroke-width="15"/>
+    <path d="M196 298V222c0-31 27-56 60-56s60 25 60 56v76" stroke="#EFC06A" stroke-width="8.5"/>
+    <path d="M222 298v-60c0-18 15-33 34-33s34 15 34 33v60" stroke="#FFF7E9" stroke-width="8"/>
+  </g>
+
+  <g>
+    <circle cx="202" cy="184" r="27" fill="#F7CA6B"/>
+    <circle cx="212" cy="178" r="24" fill="#6A3ACC"/>
+    <polygon points="317,170 322,181 334,182 325,190 328,202 317,196 306,202 309,190 300,182 312,181" fill="#FFE8AE"/>
+    <circle cx="338" cy="214" r="4.5" fill="#FFF1CC"/>
+    <circle cx="173" cy="235" r="3.5" fill="#FFE8AE"/>
+    <circle cx="339" cy="250" r="3.5" fill="#FFE8AE"/>
+  </g>
+
+  <g>
+    <path d="M256 276c10 0 19 8 19 18s-9 18-19 18-19-8-19-18 9-18 19-18Z" fill="#FFEDC0"/>
+    <path d="M256 284l8 10-8 10-8-10 8-10Z" fill="#D89433"/>
+  </g>
+
+  <g transform="translate(0 6)">
+    <path d="M154 332c35-23 67-34 102-34v92c-31-19-63-28-102-28-12 0-22-10-22-23 0-11 8-19 22-7Z" fill="url(#bookFill)"/>
+    <path d="M358 332c-35-23-67-34-102-34v92c31-19 63-28 102-28 12 0 22-10 22-23 0-11-8-19-22-7Z" fill="url(#bookFill)"/>
+    <path d="M256 298v97" stroke="#B67022" stroke-width="8" stroke-linecap="round"/>
+    <path d="M162 343c31-17 59-25 94-28" stroke="#D9AA59" stroke-width="4" stroke-linecap="round"/>
+    <path d="M350 343c-31-17-59-25-94-28" stroke="#D9AA59" stroke-width="4" stroke-linecap="round"/>
+    <path d="M186 380c25-8 46-11 70-11" stroke="#E9C57C" stroke-width="3" stroke-linecap="round"/>
+    <path d="M326 380c-25-8-46-11-70-11" stroke="#E9C57C" stroke-width="3" stroke-linecap="round"/>
+    <path d="M149 351c37-20 70-29 107-31" fill="none" stroke="#9F5B1D" stroke-opacity="0.2" stroke-width="6" stroke-linecap="round"/>
+    <path d="M363 351c-37-20-70-29-107-31" fill="none" stroke="#9F5B1D" stroke-opacity="0.2" stroke-width="6" stroke-linecap="round"/>
+  </g>
+
+  <path d="M182 414c26 15 49 20 74 20 25 0 48-5 74-20" fill="none" stroke="url(#bookShade)" stroke-width="10" stroke-linecap="round"/>
+</svg>

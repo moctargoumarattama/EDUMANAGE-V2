@@ -1,0 +1,118 @@
+<div id="vocab-results-region" data-vocab-results-region="true">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-center gap-3 mb-3">
+        <div>
+            <h2 class="h5 fw-bold mb-1">Entrees disponibles</h2>
+            <div class="text-muted small">Affichage pagine pour supporter les imports massifs.</div>
+        </div>
+        <div class="d-flex flex-wrap align-items-center gap-2">
+            <span class="badge-role badge-role-enseignant">{{ total_count }} mot(s)</span>
+            <span class="badge-role badge-role-eleve">{{ pedagogique_count }} pedagogiques</span>
+            <span class="badge-role badge-A1">A1: {{ a1_count }}</span>
+            <span class="badge-role badge-A2">A2: {{ a2_count }}</span>
+            <span class="badge-role badge-role-admin">Page {{ pagination.page }} / {{ pagination.pages or 1 }}</span>
+        </div>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div id="vocab-pagination-top" class="d-flex justify-content-between align-items-center mb-3 gap-3 flex-wrap vocab-pagination-bar instant-nav-zone">
+        <div class="text-muted small">
+            {{ ((pagination.page - 1) * pagination.per_page) + 1 }}-{{ ((pagination.page - 1) * pagination.per_page) + (vocabulaire|length) }} sur {{ total_count }}
+        </div>
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+            {% if pagination.has_prev %}
+            <a class="btn btn-outline-platform btn-sm" href="{{ url_for('main.vocabulaire_admin', page=pagination.prev_num, q=q, niveau=niveau, pedagogique=pedagogique, traduits=traduits) }}#vocab-pagination-top">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% endif %}
+            {% for page_num in pagination.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+                {% if page_num %}
+                    <a class="btn btn-sm {% if page_num == pagination.page %}btn-primary-platform{% else %}btn-outline-platform{% endif %}" href="{{ url_for('main.vocabulaire_admin', page=page_num, q=q, niveau=niveau, pedagogique=pedagogique, traduits=traduits) }}#vocab-pagination-top">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="px-1 text-muted">...</span>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+            <a class="btn btn-outline-platform btn-sm" href="{{ url_for('main.vocabulaire_admin', page=pagination.next_num, q=q, niveau=niveau, pedagogique=pedagogique, traduits=traduits) }}#vocab-pagination-top">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div id="vocab-results" class="soft-list vocab-soft-list">
+        {% for mot in vocabulaire %}
+        <div class="card-platform p-3 vocab-entry-card">
+            <div class="d-flex justify-content-between align-items-start gap-3 flex-wrap">
+                <div class="flex-grow-1 min-w-0">
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                        <div class="arabic-text fw-bold fs-4 vocab-entry-word">{{ mot.mot_arabe }}</div>
+                        {% if mot.translitteration %}
+                        <span class="text-muted">{{ mot.translitteration }}</span>
+                        {% endif %}
+                        {% if mot.est_pedagogique %}
+                        <span class="badge-role badge-role-eleve">Pedagogique</span>
+                        {% endif %}
+                        {% if mot.niveau_cefr %}
+                        <span class="badge-niveau badge-{{ mot.niveau_cefr }}">{{ mot.niveau_cefr }}</span>
+                        {% endif %}
+                        {% if mot.theme %}
+                        <span class="badge-role badge-role-maintenance">{{ mot.theme }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="row g-2 small vocab-translation-grid">
+                        <div class="col-12 col-md-4"><strong>FR:</strong> <span class="vocab-translation-text" title="{{ mot.traduction_fr or '-' }}">{{ mot.traduction_fr or '-' }}</span></div>
+                        <div class="col-12 col-md-4"><strong>EN:</strong> <span class="vocab-translation-text" title="{{ mot.traduction_en or '-' }}">{{ mot.traduction_en or '-' }}</span></div>
+                        <div class="col-12 col-md-4"><strong>ES:</strong> <span class="vocab-translation-text" title="{{ mot.traduction_es or '-' }}">{{ mot.traduction_es or '-' }}</span></div>
+                    </div>
+                    {% if mot.exemple_phrase %}
+                    <div class="arabic-text mt-3 text-muted vocab-example-text">{{ mot.exemple_phrase }}</div>
+                    {% endif %}
+                </div>
+                <form method="post" action="{{ url_for('main.supprimer_vocabulaire', vocabulaire_id=mot.id) }}">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Supprimer {{ mot.mot_arabe }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="bi bi-translate d-block fs-1 mb-3 opacity-25"></i>
+            Le dictionnaire est encore vide.
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div id="vocab-pagination-bottom" class="d-flex justify-content-between align-items-center mt-4 gap-3 flex-wrap vocab-pagination-bar instant-nav-zone">
+        <div class="text-muted small">
+            {% if q %}Resultats pour "{{ q }}"{% else %}Navigation du dictionnaire{% endif %}
+        </div>
+        <div class="d-flex gap-2 flex-wrap align-items-center">
+            {% if pagination.has_prev %}
+            <a class="btn btn-outline-platform btn-sm" href="{{ url_for('main.vocabulaire_admin', page=pagination.prev_num, q=q, niveau=niveau, pedagogique=pedagogique, traduits=traduits) }}#vocab-pagination-bottom">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+            {% endif %}
+            {% for page_num in pagination.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
+                {% if page_num %}
+                    <a class="btn btn-sm {% if page_num == pagination.page %}btn-primary-platform{% else %}btn-outline-platform{% endif %}" href="{{ url_for('main.vocabulaire_admin', page=page_num, q=q, niveau=niveau, pedagogique=pedagogique, traduits=traduits) }}#vocab-pagination-bottom">
+                        {{ page_num }}
+                    </a>
+                {% else %}
+                    <span class="px-1 text-muted">...</span>
+                {% endif %}
+            {% endfor %}
+            {% if pagination.has_next %}
+            <a class="btn btn-outline-platform btn-sm" href="{{ url_for('main.vocabulaire_admin', page=pagination.next_num, q=q, niveau=niveau, pedagogique=pedagogique, traduits=traduits) }}#vocab-pagination-bottom">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>

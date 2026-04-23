@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}{% if is_edit %}{{ _('Modifier le cours') }}{% else %}{{ _('Nouveau cours') }}{% endif %} | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="course-editor-shell">
+    <aside class="course-editor-hero">
+        <span class="course-editor-kicker">
+            <i class="bi bi-journal-richtext"></i>
+            {{ _('Espace enseignant') }}
+        </span>
+        <h1 class="course-editor-title">
+            {% if is_edit %}{{ _('Modifier le cours') }}{% else %}{{ _('Créer un nouveau cours') }}{% endif %}
+        </h1>
+        <p class="course-editor-description">{{ _('Renseignez les informations essentielles du cours.') }}</p>
+
+        <div class="course-editor-note">
+            <div class="course-editor-note-title">{{ _('Essentiel du cours') }}</div>
+            <p class="mb-0">{{ _('Titre, niveau, image et description.') }}</p>
+        </div>
+
+        <div class="course-editor-guidelines">
+            <div class="course-editor-guideline">
+                <strong>{{ _('Titre') }}</strong>
+                <span>{{ _('Un nom simple et clair.') }}</span>
+            </div>
+            <div class="course-editor-guideline">
+                <strong>{{ _('Niveau') }}</strong>
+                <span>{{ _('Choisissez le niveau adapté.') }}</span>
+            </div>
+            <div class="course-editor-guideline">
+                <strong>{{ _('Description') }}</strong>
+                <span>{{ _('Décrivez le contenu en quelques lignes.') }}</span>
+            </div>
+        </div>
+
+        <a href="{% if cours %}{{ url_for('courses.detail', cours_id=cours.id) }}{% else %}{{ url_for('courses.liste') }}{% endif %}" class="btn btn-outline-platform course-editor-backlink">
+            <i class="bi bi-arrow-left me-2"></i>{{ _('Retour') }}
+        </a>
+    </aside>
+
+    <div class="card-platform course-editor-form-card">
+        <form method="POST" enctype="multipart/form-data" class="course-editor-form">
+            {{ form.hidden_tag() }}
+
+            <section class="course-editor-fieldset">
+                <div class="course-editor-section-head">
+                    <h2 class="course-editor-section-title">{{ _('Détails') }}</h2>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.titre.label(class="form-label fw-semibold course-editor-label") }}
+                        {{ form.titre(class="form-control course-editor-input", placeholder=_('Ex. Alphabet arabe pour débutants')) }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.niveau.label(class="form-label fw-semibold course-editor-label") }}
+                        {{ form.niveau(class="form-select course-editor-input") }}
+                    </div>
+                    <div class="col-md-8">
+                        {{ form.image.label(class="form-label fw-semibold course-editor-label") }}
+                        {{ form.image(class="form-control course-editor-input") }}
+                        {% if cours and cours.image_url %}
+                            <div class="form-text course-editor-help">{{ _('Fichier actuel') }} : {{ cours.image_url }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </section>
+
+            <section class="course-editor-fieldset">
+                <div class="course-editor-section-head">
+                    <h2 class="course-editor-section-title">{{ _('Description') }}</h2>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12">
+                        {{ form.description.label(class="form-label fw-semibold course-editor-label") }}
+                        {{ form.description(class="form-control course-editor-input course-editor-textarea", rows="7", placeholder=_('Présentez les objectifs et le contenu du cours.')) }}
+                    </div>
+                    {% if is_edit %}
+                        <div class="col-12">
+                            <div class="form-check course-editor-check">
+                                {{ form.est_publie(class="form-check-input") }}
+                                <label class="form-check-label fw-semibold" for="{{ form.est_publie.id }}">{{ _('Publier') }}</label>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+
+            <div class="course-editor-actions">
+                <a href="{% if cours %}{{ url_for('courses.detail', cours_id=cours.id) }}{% else %}{{ url_for('courses.liste') }}{% endif %}" class="btn btn-outline-platform course-editor-secondary-action">{{ _('Annuler') }}</a>
+                {{ form.submit(class="btn btn-primary-platform course-editor-primary-action") }}
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

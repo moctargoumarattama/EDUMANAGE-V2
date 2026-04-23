@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}{{ cours.nom }} | LabeeB Arabic{% endblock %}
+
+{% block content %}
+{% if cours.image_url %}
+    {% if cours.image_url.startswith('http') %}
+        {% set hero_image = cours.image_url %}
+    {% else %}
+        {% set hero_image = asset_url(cours.image_url) %}
+    {% endif %}
+{% else %}
+    {% set hero_image = None %}
+{% endif %}
+<section class="hero-panel course-hero-panel card-platform mb-4"{% if hero_image %} style="background-image: linear-gradient(135deg, rgba(76, 29, 149, 0.82), rgba(56, 189, 248, 0.42)), url('{{ hero_image }}');"{% endif %}>
+    <div class="row g-4 align-items-center">
+        <div class="col-12 d-flex flex-column justify-content-between course-hero-content">
+            <div class="d-flex flex-wrap gap-2 mb-3">
+                <span class="badge-niveau badge-{{ cours.niveau }}">{{ cours.niveau }}</span>
+                {% if cours.est_publie %}
+                    <span class="badge bg-success-subtle text-success">{{ _('Publié') }}</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">{{ _('Brouillon') }}</span>
+                {% endif %}
+            </div>
+            <div class="course-hero-meta d-flex flex-wrap gap-3 small">
+                <span><i class="bi bi-person-workspace me-1"></i>{{ cours.enseignant_nom }}</span>
+                <span><i class="bi bi-collection-play me-1"></i>{{ ngettext('%(count)s leçon', '%(count)s leçons', visible_lessons|length, count=visible_lessons|length) }}</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="content-shell with-sidebar">
+    <section class="d-grid gap-3">
+        <div class="card-platform p-4">
+            <div class="page-header mb-3">
+                <div>
+                    <h2 class="h4 fw-bold mb-1">{{ _('Leçons du cours') }}</h2>
+                    <p class="text-muted mb-0">{{ _("Suivez les étapes dans l'ordre et revenez où vous voulez.") }}</p>
+                </div>
+                {% if can_manage %}
+                    <a href="{{ url_for('lessons.nouvelle', cours_id=cours.id) }}" class="btn btn-primary-platform">
+                        <i class="bi bi-plus-lg me-2"></i>{{ _('Ajouter une leçon') }}
+                    </a>
+                {% endif %}
+            </div>
+
+            {% if visible_lessons %}
+                {% for lecon in visible_lessons %}
+                    {% set progression_lecon = progressions_map.get(lecon.id) %}
+                    <div class="lecon-item {% if progression_lecon and progression_lecon.vue %}vue{% endif %}">
+                        <div class="lecon-icon">
+                            {% if progression_lecon and progression_lecon.vue %}
+                                <i class="bi bi-check-lg"></i>
+                            {% else %}
+                                <i class="bi bi-play"></i>
+                            {% endif %}
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold">{{ loop.index }}. {{ lecon.titre }}</div>
+                            <div class="small text-muted">
+                                {% if lecon.duree_minutes %}
+                                    {{ _('%(minutes)s min', minutes=lecon.duree_minutes) }}
+                                {% else %}
+                                    {{ _('Durée libre') }}
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div>
+                            {% if can_open_lessons %}
+                                <a href="{{ url_for('lessons.start', lecon_id=lecon.id) if current_user.role == 'eleve' else url_for('lessons.detail', lecon_id=lecon.id) }}" class="btn btn-outline-platform btn-sm">{{ _('Ouvrir') }}</a>
+                            {% else %}
+                                <span class="small text-muted">{{ _('Inscription requise') }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <i class="bi bi-journal-text fs-1 d-block mb-2 opacity-25"></i>
+                    {{ _('Ce cours ne contient pas encore de leçons.') }}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    <aside class="d-grid gap-3">
+        <div class="card-platform p-4">
+            <h2 class="h5 fw-bold mb-3">{{ _('Votre progression') }}</h2>
+            {% if progression is not none %}
+                <div class="d-flex justify-content-between align-items-center small text-muted mb-2">
+                    <span>{{ _('Avancement') }}</span>
+                    <strong>{{ progression }}%</strong>
+                </div>
+                <div class="progress-platform mb-3">
+                    <div class="progress-fill" style="width: {{ progression }}%;"></div>
+                </div>
+            {% else %}
+                <p class="text-muted mb-3">{{ _("La progression s'affiche pour les apprenants inscrits.") }}</p>
+            {% endif %}
+
+            <div class="info-list">
+                <div class="info-item">
+                    <span class="info-label">{{ _('Niveau') }}</span>
+                    <span class="info-value"><span class="badge-niveau badge-{{ cours.niveau }}">{{ cours.niveau }}</span></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">{{ _('Enseignant') }}</span>
+                    <span class="info-value">{{ cours.enseignant_nom }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">{{ _('Leçons') }}</span>
+                    <span class="info-value">{{ visible_lessons|length }}</span>
+                </div>
+            </div>
+
+            {% if current_user.role == 'eleve' and not inscription %}
+                <form method="POST" action="{{ url_for('courses.inscrire', cours_id=cours.id) }}" class="mt-4">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-accent w-100">
+                        <i class="bi bi-person-plus me-2"></i>{{ _("S'inscrire au cours") }}
+                    </button>
+                </form>
+            {% elif current_user.role == 'eleve' and inscription %}
+                <div class="alert alert-success mt-4 mb-0">
+                    <i class="bi bi-check-circle me-2"></i>{{ _('Vous êtes inscrit à ce cours.') }}
+                </div>
+            {% endif %}
+        </div>
+
+        {% if can_manage %}
+            <div class="card-platform p-4">
+                <h2 class="h5 fw-bold mb-3">{{ _('Gestion du cours') }}</h2>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('courses.modifier', cours_id=cours.id) }}" class="btn btn-primary-platform">
+                        <i class="bi bi-pencil-square me-2"></i>{{ _('Modifier') }}
+                    </a>
+                    <form method="POST" action="{{ url_for('courses.supprimer', cours_id=cours.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="bi bi-trash me-2"></i>{{ _('Supprimer le cours') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endif %}
+    </aside>
+</div>
+{% endblock %}

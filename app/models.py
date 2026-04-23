@@ -1,230 +1,173 @@
+import json
+from datetime import date, datetime, timedelta
+
 from flask_login import UserMixin
+from sqlalchemy.orm import validates
+from werkzeug.security import check_password_hash, generate_password_hash
+
 from . import db
-from datetime import datetime, date
-from werkzeug.security import generate_password_hash, check_password_hash
-import random
-import string
-from sqlalchemy import event
-from datetime import datetime
-
-# app/models.py
-# -----------------------
-# Table de liaison pour les gestionnaires multi-écoles
-# -----------------------
-gestion_ecole = db.Table(
-    'gestion_ecole',
-    db.Column('utilisateur_id', db.Integer, db.ForeignKey('utilisateur.id'), primary_key=True),
-    db.Column('ecole_id', db.Integer, db.ForeignKey('ecole.id'), primary_key=True)
-)
-
-# -----------------------
-# Table d'association Professeur / Classe
-# -----------------------
-professeur_classes = db.Table(
-    'professeur_classes',
-    db.Column('professeur_id', db.Integer, db.ForeignKey('professeur.id'), primary_key=True),
-    db.Column('classe_id', db.Integer, db.ForeignKey('classe.id'), primary_key=True),
-    db.Column('date_assignation', db.DateTime, server_default=db.func.now()),
-    db.Column('ecole_id', db.Integer, db.ForeignKey('ecole.id'), nullable=False)
-)
-
-# -----------------------
-# Fonction utilitaire
-# -----------------------
-def generer_code_parent_unique(self):
-    """Génère un code parent unique et sauvegarde l'élève."""
-    lettres_chiffres = string.ascii_uppercase + string.digits
-    while True:
-        code = ''.join(random.choices(lettres_chiffres, k=8))
-        if not Eleve.query.filter_by(code_parent=code).first():
-            self.code_parent = code
-            db.session.commit()
-            return code
-
-def assigner_code_parent(self):
-    """Si l'élève a un parent et pas de code, génère et sauvegarde le code parent."""
-    if self.parent and not self.code_parent:
-        return self.generer_code_parent_unique()
-    return self.code_parent
-
-# -----------------------
-# Année Scolaire
-# -----------------------
-class AnneeScolaire(db.Model):
-    __tablename__ = 'annee_scolaire'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(20), nullable=False)
-    date_debut = db.Column(db.Date, nullable=False)
-    date_fin = db.Column(db.Date, nullable=False)
-    active = db.Column(db.Boolean, default=False)
-
-    statut = db.Column(db.String(20), default='planifiee')  # planifiee, active, archivee
-    
-    # Lien avec l'école
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)
-    ecole = db.relationship('Ecole', backref='annees_scolaires')
-    __table_args__ = (db.Index('idx_ecole_id', 'ecole_id'),)
-
-    # Relations
-    classes = db.relationship('Classe', back_populates='annee_scolaire', lazy=True)
-    inscriptions = db.relationship('Inscription', back_populates='annee_scolaire', lazy=True)
-    
-    # Contrainte unique nom + ecole
-    __table_args__ = (
-        db.UniqueConstraint('nom', 'ecole_id', name='_annee_ecole_uc'),
-    )
-    
-    def __repr__(self):
-        return f'<AnneeScolaire {self.nom} - {self.ecole.nom if self.ecole else "Sans école"}>'
-    
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "nom": self.nom,
-            "date_debut": self.date_debut.isoformat() if self.date_debut else None,
-            "date_fin": self.date_fin.isoformat() if self.date_fin else None,
-            "statut": self.statut,
-            "ecole_id": self.ecole_id,
-            "ecole_nom": self.ecole.nom if self.ecole else None
-        }
 
 
-# -----------------------
-# École
-# -----------------------
-class Ecole(db.Model):
-    __tablename__ = 'ecole'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(200), nullable=False)
-    adresse = db.Column(db.String(300))
-    telephone = db.Column(db.String(20))
-    email = db.Column(db.String(120))
-    directeur = db.Column(db.String(100))
-    logo = db.Column(db.String(200), default='default_logo.png')
-    statut = db.Column(db.String(20), default='actif')
-    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
-    logo_path = db.Column(db.String(200))  # <-- champ existant
-    
-    # Relations
-    utilisateurs = db.relationship(
-        'Utilisateur',
-        back_populates='ecole',
-        cascade="all, delete-orphan",
-        lazy=True
-    )
-    gestionnaires = db.relationship(
-        'Utilisateur',
-        secondary=gestion_ecole,
-        back_populates='ecoles_gerees',
-        lazy='dynamic'
-    )
-    classes = db.relationship('Classe', back_populates='ecole', lazy=True)
-    eleves = db.relationship('Eleve', back_populates='ecole', lazy=True)
-    professeurs = db.relationship('Professeur', back_populates='ecole', lazy=True)
-    
-    def __repr__(self):
-        return f'<Ecole {self.nom}>'
-
-    # --- Conversion en dictionnaire pour la sauvegarde JSON ---
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "nom": self.nom,
-            "adresse": self.adresse,
-            "telephone": self.telephone,
-            "email": self.email,
-            "directeur": self.directeur,
-            "logo": self.logo,
-            "statut": self.statut,
-            "date_creation": self.date_creation.isoformat() if self.date_creation else None,
-            "logo_path": self.logo_path
-        }
-
-# -----------------------
-# Utilisateur (comptes)
-# -----------------------
-
-# -----------------------------------------------------------------------------
-# Utilisateur
-# -----------------------------------------------------------------------------
 class Utilisateur(db.Model, UserMixin):
-    __tablename__ = 'utilisateur'
+    __tablename__ = "utilisateur"
+
+    ROLES_VALIDES = ["admin", "enseignant", "eleve", "maintenance"]
+    __table_args__ = (
+        db.CheckConstraint(
+            "role IN ('admin', 'enseignant', 'eleve', 'maintenance')",
+            name="ck_utilisateur_role_valide",
+        ),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100), nullable=False)
     prenom = db.Column(db.String(100))
     email = db.Column(db.String(120), unique=True, nullable=False)
     mot_de_passe = db.Column(db.String(200), nullable=False)
-    role = db.Column(db.String(20), nullable=False, default='parent')
+    role = db.Column(db.String(20), nullable=False, default="eleve")
     telephone = db.Column(db.String(20))
-    statut = db.Column(db.String(20), default='actif')
+    langue_preferee = db.Column(db.String(5))
+    statut = db.Column(db.String(20), default="actif")
+    niveau_depart = db.Column(db.String(5))
     date_creation = db.Column(db.DateTime, default=datetime.utcnow)
     dernier_acces = db.Column(db.DateTime)
 
-    # nullable=True pour permettre aux super admins de ne pas avoir d'école
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id', ondelete='SET NULL'), nullable=True)
-    ecole = db.relationship('Ecole', back_populates='utilisateurs')
-
-    # écoles gérées (admin/gestionnaire)
-    ecoles_gerees = db.relationship(
-        'Ecole',
-        secondary='gestion_ecole',
-        back_populates='gestionnaires',
-        lazy='dynamic'
+    cours_enseignes = db.relationship(
+        "Cours",
+        back_populates="enseignant_utilisateur",
+        lazy=True,
+        foreign_keys="Cours.enseignant_id",
     )
-
-    # --- Relations parents/enfants ---
-    # IMPORTANT: ne pas utiliser delete-orphan ici pour éviter de supprimer des élèves
-    enfants = db.relationship(
-        'Eleve',
-        back_populates='parent',
-        lazy='dynamic',
-        foreign_keys='Eleve.parent_id',
-        passive_deletes=True
+    inscriptions_cours = db.relationship(
+        "Inscription",
+        back_populates="eleve",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="Inscription.eleve_id",
     )
-
-    # --- Relation Professeur 1-1 (un utilisateur peut avoir un profil professeur) ---
-    professeur_rel = db.relationship(
-        'Professeur',
-        back_populates='utilisateur',
+    reponses_quiz = db.relationship(
+        "ReponseEleve",
+        back_populates="eleve",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="ReponseEleve.eleve_id",
+    )
+    progressions_lecons = db.relationship(
+        "ProgressionLecon",
+        back_populates="eleve",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="ProgressionLecon.eleve_id",
+    )
+    xp = db.relationship(
+        "XPEleve",
+        back_populates="eleve",
         uselist=False,
         cascade="all, delete-orphan",
-        passive_deletes=True
+        passive_deletes=True,
     )
-
-    # relation pour cours si nécessaire (vérifier foreign_keys selon ta table Cours)
-    cours_enseignes = db.relationship(
-        'Cours',
-        back_populates='enseignant_utilisateur',
+    push_subscriptions = db.relationship(
+        "PushSubscription",
+        back_populates="eleve",
         lazy=True,
-        # assume Cours.enseignant_id existe et réfère à Utilisateur.id
-        foreign_keys='Cours.enseignant_id'
+        cascade="all, delete-orphan",
+        foreign_keys="PushSubscription.eleve_id",
+    )
+    notifications = db.relationship(
+        "Notification",
+        back_populates="user",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="Notification.user_id",
+    )
+    notification_preferences = db.relationship(
+        "NotificationPreference",
+        back_populates="user",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="NotificationPreference.user_id",
+    )
+    support_thread = db.relationship(
+        "SupportThread",
+        back_populates="student",
+        uselist=False,
+        cascade="all, delete-orphan",
+        foreign_keys="SupportThread.student_id",
+    )
+    support_messages = db.relationship(
+        "SupportMessage",
+        back_populates="author_user",
+        lazy=True,
+        foreign_keys="SupportMessage.author_user_id",
+    )
+    password_reset_grants = db.relationship(
+        "PasswordResetGrant",
+        back_populates="student",
+        lazy=True,
+        foreign_keys="PasswordResetGrant.student_id",
+    )
+    granted_password_reset_grants = db.relationship(
+        "PasswordResetGrant",
+        back_populates="granted_by_admin",
+        lazy=True,
+        foreign_keys="PasswordResetGrant.granted_by_admin_id",
+    )
+    earned_badges = db.relationship(
+        "UserBadge",
+        back_populates="user",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="UserBadge.user_id",
+    )
+    resultat_placement = db.relationship(
+        "ResultatPlacement",
+        back_populates="eleve",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+    logs = db.relationship("Log", back_populates="utilisateur", lazy=True)
+    active_sessions = db.relationship(
+        "ActiveSession",
+        back_populates="user",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="ActiveSession.user_id",
     )
 
-    # system
-    alertes = db.relationship('Alerte', back_populates='utilisateur', lazy=True)
-    logs = db.relationship('Log', back_populates='utilisateur', lazy=True)
+    @validates("role")
+    def validate_role(self, key, value):
+        role = (value or "").strip().lower()
+        if role not in self.ROLES_VALIDES:
+            raise ValueError(f"Role invalide: {value}")
+        return role
 
-    # ---------- utilitaires ----------
-    def set_mot_de_passe(self, mot_de_passe_plain: str):
+    @validates("langue_preferee")
+    def validate_langue_preferee(self, key, value):
+        if value is None:
+            return None
+
+        langue = (value or "").strip().lower()
+        if not langue:
+            return None
+        if langue not in {"fr", "en", "es"}:
+            raise ValueError(f"Langue invalide: {value}")
+        return langue
+
+    @property
+    def nom_complet(self):
+        return f"{self.prenom or ''} {self.nom}".strip() or self.email
+
+    def set_mot_de_passe(self, mot_de_passe_plain):
         self.mot_de_passe = generate_password_hash(mot_de_passe_plain)
 
-    def check_mot_de_passe(self, mot_de_passe_plain: str) -> bool:
+    def check_mot_de_passe(self, mot_de_passe_plain):
         return check_password_hash(self.mot_de_passe, mot_de_passe_plain)
 
-    def is_admin(self) -> bool:
-        return self.role == 'admin'
-
-    def get_professeur(self):
-        return self.professeur_rel if self.role in ('enseignant', 'professeur') else None
-
-    def get_enfants(self):
-        return self.enfants.all() if self.role == 'parent' else []
+    def is_admin(self):
+        return self.role == "admin"
 
     def __repr__(self):
-        return f'<Utilisateur {self.nom} ({self.email})>'
+        return f"<Utilisateur {self.email}>"
 
     def to_dict(self):
         return {
@@ -234,374 +177,66 @@ class Utilisateur(db.Model, UserMixin):
             "email": self.email,
             "role": self.role,
             "telephone": self.telephone,
+            "langue_preferee": self.langue_preferee,
             "statut": self.statut,
+            "niveau_depart": self.niveau_depart,
             "date_creation": self.date_creation.isoformat() if self.date_creation else None,
             "dernier_acces": self.dernier_acces.isoformat() if self.dernier_acces else None,
-            "ecole_id": self.ecole_id
-        }
-
-# -----------------------------------------------------------------------------
-# Professeur
-# -----------------------------------------------------------------------------
-class Professeur(db.Model):
-    __tablename__ = 'professeur'
-
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
-    prenom = db.Column(db.String(100), nullable=False)
-    date_naissance = db.Column(db.Date)
-    adresse = db.Column(db.String(200))
-    telephone = db.Column(db.String(20))
-    # IMPORTANT: retirer unique=True pour éviter conflit avec Utilisateur.email
-    email = db.Column(db.String(120))
-    specialite = db.Column(db.String(100))
-    matieres_enseignees = db.Column(db.String(200))
-    photo = db.Column(db.String(200), default='default_prof.png')
-    date_embauche = db.Column(db.DateTime, default=datetime.utcnow)
-    planning = db.Column(db.JSON)
-    code_prof = db.Column(db.String(50), unique=True)
-    mot_de_passe = db.Column(db.String(200))
-
-    # Utilisateur 1-1 (force la liaison utilisateur <-> professeur)
-    utilisateur_id = db.Column(
-        db.Integer,
-        db.ForeignKey('utilisateur.id', ondelete='CASCADE'),
-        nullable=False,
-        unique=True
-    )
-
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id', ondelete='CASCADE'), nullable=False)
-    ecole = db.relationship('Ecole', back_populates='professeurs')
-
-    utilisateur = db.relationship('Utilisateur', back_populates='professeur_rel', uselist=False)
-    cours = db.relationship('Cours', back_populates='professeur', lazy=True, cascade="all, delete-orphan")
-    emplois_du_temps = db.relationship('EmploiTemps', back_populates='professeur', lazy=True, cascade="all, delete-orphan")
-
-    classes_assignees = db.relationship(
-        'Classe',
-        secondary=professeur_classes,
-        back_populates='professeurs_assignes',
-        lazy='dynamic'
-    )
-
-    def __repr__(self):
-        return f'<Professeur {self.prenom} {self.nom}>'
-
-    @staticmethod
-    def generer_code(length=6):
-        return ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "nom": self.nom,
-            "prenom": self.prenom,
-            "date_naissance": self.date_naissance.isoformat() if self.date_naissance else None,
-            "adresse": self.adresse,
-            "telephone": self.telephone,
-            "email": self.email,
-            "specialite": self.specialite,
-            "matieres_enseignees": self.matieres_enseignees,
-            "photo": self.photo,
-            "date_embauche": self.date_embauche.isoformat() if self.date_embauche else None,
-            "planning": self.planning,
-            "code_prof": self.code_prof,
-            "utilisateur_id": self.utilisateur_id,
-            "ecole_id": self.ecole_id,
-            "classes_assignees": [classe.to_dict() for classe in self.classes_assignees.all()]
         }
 
 
-# -----------------------
-# Classe
-# -----------------------
-class Classe(db.Model):
-    __tablename__ = 'classe'
-
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(50), nullable=False)
-    niveau = db.Column(db.String(50))
-    effectif = db.Column(db.Integer, default=0)
-    capacite = db.Column(db.Integer, default=30)
-
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)
-    ecole = db.relationship('Ecole', back_populates='classes')
-    salle = db.Column(db.String(50))
-    professeur_id = db.Column(db.Integer, db.ForeignKey("professeur.id"))
-    
-    # Lien avec l'année scolaire
-    annee_scolaire_id = db.Column(db.Integer, db.ForeignKey('annee_scolaire.id'), nullable=False, default=1)
-    annee_scolaire = db.relationship('AnneeScolaire', back_populates='classes')
-    
-    eleves = db.relationship('Eleve', back_populates='classe', lazy=True, cascade="all, delete-orphan")
-    emplois = db.relationship('EmploiTemps', back_populates='classe', lazy=True, cascade="all, delete-orphan")
-    cours = db.relationship('Cours', back_populates='classe', lazy=True, cascade="all, delete-orphan")
-    capacite_max = db.Column(db.Integer, nullable=False, default=30)
-    
-    # NOUVELLE RELATION - Professeurs assignés à cette classe
-    professeurs_assignes = db.relationship(
-        'Professeur', 
-        secondary=professeur_classes,
-        back_populates='classes_assignees',
-        lazy='dynamic'
-    )
-    
-    @property
-    def nom_complet(self):
-        annee_nom = self.annee_scolaire.nom if self.annee_scolaire else "N/A"
-        return f"{self.nom} - {annee_nom}"
-    
-    @property
-    def effectif_reel(self):
-        return len(self.eleves)
-
-    def __repr__(self):
-        return f'<Classe {self.nom_complet}>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "nom": self.nom,
-            "nom_complet": self.nom_complet,
-            "niveau": self.niveau,
-            "effectif": self.effectif,
-            "ecole_id": self.ecole_id,
-            "salle": self.salle,
-            "professeur_id": self.professeur_id,
-            "annee_scolaire_id": self.annee_scolaire_id,
-            "capacite_max": self.capacite_max,
-            "effectif_reel": self.effectif_reel,
-            # Ajouter les professeurs assignés
-            "professeurs_assignes": [prof.to_dict() for prof in self.professeurs_assignes]
-        }
-# -----------------------------------------------------------------------------
-# Eleve
-# -----------------------------------------------------------------------------
-class Eleve(db.Model):
-    __tablename__ = 'eleve'
-
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
-    prenom = db.Column(db.String(100), nullable=False)
-    date_naissance = db.Column(db.Date, nullable=False)
-    lieu_naissance = db.Column(db.String(100))
-    adresse = db.Column(db.String(200))
-    telephone = db.Column(db.String(20))
-    contact_parent = db.Column(db.String(20))
-    email = db.Column(db.String(120))
-    email_parent = db.Column(db.String(120))
-    genre = db.Column(db.String(1), default='M')
-    frais_annuels = db.Column(db.Float, default=150000.0)
-    code_parent = db.Column(db.String(10), unique=True, nullable=True)
-    photo = db.Column(db.String(200), default='default_eleve.png')
-    statut = db.Column(db.String(20), default='actif')
-    date_inscription = db.Column(db.DateTime, default=datetime.utcnow)
-
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id', ondelete='CASCADE'), nullable=False)
-    ecole = db.relationship('Ecole', back_populates='eleves')
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    classe_id = db.Column(db.Integer, db.ForeignKey('classe.id', ondelete='SET NULL'), nullable=True)
-    classe = db.relationship('Classe', back_populates='eleves')
-
-    # parent_id : ondelete SET NULL pour ne pas supprimer un élève si le parent est supprimé
-    parent_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id', ondelete='SET NULL'), nullable=True)
-    parent = db.relationship('Utilisateur', back_populates='enfants', foreign_keys=[parent_id])
-
-    notes = db.relationship('Note', backref='eleve', lazy=True, cascade="all, delete-orphan")
-    paiements = db.relationship('Paiement', backref='eleve', lazy=True, cascade="all, delete-orphan")
-    absences = db.relationship('Absence', backref='eleve', lazy=True, cascade="all, delete-orphan")
-    alertes = db.relationship('Alerte', back_populates='eleve', lazy=True)
-    annee_premiere_ecole = db.Column(db.Integer)
-
-    @staticmethod
-    def generer_code_parent(length=8):
-        lettres_chiffres = string.ascii_uppercase + string.digits
-        return ''.join(random.choices(lettres_chiffres, k=length))
-
-    def total_paye(self):
-        return sum(p.montant for p in self.paiements)
-
-    def reste_a_payer(self):
-        return max(0, self.frais_annuels - self.total_paye())
-
-    def pourcentage_paye(self):
-        return round((self.total_paye() / self.frais_annuels) * 100, 2) if self.frais_annuels else 0
-
-    def moyenne_generale(self):
-        if not self.notes:
-            return None
-        total_pondere = sum(n.valeur * n.coefficient for n in self.notes)
-        total_coeff = sum(n.coefficient for n in self.notes)
-        return round(total_pondere / total_coeff, 2) if total_coeff > 0 else 0
-
-    def __repr__(self):
-        return f'<Élève {self.prenom} {self.nom}>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "nom": self.nom,
-            "prenom": self.prenom,
-            "date_naissance": self.date_naissance.isoformat() if self.date_naissance else None,
-            "lieu_naissance": self.lieu_naissance,
-            "adresse": self.adresse,
-            "telephone": self.telephone,
-            "contact_parent": self.contact_parent,
-            "email": self.email,
-            "email_parent": self.email_parent,
-            "genre": self.genre,
-            "frais_annuels": self.frais_annuels,
-            "code_parent": self.code_parent,
-            "photo": self.photo,
-            "statut": self.statut,
-            "date_inscription": self.date_inscription.isoformat() if self.date_inscription else None,
-            "ecole_id": self.ecole_id,
-            "classe_id": self.classe_id,
-            "parent_id": self.parent_id,
-            "annee_premiere_ecole": self.annee_premiere_ecole
-        }
-# -----------------------
-# Note
-# -----------------------
-class Note(db.Model):
-    __tablename__ = 'note'
-
-    id = db.Column(db.Integer, primary_key=True)
-    valeur = db.Column(db.Float, nullable=False)
-    coefficient = db.Column(db.Float, default=1.0)
-    type_evaluation = db.Column(db.String(50))
-    periode = db.Column(db.String(50), default='Trimestre 1')
-    date_evaluation = db.Column(db.DateTime, default=datetime.utcnow)
-    annee_id = db.Column(db.Integer, db.ForeignKey('annee_scolaire.id'))
-    annee = db.relationship('AnneeScolaire', backref='notes')
-
-
-    eleve_id = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=False)
-    cours_id = db.Column(db.Integer, db.ForeignKey('cours.id'), nullable=False)
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'))
-
-    def __repr__(self):
-        return f'<Note {self.valeur} (élève {self.eleve_id})>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "valeur": self.valeur,
-            "coefficient": self.coefficient,
-            "type_evaluation": self.type_evaluation,
-            "periode": self.periode,
-            "date_evaluation": self.date_evaluation.isoformat() if self.date_evaluation else None,
-            "eleve_id": self.eleve_id,
-            "cours_id": self.cours_id,
-            "ecole_id": self.ecole_id
-        }
-
-# -----------------------
-# Paiement
-# -----------------------
-class Paiement(db.Model):
-    __tablename__ = 'paiement'
-
-    id = db.Column(db.Integer, primary_key=True)
-    montant = db.Column(db.Float, nullable=False)
-    date_paiement = db.Column(db.DateTime, default=datetime.utcnow)
-    mois = db.Column(db.String(20), nullable=False)
-    annee = db.Column(db.Integer, default=datetime.utcnow().year)
-    mode_paiement = db.Column(db.String(30), default='espèces')
-    statut = db.Column(db.String(20), default='payé')
-    reference = db.Column(db.String(100))
-    eleve_id = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=False)
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'))
-
-    def statut_paiement(self):
-        mois_num = {
-            'Janvier': 1, 'Février': 2, 'Mars': 3, 'Avril': 4,
-            'Mai': 5, 'Juin': 6, 'Juillet': 7, 'Août': 8,
-            'Septembre': 9, 'Octobre': 10, 'Novembre': 11, 'Décembre': 12
-        }
-        if self.mois not in mois_num:
-            return "Mois invalide"
-        date_limite = date(self.annee, mois_num[self.mois], 10)
-        return "OK" if self.date_paiement.date() <= date_limite else "En retard"
-
-    def __repr__(self):
-        return f'<Paiement {self.montant} {self.mois}/{self.annee}>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "montant": self.montant,
-            "date_paiement": self.date_paiement.isoformat() if self.date_paiement else None,
-            "mois": self.mois,
-            "annee": self.annee,
-            "mode_paiement": self.mode_paiement,
-            "statut": self.statut,
-            "reference": self.reference,
-            "eleve_id": self.eleve_id,
-            "ecole_id": self.ecole_id
-        }
-
-# -----------------------
-# Absence
-# -----------------------
-class Absence(db.Model):
-    __tablename__ = 'absence'
-
-    id = db.Column(db.Integer, primary_key=True)
-    date_absence = db.Column(db.Date, default=date.today, nullable=False)
-    motif = db.Column(db.String(200))
-    justifiee = db.Column(db.Boolean, default=False)
-
-    eleve_id = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=False)
-    cours_id = db.Column(db.Integer, db.ForeignKey('cours.id'))
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'))
-
-    def __repr__(self):
-        return f'<Absence {self.date_absence} - élève {self.eleve_id}>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "date_absence": self.date_absence.isoformat() if self.date_absence else None,
-            "motif": self.motif,
-            "justifiee": self.justifiee,
-            "eleve_id": self.eleve_id,
-            "cours_id": self.cours_id,
-            "ecole_id": self.ecole_id
-        }
-
-# -----------------------
-# Cours
-# -----------------------
 class Cours(db.Model):
-    __tablename__ = 'cours'
+    __tablename__ = "cours"
 
     id = db.Column(db.Integer, primary_key=True)
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text)
     coefficient = db.Column(db.Float, default=1.0)
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)
-    classe_id = db.Column(db.Integer, db.ForeignKey('classe.id'))
-    professeur_id = db.Column(db.Integer, db.ForeignKey('professeur.id'))
-    enseignant_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'))
-    
-    # Relations existantes
-    classe = db.relationship('Classe', back_populates='cours')
-    professeur = db.relationship('Professeur', back_populates='cours')
-    notes = db.relationship('Note', backref='cours', lazy=True, cascade="all, delete-orphan")
-    absences = db.relationship('Absence', backref='cours', lazy=True, cascade="all, delete-orphan")
-    emplois_du_temps = db.relationship('EmploiTemps', back_populates='cours', lazy=True, cascade="all, delete-orphan")
+    niveau = db.Column(db.String(10), nullable=False, default="A1")
+    image_url = db.Column(db.String(255))
+    est_publie = db.Column(db.Boolean, default=False)
+    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
+    enseignant_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"))
 
-    # --- Nouvelle relation avec Utilisateur ---
     enseignant_utilisateur = db.relationship(
-        'Utilisateur',
-        back_populates='cours_enseignes',
-        foreign_keys=[enseignant_id]
+        "Utilisateur",
+        back_populates="cours_enseignes",
+        foreign_keys=[enseignant_id],
+    )
+    lecons = db.relationship(
+        "Lecon",
+        back_populates="cours",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="Lecon.ordre",
+    )
+    inscriptions = db.relationship(
+        "Inscription",
+        back_populates="cours",
+        lazy=True,
+        cascade="all, delete-orphan",
     )
 
+    @property
+    def enseignant_nom(self):
+        if self.enseignant_utilisateur:
+            return self.enseignant_utilisateur.nom_complet
+        return "Non assigne"
+
+    def get_progression_eleve(self, eleve_id):
+        visible_lessons = [lecon for lecon in self.lecons if lecon.est_publie]
+        total = len(visible_lessons)
+        if total == 0:
+            return 0
+        vues = (
+            ProgressionLecon.query.filter_by(eleve_id=eleve_id, vue=True)
+            .filter(ProgressionLecon.lecon_id.in_([lecon.id for lecon in visible_lessons]))
+            .count()
+        )
+        return round((vues / total) * 100)
+
     def __repr__(self):
-        return f'<Cours {self.nom}>'
+        return f"<Cours {self.nom}>"
 
     def to_dict(self):
         return {
@@ -609,136 +244,574 @@ class Cours(db.Model):
             "nom": self.nom,
             "description": self.description,
             "coefficient": self.coefficient,
-            "ecole_id": self.ecole_id,
-            "classe_id": self.classe_id,
-            "professeur_id": self.professeur_id,
-            "enseignant_id": self.enseignant_id
-        }
-
-# -----------------------
-# Bulletin
-# -----------------------
-class Bulletin(db.Model):
-    __tablename__ = 'bulletin'
-
-    id = db.Column(db.Integer, primary_key=True)
-    eleve_id = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=False)
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)  # <- Ajouté
-    matiere = db.Column(db.String(100), nullable=False)
-    note = db.Column(db.Float, nullable=False)
-    annee = db.Column(db.String(10), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    eleve = db.relationship('Eleve', backref='bulletins')
-    ecole = db.relationship('Ecole', backref='bulletins')  # <- Relation pour filtrage facile
-
-    def __repr__(self):
-        return f'<Bulletin {self.id} - Eleve {self.eleve_id}>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "eleve_id": self.eleve_id,
-            "ecole_id": self.ecole_id,  # <- Inclure ecole_id
-            "matiere": self.matiere,
-            "note": self.note,
-            "annee": self.annee,
-            "created_at": self.created_at.isoformat() if self.created_at else None
-        }
-
-# -----------------------
-# EmploiTemps
-# -----------------------
-class EmploiTemps(db.Model):
-    __tablename__ = 'emploi_temps'
-
-    id = db.Column(db.Integer, primary_key=True)
-    professeur_id = db.Column(db.Integer, db.ForeignKey('professeur.id'), nullable=False)
-    jour = db.Column(db.String(20), nullable=False)
-    heure_debut = db.Column(db.Time, nullable=False)
-    heure_fin = db.Column(db.Time, nullable=False)
-    cours_id = db.Column(db.Integer, db.ForeignKey('cours.id'), nullable=False)
-    classe_id = db.Column(db.Integer, db.ForeignKey('classe.id'), nullable=False)
-    salle = db.Column(db.String(50))
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'))  # ✅ Ajout du lien vers l’école
-    professeur = db.relationship('Professeur', back_populates='emplois_du_temps')
-    cours = db.relationship('Cours', back_populates='emplois_du_temps')
-    classe = db.relationship('Classe', back_populates='emplois')
-
-    def __repr__(self):
-        return f'<EmploiTemps {self.jour} {self.heure_debut}-{self.heure_fin}>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "professeur_id": self.professeur_id,
-            "jour": self.jour,
-            "heure_debut": self.heure_debut.isoformat() if self.heure_debut else None,
-            "heure_fin": self.heure_fin.isoformat() if self.heure_fin else None,
-            "cours_id": self.cours_id,
-            "classe_id": self.classe_id,
-            "salle": self.salle
-        }
-
-# -----------------------
-# Alerte
-# -----------------------
-class Alerte(db.Model):
-    __tablename__ = 'alerte'
-
-    id = db.Column(db.Integer, primary_key=True)
-    type = db.Column(db.String(20), nullable=False)
-    titre = db.Column(db.String(200), nullable=False)
-    message = db.Column(db.Text, nullable=False)
-    source = db.Column(db.String(50))
-    lien = db.Column(db.String(200))
-    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
-    date_lue = db.Column(db.DateTime, nullable=True)
-    utilisateur_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=True)
-    eleve_id = db.Column(db.Integer, db.ForeignKey('eleve.id'), nullable=True)
-    priorite = db.Column(db.Integer, default=1)
-
-    utilisateur = db.relationship('Utilisateur', back_populates='alertes')
-    eleve = db.relationship('Eleve', back_populates='alertes')
-
-    def __repr__(self):
-        return f'<Alerte {self.titre} ({self.type})>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "type": self.type,
-            "titre": self.titre,
-            "message": self.message,
-            "source": self.source,
-            "lien": self.lien,
+            "niveau": self.niveau,
+            "image_url": self.image_url,
+            "est_publie": self.est_publie,
             "date_creation": self.date_creation.isoformat() if self.date_creation else None,
-            "date_lue": self.date_lue.isoformat() if self.date_lue else None,
-            "utilisateur_id": self.utilisateur_id,
-            "eleve_id": self.eleve_id,
-            "priorite": self.priorite
+            "enseignant_id": self.enseignant_id,
         }
 
-# -----------------------
-# Logs système
-# -----------------------
+
+class Lecon(db.Model):
+    __tablename__ = "lecon"
+
+    id = db.Column(db.Integer, primary_key=True)
+    cours_id = db.Column(db.Integer, db.ForeignKey("cours.id"), nullable=False)
+    titre = db.Column(db.String(200), nullable=False)
+    ordre = db.Column(db.Integer, default=0)
+    contenu_texte = db.Column(db.Text)
+    video_url = db.Column(db.String(500))
+    pdf_url = db.Column(db.String(500))
+    audio_url = db.Column(db.String(500))
+    duree_minutes = db.Column(db.Integer)
+    points_recompense = db.Column(db.Integer, default=10)
+    est_publie = db.Column(db.Boolean, default=False, nullable=False)
+    date_publication = db.Column(db.DateTime)
+    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
+
+    cours = db.relationship("Cours", back_populates="lecons")
+    questions = db.relationship(
+        "Question",
+        back_populates="lecon",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="Question.ordre",
+    )
+    progressions = db.relationship(
+        "ProgressionLecon",
+        back_populates="lecon",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return f"<Lecon {self.titre}>"
+
+
+class Question(db.Model):
+    __tablename__ = "question"
+
+    TYPES_EXERCICE = (
+        "qcm",
+        "ordre_mots",
+        "ecoute",
+        "dictee",
+        "speaking",
+    )
+
+    id = db.Column(db.Integer, primary_key=True)
+    lecon_id = db.Column(db.Integer, db.ForeignKey("lecon.id"), nullable=False)
+    texte = db.Column(db.Text, nullable=False)
+    ordre = db.Column(db.Integer, default=0)
+    type_exercice = db.Column(db.String(30), default="qcm")
+    audio_url = db.Column(db.String(500))
+    bonne_reponse_texte = db.Column(db.String(500))
+
+    lecon = db.relationship("Lecon", back_populates="questions")
+    choix = db.relationship(
+        "Choix",
+        back_populates="question",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+    reponses = db.relationship(
+        "ReponseEleve",
+        back_populates="question",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return f"<Question {self.id} lecon={self.lecon_id}>"
+
+
+class Choix(db.Model):
+    __tablename__ = "choix"
+
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey("question.id"), nullable=False)
+    texte = db.Column(db.String(500), nullable=False)
+    est_correct = db.Column(db.Boolean, default=False)
+    audio_url = db.Column(db.String(500))
+
+    question = db.relationship("Question", back_populates="choix")
+    reponses = db.relationship(
+        "ReponseEleve",
+        back_populates="choix",
+        lazy=True,
+    )
+
+    def __repr__(self):
+        return f"<Choix {self.id} question={self.question_id}>"
+
+
+class ReponseEleve(db.Model):
+    __tablename__ = "reponse_eleve"
+
+    id = db.Column(db.Integer, primary_key=True)
+    eleve_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey("question.id"), nullable=False)
+    choix_id = db.Column(db.Integer, db.ForeignKey("choix.id"), nullable=True)
+    reponse_saisie = db.Column(db.String(500))
+    est_correct = db.Column(db.Boolean, default=False)
+    date_reponse = db.Column(db.DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        db.UniqueConstraint("eleve_id", "question_id", name="uq_reponse_eleve_question"),
+    )
+
+    eleve = db.relationship("Utilisateur", back_populates="reponses_quiz", foreign_keys=[eleve_id])
+    question = db.relationship("Question", back_populates="reponses")
+    choix = db.relationship("Choix", back_populates="reponses")
+
+    def __repr__(self):
+        return f"<ReponseEleve eleve={self.eleve_id} question={self.question_id}>"
+
+
+class Inscription(db.Model):
+    __tablename__ = "inscription"
+
+    id = db.Column(db.Integer, primary_key=True)
+    eleve_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=False)
+    cours_id = db.Column(db.Integer, db.ForeignKey("cours.id"), nullable=False)
+    date_inscription = db.Column(db.DateTime, default=datetime.utcnow)
+    est_active = db.Column(db.Boolean, default=True)
+
+    __table_args__ = (
+        db.UniqueConstraint("eleve_id", "cours_id", name="uq_inscription_eleve_cours"),
+    )
+
+    eleve = db.relationship("Utilisateur", back_populates="inscriptions_cours", foreign_keys=[eleve_id])
+    cours = db.relationship("Cours", back_populates="inscriptions")
+
+    def __repr__(self):
+        return f"<Inscription eleve={self.eleve_id} cours={self.cours_id}>"
+
+
+class ProgressionLecon(db.Model):
+    __tablename__ = "progression_lecon"
+
+    id = db.Column(db.Integer, primary_key=True)
+    eleve_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=False)
+    lecon_id = db.Column(db.Integer, db.ForeignKey("lecon.id"), nullable=False)
+    vue = db.Column(db.Boolean, default=False)
+    date_vue = db.Column(db.DateTime)
+    score_quiz = db.Column(db.Float)
+
+    __table_args__ = (
+        db.UniqueConstraint("eleve_id", "lecon_id", name="uq_progression_eleve_lecon"),
+    )
+
+    eleve = db.relationship("Utilisateur", back_populates="progressions_lecons", foreign_keys=[eleve_id])
+    lecon = db.relationship("Lecon", back_populates="progressions")
+
+    @property
+    def pourcentage_score(self):
+        if self.score_quiz is None:
+            return None
+        return round(self.score_quiz * 100)
+
+    def __repr__(self):
+        return f"<ProgressionLecon eleve={self.eleve_id} lecon={self.lecon_id}>"
+
+
+class XPEleve(db.Model):
+    __tablename__ = "xp_eleve"
+
+    id = db.Column(db.Integer, primary_key=True)
+    eleve_id = db.Column(
+        db.Integer,
+        db.ForeignKey("utilisateur.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    points = db.Column(db.Integer, default=0)
+    streak_jours = db.Column(db.Integer, default=0)
+    derniere_activite = db.Column(db.DateTime)
+    total_lecons_terminees = db.Column(db.Integer, default=0)
+
+    eleve = db.relationship("Utilisateur", back_populates="xp", foreign_keys=[eleve_id])
+
+    @staticmethod
+    def get_or_create(eleve_id):
+        xp = XPEleve.query.filter_by(eleve_id=eleve_id).first()
+        if not xp:
+            xp = XPEleve(eleve_id=eleve_id, points=0)
+            db.session.add(xp)
+            db.session.commit()
+        return xp
+
+    def ajouter_points(self, nb):
+        now = datetime.utcnow()
+        today = now.date()
+        last_active_date = self.derniere_activite.date() if self.derniere_activite else None
+        if last_active_date == today - timedelta(days=1):
+            self.streak_jours += 1
+        elif last_active_date != today:
+            self.streak_jours = 1
+
+        self.points += nb
+        self.derniere_activite = now
+        db.session.commit()
+
+    def __repr__(self):
+        return f"<XPEleve eleve={self.eleve_id} points={self.points}>"
+
+
+class PushSubscription(db.Model):
+    __tablename__ = "push_subscription"
+
+    id = db.Column(db.Integer, primary_key=True)
+    eleve_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=False)
+    endpoint = db.Column(db.Text, nullable=False)
+    p256dh = db.Column(db.String(500), nullable=False)
+    auth = db.Column(db.String(200), nullable=False)
+    date_creation = db.Column(db.DateTime, default=datetime.utcnow)
+    active = db.Column(db.Boolean, default=True)
+
+    __table_args__ = (
+        db.UniqueConstraint("eleve_id", "endpoint", name="uq_push_subscription_eleve_endpoint"),
+    )
+
+    eleve = db.relationship("Utilisateur", back_populates="push_subscriptions", foreign_keys=[eleve_id])
+
+    def __repr__(self):
+        return f"<PushSubscription eleve={self.eleve_id} active={self.active}>"
+
+
+class Notification(db.Model):
+    __tablename__ = "notification"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    cta_url = db.Column(db.String(500))
+    icon = db.Column(db.String(50))
+    event_key = db.Column(db.String(200))
+    payload_json = db.Column(db.Text)
+    is_read = db.Column(db.Boolean, default=False, nullable=False)
+    read_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    pushed_at = db.Column(db.DateTime)
+
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "event_key", name="uq_notification_user_event_key"),
+    )
+
+    user = db.relationship("Utilisateur", back_populates="notifications", foreign_keys=[user_id])
+
+    def get_payload(self):
+        if not self.payload_json:
+            return {}
+        try:
+            return json.loads(self.payload_json)
+        except (TypeError, ValueError):
+            return {}
+
+    def set_payload(self, payload):
+        self.payload_json = json.dumps(payload or {}, ensure_ascii=False)
+
+    def __repr__(self):
+        return f"<Notification user={self.user_id} type={self.type} read={self.is_read}>"
+
+
+class NotificationPreference(db.Model):
+    __tablename__ = "notification_preference"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=False)
+    type = db.Column(db.String(50), nullable=False)
+    inbox_enabled = db.Column(db.Boolean, default=True, nullable=False)
+    push_enabled = db.Column(db.Boolean, default=True, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "type", name="uq_notification_preference_user_type"),
+    )
+
+    user = db.relationship("Utilisateur", back_populates="notification_preferences", foreign_keys=[user_id])
+
+    def __repr__(self):
+        return f"<NotificationPreference user={self.user_id} type={self.type}>"
+
+
+class SupportThread(db.Model):
+    __tablename__ = "support_thread"
+
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id", ondelete="CASCADE"), nullable=False, unique=True)
+    status = db.Column(db.String(20), default="open", nullable=False)
+    last_activity_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    last_reset_requested_at = db.Column(db.DateTime)
+    last_reset_granted_at = db.Column(db.DateTime)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    student = db.relationship("Utilisateur", back_populates="support_thread", foreign_keys=[student_id])
+    messages = db.relationship(
+        "SupportMessage",
+        back_populates="thread",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="SupportMessage.created_at.asc()",
+        foreign_keys="SupportMessage.thread_id",
+    )
+    reset_grants = db.relationship(
+        "PasswordResetGrant",
+        back_populates="thread",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="PasswordResetGrant.created_at.desc()",
+        foreign_keys="PasswordResetGrant.thread_id",
+    )
+
+    @property
+    def latest_message(self):
+        if not self.messages:
+            return None
+        return self.messages[-1]
+
+    def __repr__(self):
+        return f"<SupportThread student={self.student_id} status={self.status}>"
+
+
+class SupportMessage(db.Model):
+    __tablename__ = "support_message"
+
+    id = db.Column(db.Integer, primary_key=True)
+    thread_id = db.Column(db.Integer, db.ForeignKey("support_thread.id", ondelete="CASCADE"), nullable=False)
+    author_user_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id", ondelete="SET NULL"))
+    author_role = db.Column(db.String(20), nullable=False)
+    message_type = db.Column(db.String(30), default="message", nullable=False)
+    body = db.Column(db.Text, nullable=False)
+    payload_json = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    thread = db.relationship("SupportThread", back_populates="messages", foreign_keys=[thread_id])
+    author_user = db.relationship("Utilisateur", back_populates="support_messages", foreign_keys=[author_user_id])
+
+    def get_payload(self):
+        if not self.payload_json:
+            return {}
+        try:
+            return json.loads(self.payload_json)
+        except (TypeError, ValueError):
+            return {}
+
+    def set_payload(self, payload):
+        self.payload_json = json.dumps(payload or {}, ensure_ascii=False)
+
+    def __repr__(self):
+        return f"<SupportMessage thread={self.thread_id} type={self.message_type} role={self.author_role}>"
+
+
+class PasswordResetGrant(db.Model):
+    __tablename__ = "password_reset_grant"
+
+    id = db.Column(db.Integer, primary_key=True)
+    thread_id = db.Column(db.Integer, db.ForeignKey("support_thread.id", ondelete="CASCADE"), nullable=False)
+    student_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id", ondelete="CASCADE"), nullable=False)
+    granted_by_admin_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id", ondelete="SET NULL"))
+    token = db.Column(db.String(255), nullable=False, unique=True)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used_at = db.Column(db.DateTime)
+    request_ip = db.Column(db.String(80))
+    request_user_agent = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    thread = db.relationship("SupportThread", back_populates="reset_grants", foreign_keys=[thread_id])
+    student = db.relationship("Utilisateur", back_populates="password_reset_grants", foreign_keys=[student_id])
+    granted_by_admin = db.relationship(
+        "Utilisateur",
+        back_populates="granted_password_reset_grants",
+        foreign_keys=[granted_by_admin_id],
+    )
+
+    @property
+    def is_expired(self):
+        return self.expires_at <= datetime.utcnow()
+
+    @property
+    def is_active(self):
+        return self.used_at is None and not self.is_expired
+
+    def __repr__(self):
+        return f"<PasswordResetGrant thread={self.thread_id} student={self.student_id}>"
+
+
+class BadgeDefinition(db.Model):
+    __tablename__ = "badge_definition"
+
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String(80), nullable=False, unique=True)
+    name = db.Column(db.String(120), nullable=False)
+    description = db.Column(db.Text)
+    image_url = db.Column(db.String(500))
+    rule_type = db.Column(db.String(50), nullable=False)
+    threshold = db.Column(db.Integer, nullable=False, default=1)
+    is_active = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    earned_by = db.relationship(
+        "UserBadge",
+        back_populates="badge",
+        lazy=True,
+        cascade="all, delete-orphan",
+        foreign_keys="UserBadge.badge_id",
+    )
+
+    def __repr__(self):
+        return f"<BadgeDefinition slug={self.slug} rule={self.rule_type}>"
+
+
+class UserBadge(db.Model):
+    __tablename__ = "user_badge"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=False)
+    badge_id = db.Column(db.Integer, db.ForeignKey("badge_definition.id"), nullable=False)
+    source_notification_id = db.Column(db.Integer, db.ForeignKey("notification.id"))
+    date_earned = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    __table_args__ = (
+        db.UniqueConstraint("user_id", "badge_id", name="uq_user_badge_user_badge"),
+    )
+
+    user = db.relationship("Utilisateur", back_populates="earned_badges", foreign_keys=[user_id])
+    badge = db.relationship("BadgeDefinition", back_populates="earned_by", foreign_keys=[badge_id])
+    source_notification = db.relationship("Notification", foreign_keys=[source_notification_id])
+
+    def __repr__(self):
+        return f"<UserBadge user={self.user_id} badge={self.badge_id}>"
+
+
+class AppSetting(db.Model):
+    __tablename__ = "app_setting"
+
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(120), nullable=False, unique=True)
+    value = db.Column(db.Text, nullable=False)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def __repr__(self):
+        return f"<AppSetting {self.key}>"
+
+
+class PlacementTest(db.Model):
+    __tablename__ = "placement_test"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    questions = db.relationship(
+        "PlacementQuestion",
+        back_populates="test",
+        lazy=True,
+        cascade="all, delete-orphan",
+        order_by="PlacementQuestion.ordre",
+    )
+
+    def __repr__(self):
+        return f"<PlacementTest {self.id}>"
+
+
+class PlacementQuestion(db.Model):
+    __tablename__ = "placement_question"
+
+    id = db.Column(db.Integer, primary_key=True)
+    test_id = db.Column(db.Integer, db.ForeignKey("placement_test.id"), nullable=False)
+    texte = db.Column(db.String(500), nullable=False)
+    type_question = db.Column(db.String(30), default="qcm")
+    image_url = db.Column(db.String(500))
+    audio_url = db.Column(db.String(500))
+    ordre = db.Column(db.Integer, default=0)
+
+    test = db.relationship("PlacementTest", back_populates="questions")
+    choix = db.relationship(
+        "PlacementChoix",
+        back_populates="question",
+        lazy=True,
+        cascade="all, delete-orphan",
+    )
+
+    def __repr__(self):
+        return f"<PlacementQuestion {self.id} test={self.test_id}>"
+
+
+class PlacementChoix(db.Model):
+    __tablename__ = "placement_choix"
+
+    id = db.Column(db.Integer, primary_key=True)
+    question_id = db.Column(db.Integer, db.ForeignKey("placement_question.id"), nullable=False)
+    texte = db.Column(db.String(300), nullable=False)
+    image_url = db.Column(db.String(500))
+    est_correct = db.Column(db.Boolean, default=False)
+
+    question = db.relationship("PlacementQuestion", back_populates="choix")
+
+    def __repr__(self):
+        return f"<PlacementChoix {self.id} question={self.question_id}>"
+
+
+class ResultatPlacement(db.Model):
+    __tablename__ = "resultat_placement"
+
+    id = db.Column(db.Integer, primary_key=True)
+    eleve_id = db.Column(
+        db.Integer,
+        db.ForeignKey("utilisateur.id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
+    )
+    niveau_assigne = db.Column(db.String(5), nullable=False)
+    score = db.Column(db.Float, nullable=False)
+    date_passage = db.Column(db.DateTime, default=datetime.utcnow)
+    a_passe = db.Column(db.Boolean, default=True)
+
+    eleve = db.relationship("Utilisateur", back_populates="resultat_placement", foreign_keys=[eleve_id])
+
+    def __repr__(self):
+        return f"<ResultatPlacement eleve={self.eleve_id} niveau={self.niveau_assigne}>"
+
+
+class Vocabulaire(db.Model):
+    __tablename__ = "vocabulaire"
+
+    id = db.Column(db.Integer, primary_key=True)
+    mot_arabe = db.Column(db.String(200), nullable=False, unique=True)
+    translitteration = db.Column(db.String(200))
+    traduction_fr = db.Column(db.String(300))
+    traduction_en = db.Column(db.String(300))
+    traduction_es = db.Column(db.String(300))
+    audio_url = db.Column(db.String(500))
+    exemple_phrase = db.Column(db.Text)
+    niveau_cefr = db.Column(db.String(5))
+    theme = db.Column(db.String(100))
+    est_pedagogique = db.Column(db.Boolean, default=False, nullable=False)
+    date_ajout = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Vocabulaire {self.mot_arabe}>"
+
+
 class Log(db.Model):
-    __tablename__ = 'log'
-    
+    __tablename__ = "log"
+
     id = db.Column(db.Integer, primary_key=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     level = db.Column(db.String(20), nullable=False)
     module = db.Column(db.String(100), nullable=False)
     action = db.Column(db.String(200), nullable=False)
     details = db.Column(db.Text)
-    utilisateur_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=True)
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=True)  # 🔥 ajout important
+    utilisateur_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id"), nullable=True)
     ip_address = db.Column(db.String(45))
-    
-    utilisateur = db.relationship('Utilisateur', back_populates='logs')
-    
+
+    utilisateur = db.relationship("Utilisateur", back_populates="logs")
+
     def __repr__(self):
-        return f'<Log {self.timestamp} {self.level} {self.action}>'
+        return f"<Log {self.timestamp} {self.level}>"
 
     def to_dict(self):
         return {
@@ -749,298 +822,51 @@ class Log(db.Model):
             "action": self.action,
             "details": self.details,
             "utilisateur_id": self.utilisateur_id,
-            "ip_address": self.ip_address
+            "ip_address": self.ip_address,
         }
 
-# -----------------------
-# Paramètres système
-# -----------------------
-class ParametreSysteme(db.Model):
-    __tablename__ = 'parametre_systeme'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    cle = db.Column(db.String(100), unique=True, nullable=False)
-    valeur = db.Column(db.Text, nullable=False)
-    description = db.Column(db.Text)
-    modifiable = db.Column(db.Boolean, default=True)
-    
-    def __repr__(self):
-        return f'<ParametreSysteme {self.cle}={self.valeur}>'
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "cle": self.cle,
-            "valeur": self.valeur,
-            "description": self.description,
-            "modifiable": self.modifiable
-        }
+class SystemSetting(db.Model):
+    __tablename__ = "system_setting"
 
-# -----------------------
-# Archives
-# -----------------------
-class ArchiveNote(db.Model):
-    __tablename__ = 'archive_note'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    eleve_id = db.Column(db.Integer, nullable=False)
-    cours_id = db.Column(db.Integer, nullable=False)
-    valeur = db.Column(db.Float, nullable=False)
-    coefficient = db.Column(db.Float, default=1.0)
-    type_evaluation = db.Column(db.String(50))
-    periode = db.Column(db.String(50))
-    date_evaluation = db.Column(db.DateTime)
-    
-    # NOUVEAU: Stocker aussi la classe et l'année scolaire
-    classe_id = db.Column(db.Integer, nullable=False)
-    annee_scolaire_id = db.Column(db.Integer, nullable=False)
-    archived_by = db.Column(db.Integer, db.ForeignKey('utilisateur.id'))
+    key = db.Column(db.String(100), primary_key=True)
+    value_json = db.Column(db.Text, nullable=False, default="null")
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
-    annee_scolaire = db.Column(db.String(20), nullable=False)
-    date_archivage = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<ArchiveNote {self.eleve_id} {self.cours_id} {self.valeur}>'
+    def get_value(self):
+        if not self.value_json:
+            return None
+        try:
+            return json.loads(self.value_json)
+        except (TypeError, ValueError):
+            return None
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "eleve_id": self.eleve_id,
-            "cours_id": self.cours_id,
-            "valeur": self.valeur,
-            "coefficient": self.coefficient,
-            "type_evaluation": self.type_evaluation,
-            "periode": self.periode,
-            "date_evaluation": self.date_evaluation.isoformat() if self.date_evaluation else None,
-            "classe_id": self.classe_id,
-            "annee_scolaire_id": self.annee_scolaire_id,
-            "annee_scolaire": self.annee_scolaire,
-            "date_archivage": self.date_archivage.isoformat() if self.date_archivage else None
-        }
-
-class ArchiveAbsence(db.Model):
-    __tablename__ = 'archive_absence'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    eleve_id = db.Column(db.Integer, nullable=False)
-    cours_id = db.Column(db.Integer, nullable=True)
-    date_absence = db.Column(db.Date, nullable=False)
-    motif = db.Column(db.String(200))
-    justifiee = db.Column(db.Boolean, default=False)
-    archived_by = db.Column(db.Integer, db.ForeignKey('utilisateur.id'))
-
-    # NOUVEAU: Stocker aussi la classe et l'année scolaire
-    classe_id = db.Column(db.Integer, nullable=False)
-    annee_scolaire_id = db.Column(db.Integer, nullable=False)
-    
-    annee_scolaire = db.Column(db.String(20), nullable=False)
-    date_archivage = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    def __repr__(self):
-        return f'<ArchiveAbsence {self.eleve_id} {self.date_absence}>'
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "eleve_id": self.eleve_id,
-            "cours_id": self.cours_id,
-            "date_absence": self.date_absence.isoformat() if self.date_absence else None,
-            "motif": self.motif,
-            "justifiee": self.justifiee,
-            "classe_id": self.classe_id,
-            "annee_scolaire_id": self.annee_scolaire_id,
-            "annee_scolaire": self.annee_scolaire,
-            "date_archivage": self.date_archivage.isoformat() if self.date_archivage else None
-        }
-
-# -----------------------
-# Synchronisation
-# -----------------------
-class SyncLog(db.Model):
-    __tablename__ = "sync_logs"
-
-    id = db.Column(db.Integer, primary_key=True)
-    data = db.Column(db.JSON, nullable=False)
-    source = db.Column(db.String(50), default="webapp")
-    status = db.Column(db.String(20), default="pending")  # pending / processed / error
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    processed_at = db.Column(db.DateTime, nullable=True)
+    def set_value(self, value):
+        self.value_json = json.dumps(value, ensure_ascii=False)
 
     def __repr__(self):
-        return f"<SyncLog {self.id} status={self.status}>"
+        return f"<SystemSetting {self.key}>"
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "data": self.data,
-            "source": self.source,
-            "status": self.status,
-            "created_at": self.created_at.isoformat() if self.created_at else None,
-            "processed_at": self.processed_at.isoformat() if self.processed_at else None
-        }
 
-# -----------------------
-# Inscriptions
-# -----------------------
-class Inscription(db.Model):
-    __tablename__ = "inscriptions"
-    
+class ActiveSession(db.Model):
+    __tablename__ = "active_session"
+
     id = db.Column(db.Integer, primary_key=True)
-    eleve_id = db.Column(db.Integer, db.ForeignKey("eleve.id"), nullable=False)
-    classe_id = db.Column(db.Integer, db.ForeignKey("classe.id"), nullable=False)
-    cours_id = db.Column(db.Integer, db.ForeignKey("cours.id"), nullable=True)
-    
-    # REMPLACER annee_scolaire par annee_scolaire_id
-    annee_scolaire_id = db.Column(db.Integer, db.ForeignKey('annee_scolaire.id'), nullable=False)
-    annee_scolaire = db.relationship('AnneeScolaire', back_populates='inscriptions')
-    
-    eleve = db.relationship("Eleve", backref="inscriptions", foreign_keys=[eleve_id])
-    classe = db.relationship("Classe", backref="inscriptions", foreign_keys=[classe_id])
-    cours = db.relationship("Cours", backref="inscriptions", foreign_keys=[cours_id])
+    session_token = db.Column(db.String(255), unique=True, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("utilisateur.id", ondelete="CASCADE"), nullable=False)
+    role_snapshot = db.Column(db.String(20), nullable=False)
+    ip_address = db.Column(db.String(45))
+    user_agent = db.Column(db.String(500))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    last_seen_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    revoked_at = db.Column(db.DateTime)
+    revoked_reason = db.Column(db.String(120))
 
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "eleve_id": self.eleve_id,
-            "classe_id": self.classe_id,
-            "cours_id": self.cours_id,
-            "annee_scolaire_id": self.annee_scolaire_id
-        }
+    user = db.relationship("Utilisateur", back_populates="active_sessions", foreign_keys=[user_id])
 
-@event.listens_for(Eleve, "after_insert")
-def creer_inscription(mapper, connection, target):
-    """Créer automatiquement une inscription quand un élève est ajouté."""
-    # Récupérer l'année scolaire active
-    annee_active = AnneeScolaire.query.filter_by(statut='active').first()
-    if not annee_active:
-        # Créer une année scolaire par défaut si aucune n'existe
-        annee_active = AnneeScolaire(
-            nom=f"{datetime.now().year}-{datetime.now().year+1}",
-            date_debut=date(datetime.now().year, 9, 1),
-            date_fin=date(datetime.now().year+1, 7, 31),
-            statut='active'
-        )
-        db.session.add(annee_active)
-        db.session.commit()
-    
-    connection.execute(
-        Inscription.__table__.insert().values(
-            eleve_id=target.id,
-            classe_id=target.classe_id,
-            cours_id=None,
-            annee_scolaire_id=annee_active.id
-        )
-    )
-
-# -----------------------
-# JournalCorrection
-# -----------------------
-class JournalCorrection(db.Model):
-    __tablename__ = 'journal_corrections'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    action = db.Column(db.String(50), nullable=False)       # ex: "modification", "suppression"
-    description = db.Column(db.String(255), nullable=False) # texte lisible
-    
-    ancienne_valeur = db.Column(db.Text, nullable=True)
-    nouvelle_valeur = db.Column(db.Text, nullable=True)
-
-    cible_type = db.Column(db.String(50), nullable=True)    # "note", "absence", "eleve"
-    cible_id = db.Column(db.Integer, nullable=True)
-
-    niveau = db.Column(db.String(20), default="info")       # info, warning, critique
-
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Relations
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=True)
-
-    ecole = db.relationship("Ecole", backref="corrections")
-    user = db.relationship("Utilisateur", backref="corrections")
-
-    def __repr__(self):
-        return f"<JournalCorrection {self.action} - {self.description}>"
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "action": self.action,
-            "description": self.description,
-            "ancienne_valeur": self.ancienne_valeur,
-            "nouvelle_valeur": self.nouvelle_valeur,
-            "cible_type": self.cible_type,
-            "cible_id": self.cible_id,
-            "niveau": self.niveau,
-            "date": self.date.isoformat() if self.date else None,
-            "ecole_id": self.ecole_id,
-            "user_id": self.user_id
-        }
-        
-class HistoriqueImport(db.Model):
-    __tablename__ = 'historique_import'
-    
-    id = db.Column(db.Integer, primary_key=True)
-    fichier = db.Column(db.String(200), nullable=False)
-    date_import = db.Column(db.DateTime, default=datetime.utcnow)
-    utilisateur_id = db.Column(db.Integer, db.ForeignKey('utilisateur.id'), nullable=False)
-    
-    # Relation vers l'utilisateur qui a fait l'import
-    utilisateur = db.relationship('Utilisateur', backref='imports')
-
-    # Propriété pour accéder à l'école via l'utilisateur
     @property
-    def ecole(self):
-        if self.utilisateur:
-            return self.utilisateur.ecole  # suppose que Utilisateur a une relation 'ecole'
-        return None
+    def is_active(self):
+        return self.revoked_at is None
 
     def __repr__(self):
-        return f"<HistoriqueImport {self.fichier} ({self.date_import})>"
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "fichier": self.fichier,
-            "date_import": self.date_import.isoformat() if self.date_import else None,
-            "utilisateur_id": self.utilisateur_id,
-            "ecole_id": self.ecole.id if self.ecole else None,
-            "ecole_nom": self.ecole.nom if self.ecole else None
-        }
-
-        
-        
-class Presence(db.Model):
-    __tablename__ = "presence"  # nom explicite de la table
-    id = db.Column(db.Integer, primary_key=True)
-    eleve_id = db.Column(db.Integer, db.ForeignKey("eleve.id"), nullable=False)
-    date = db.Column(db.Date, nullable=False, default=datetime.utcnow().date())
-    statut = db.Column(db.String(20), nullable=False)  # "present" / "absent"
-    heure = db.Column(db.String(5))       # exemple : "08:30"
-    matiere = db.Column(db.String(120))   # exemple : "Math"
-
-    eleve = db.relationship("Eleve", backref="presences")     
-    
-
-
-
-class PeriodeBulletin(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(50), nullable=False)   # Exemple : "Trimestre 1", "Semestre 1"
-    annee_id = db.Column(db.Integer, db.ForeignKey('annee_scolaire.id'), nullable=False)
-    ecole_id = db.Column(db.Integer, db.ForeignKey('ecole.id'), nullable=False)
-    publie = db.Column(db.Boolean, default=False)    # False = désactivé, True = activé
-    date_publication = db.Column(db.DateTime)        # Quand admin clique sur "Publier"
-    periode_active = db.Column(db.Boolean, default=False)  # Période actuellement active
-    
-    # Relations
-    annee = db.relationship('AnneeScolaire', backref='periodes_bulletin')
-    ecole = db.relationship('Ecole', backref='periodes_bulletin')
-
-    # Timestamps
-    created_at = db.Column(db.DateTime, default=db.func.now())
-    updated_at = db.Column(db.DateTime, default=db.func.now(), onupdate=db.func.now())
-
-    # Méthode utilitaire
-    def est_active(self):
-        return self.publie and self.periode_active
+        return f"<ActiveSession user={self.user_id} active={self.is_active}>"

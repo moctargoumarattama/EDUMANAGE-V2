@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Gamification | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="admin-dashboard-shell admin-page-shell gamification-admin-shell">
+    <div class="page-header">
+        <div class="admin-page-heading">
+            <h1 class="h3 fw-bold mb-1">Badges et notifications eleves</h1>
+            <p class="text-muted mb-0">
+                <i class="bi bi-bell me-1"></i>Reglez les recompenses visibles par les eleves avec des mots simples et des actions claires.
+            </p>
+        </div>
+        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-platform">
+            <i class="bi bi-arrow-left me-2"></i>Retour au dashboard
+        </a>
+    </div>
+
+    <div class="card-platform p-4 p-lg-5 mb-4 gamification-guide-card">
+        <div class="d-flex flex-column flex-xl-row gap-4 align-items-start justify-content-between">
+            <div class="gamification-guide-copy">
+                <span class="gamification-guide-eyebrow">Aide rapide</span>
+                <h2 class="h4 fw-bold mb-2">A quoi sert cette page ?</h2>
+                <p class="text-muted mb-0">
+                    Cette page vous permet de regler les badges et les rappels sans toucher au code.
+                    Vous choisissez quand un eleve gagne une recompense, ce qu'il lit a l'ecran et pendant combien de temps il voit ses badges recents.
+                </p>
+            </div>
+            <div class="gamification-guide-note">
+                <div class="fw-semibold mb-1">Ce que l'eleve voit</div>
+                <p class="mb-0 text-muted">
+                    Un eleve voit le nom du badge, sa description et la recompense obtenue dans son espace.
+                    Plus le message est simple, plus il comprend ce qu'il a reussi.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-3 mt-1">
+            <div class="col-12 col-md-4">
+                <div class="gamification-mini-card">
+                    <div class="gamification-mini-icon"><i class="bi bi-sliders"></i></div>
+                    <h3 class="h6 fw-bold mb-2">Reglages generaux</h3>
+                    <p class="mb-0 text-muted">Vous reglez ici le delai avant alerte et la duree de l'historique des badges.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="gamification-mini-card">
+                    <div class="gamification-mini-icon"><i class="bi bi-plus-circle"></i></div>
+                    <h3 class="h6 fw-bold mb-2">Creer un nouveau badge</h3>
+                    <p class="mb-0 text-muted">Vous ajoutez une recompense avec un nom, une regle simple et un objectif chiffre.</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-4">
+                <div class="gamification-mini-card">
+                    <div class="gamification-mini-icon"><i class="bi bi-pencil-square"></i></div>
+                    <h3 class="h6 fw-bold mb-2">Badges deja en place</h3>
+                    <p class="mb-0 text-muted">Vous pouvez relire, corriger ou desactiver un badge sans casser le reste de la plateforme.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-lg-5">
+            <div class="card-platform p-4 h-100">
+                <div class="d-flex flex-column gap-2 mb-3">
+                    <h2 class="h5 fw-bold mb-0">Reglages generaux</h2>
+                    <p class="text-muted mb-0">Ces reglages s'appliquent a tous les eleves. Ils servent surtout a definir quand relancer l'attention et combien de temps afficher les badges recents.</p>
+                </div>
+                <form method="POST" class="d-grid gap-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="form_name" value="settings">
+
+                    <div class="gamification-field-card">
+                        <label class="form-label fw-semibold">Alerte "serie en danger" apres</label>
+                        <div class="input-group">
+                            <input type="number" min="1" class="form-control" name="streak_risk_hours" value="{{ streak_risk_hours }}">
+                            <span class="input-group-text">heures</span>
+                        </div>
+                        <div class="form-text">Si un eleve ne revient pas pendant ce delai, la plateforme peut lui signaler que sa serie risque de se casser.</div>
+                        <div class="gamification-example">Exemple : 48 heures = environ 2 jours sans activite.</div>
+                    </div>
+
+                    <div class="gamification-field-card">
+                        <label class="form-label fw-semibold">Badges recents visibles pendant</label>
+                        <div class="input-group">
+                            <input type="number" min="1" class="form-control" name="badge_history_days" value="{{ badge_history_days }}">
+                            <span class="input-group-text">jours</span>
+                        </div>
+                        <div class="form-text">Cela definit pendant combien de jours un badge recent reste facile a retrouver dans l'espace eleve.</div>
+                        <div class="gamification-example">Exemple : 30 jours = l'eleve voit ses recompenses du dernier mois.</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary-platform">Enregistrer</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-7">
+            <div class="card-platform p-4 h-100">
+                <div class="d-flex flex-column gap-2 mb-3">
+                    <h2 class="h5 fw-bold mb-0">Creer un nouveau badge</h2>
+                    <p class="text-muted mb-0">Un badge donne un objectif simple a l'eleve. Remplissez les zones ci-dessous avec un nom clair et une condition facile a comprendre.</p>
+                </div>
+
+                <div class="gamification-rules-panel mb-4">
+                    <div class="fw-semibold mb-2">Conditions disponibles</div>
+                    <div class="row g-2">
+                        {% for rule_type in badge_rule_types %}
+                            <div class="col-12 col-md-4">
+                                <div class="gamification-rule-chip">
+                                    <div class="fw-semibold">{{ badge_rule_meta[rule_type].label }}</div>
+                                    <div class="small text-muted">{{ badge_rule_meta[rule_type].example }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <form method="POST" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <input type="hidden" name="form_name" value="badge">
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Code interne du badge</label>
+                        <input type="text" class="form-control" name="slug" placeholder="expert-alphabet" required>
+                        <div class="form-text">Ce code sert a reconnaitre le badge en interne. Gardez-le court, simple et sans espace.</div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold">Nom visible pour l'eleve</label>
+                        <input type="text" class="form-control" name="name" placeholder="Expert en alphabet" required>
+                        <div class="form-text">C'est le titre que l'eleve lira quand il gagne le badge.</div>
+                    </div>
+
+                    <div class="col-md-7">
+                        <label class="form-label fw-semibold">Phrase affichee a l'eleve</label>
+                        <input type="text" class="form-control" name="description" placeholder="Debloque apres 3 lecons terminees">
+                        <div class="form-text">Gardez une phrase courte, positive et concrete.</div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Lien de l'image (optionnel)</label>
+                        <input type="text" class="form-control" name="image_url" placeholder="/static/icons/icon-192.png">
+                        <div class="form-text">Vous pouvez laisser vide si vous voulez utiliser une image plus tard.</div>
+                    </div>
+
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Condition de declenchement</label>
+                        <select class="form-select" name="rule_type" required>
+                            {% for rule_type in badge_rule_types %}
+                                <option value="{{ rule_type }}">{{ badge_rule_meta[rule_type].label }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">Choisissez ce que l'eleve doit atteindre pour recevoir ce badge.</div>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold">Objectif a atteindre</label>
+                        <input type="number" min="1" class="form-control" name="threshold" value="1" required>
+                        <div class="form-text">Entrez le nombre attendu. Exemple : 3 lecons ou 100 points.</div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold d-block">Activation</label>
+                        <div class="form-check form-switch mt-2">
+                            <input type="hidden" name="is_active" value="0">
+                            <input class="form-check-input" type="checkbox" name="is_active" value="1" checked>
+                            <label class="form-check-label">Activer tout de suite</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="gamification-student-preview">
+                            <div class="fw-semibold mb-1">Ce que l'eleve voit</div>
+                            <p class="mb-0 text-muted">Une fois le badge obtenu, l'eleve voit son nom, sa phrase d'explication et la recompense dans son espace personnel.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary-platform">Creer le badge</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-platform p-4">
+        <div class="page-header mb-3">
+            <div>
+                <h2 class="h5 fw-bold mb-1">Badges deja en place</h2>
+                <p class="text-muted mb-0">Chaque badge peut etre relu et modifie ici. Vous voyez d'abord sa fonction, puis vous pouvez ajuster ses champs.</p>
+            </div>
+        </div>
+
+        {% if badges %}
+            <div class="d-grid gap-3">
+                {% for card in badge_cards %}
+                    {% set badge = card.badge %}
+                    <form method="POST" class="row g-3 border rounded-4 p-3 bg-white gamification-badge-editor">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="hidden" name="form_name" value="badge">
+                        <input type="hidden" name="badge_id" value="{{ badge.id }}">
+
+                        <div class="col-12">
+                            <div class="gamification-badge-summary">
+                                <div class="gamification-badge-summary-main">
+                                    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                        <h3 class="h6 fw-bold mb-0">{{ badge.name }}</h3>
+                                        <span class="gamification-status-pill {% if badge.is_active %}is-active{% else %}is-inactive{% endif %}">{{ card.status_label }}</span>
+                                    </div>
+                                    <p class="mb-2 text-muted">{{ card.condition_summary }}</p>
+                                    <div class="small text-muted">{{ card.effect_summary }}</div>
+                                </div>
+                                <div class="gamification-badge-summary-side">
+                                    <div class="fw-semibold">{{ card.rule_label }}</div>
+                                    <div class="small text-muted">Objectif actuel : {{ badge.threshold }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Code interne</label>
+                            <input type="text" class="form-control" name="slug" value="{{ badge.slug }}" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Nom visible</label>
+                            <input type="text" class="form-control" name="name" value="{{ badge.name }}" required>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Condition</label>
+                            <select class="form-select" name="rule_type" required>
+                                {% for rule_type in badge_rule_types %}
+                                    <option value="{{ rule_type }}" {% if badge.rule_type == rule_type %}selected{% endif %}>{{ badge_rule_meta[rule_type].label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="col-md-3">
+                            <label class="form-label fw-semibold">Objectif</label>
+                            <input type="number" min="1" class="form-control" name="threshold" value="{{ badge.threshold }}" required>
+                        </div>
+
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Message visible pour l'eleve</label>
+                            <input type="text" class="form-control" name="description" value="{{ badge.description or '' }}">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Lien image</label>
+                            <input type="text" class="form-control" name="image_url" value="{{ badge.image_url or '' }}">
+                        </div>
+
+                        <div class="col-12">
+                            <div class="gamification-student-preview compact">
+                                <div class="fw-semibold mb-1">Ce que l'eleve voit</div>
+                                <p class="mb-0 text-muted">{{ badge.description or "Ajoutez une phrase simple pour expliquer la recompense obtenue." }}</p>
+                            </div>
+                        </div>
+
+                        <div class="col-12 d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div class="form-check form-switch">
+                                <input type="hidden" name="is_active" value="0">
+                                <input class="form-check-input" type="checkbox" name="is_active" value="1" {% if badge.is_active %}checked{% endif %}>
+                                <label class="form-check-label">Badge actif</label>
+                            </div>
+                            <button type="submit" class="btn btn-outline-platform">Mettre a jour</button>
+                        </div>
+                    </form>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <i class="bi bi-award fs-1 d-block mb-2 opacity-25"></i>
+                Aucun badge configure pour le moment.
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="app-auth-fingerprint" content="{% if current_user.is_authenticated %}user:{{ current_user.id }}:{{ current_user.role }}{% else %}anonymous{% endif %}">
+    <title>{% block title %}Maintenance | LabeeB Arabic{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <meta data-app-head-boundary="start">
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --panel: rgba(255, 255, 255, 0.94);
+            --panel-soft: #eef6ff;
+            --border: rgba(15, 23, 42, 0.1);
+            --text: #0f172a;
+            --muted: #64748b;
+            --accent: #0f766e;
+            --accent-soft: rgba(15, 118, 110, 0.12);
+            --success: #15803d;
+            --warning: #b45309;
+            --danger: #b91c1c;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+            min-height: 100vh;
+        }
+        .maintenance-shell {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+        .maintenance-sidebar {
+            background:
+                radial-gradient(circle at top, rgba(45, 212, 191, 0.18), transparent 32%),
+                linear-gradient(180deg, #0f172a 0%, #111827 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 24px 18px;
+        }
+        .maintenance-brand {
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+        .maintenance-nav a {
+            display: block;
+            color: rgba(226, 232, 240, 0.82);
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 14px;
+            margin-bottom: 8px;
+            transition: background 0.2s ease, transform 0.2s ease, color 0.2s ease;
+        }
+        .maintenance-nav a.active,
+        .maintenance-nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(2px);
+        }
+        .maintenance-main {
+            padding: 28px;
+            background:
+                radial-gradient(circle at top, rgba(15, 118, 110, 0.08), transparent 28%),
+                linear-gradient(180deg, #f8fbff 0%, #f4f7fb 100%);
+        }
+        .tech-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: 0 20px 50px rgba(15, 23, 42, 0.06);
+        }
+        .tech-stat {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.98));
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 20px;
+            height: 100%;
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
+        }
+        .tech-label {
+            color: var(--muted);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+        .tech-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-top: 8px;
+            line-height: 1.1;
+        }
+        .tech-note {
+            color: var(--muted);
+            margin-top: 10px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .log-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px;
+            min-height: 420px;
+            white-space: pre-wrap;
+            word-break: break-word;
+            color: #334155;
+        }
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--text);
+            font-weight: 600;
+        }
+        .status-ok { color: var(--success); }
+        .status-warn { color: var(--warning); }
+        .status-danger { color: var(--danger); }
+        .result-box {
+            display: none;
+            margin-top: 12px;
+            padding: 16px;
+            border-radius: 18px;
+            border: 1px solid var(--border);
+            background: #ffffff;
+            color: var(--text);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+        }
+        .result-box--success {
+            border-color: rgba(21, 128, 61, 0.18);
+            background: rgba(240, 253, 244, 0.96);
+        }
+        .result-box--error {
+            border-color: rgba(185, 28, 28, 0.18);
+            background: rgba(254, 242, 242, 0.96);
+        }
+        .result-box__header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .result-box__icon {
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            background: rgba(15, 23, 42, 0.08);
+            font-size: 1.1rem;
+        }
+        .result-box--success .result-box__icon {
+            background: rgba(21, 128, 61, 0.12);
+            color: var(--success);
+        }
+        .result-box--error .result-box__icon {
+            background: rgba(185, 28, 28, 0.12);
+            color: var(--danger);
+        }
+        .result-box__title {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .result-box__message {
+            color: #334155;
+            line-height: 1.6;
+        }
+        .result-box__chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+        .result-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 6px 12px;
+            background: rgba(15, 23, 42, 0.06);
+            color: #0f172a;
+            font-size: 0.88rem;
+            font-weight: 600;
+        }
+        .result-box__details {
+            display: grid;
+            gap: 8px;
+            margin-top: 14px;
+        }
+        .result-box__detail {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(15, 23, 42, 0.08);
+        }
+        .result-box__detail-label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        .result-box__detail-value {
+            color: var(--text);
+            text-align: right;
+            word-break: break-word;
+        }
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .tech-table th,
+        .tech-table td {
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+        .tech-table th {
+            color: var(--muted);
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .tech-table tbody tr:hover {
+            background: rgba(15, 118, 110, 0.04);
+        }
+        .tech-input,
+        .tech-select {
+            width: 100%;
+            background: #ffffff;
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 12px;
+        }
+        .tech-grid {
+            display: grid;
+            gap: 16px;
+        }
+        .tech-grid--filters {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        }
+        .tech-kv {
+            display: grid;
+            grid-template-columns: minmax(170px, 240px) 1fr;
+            gap: 8px 16px;
+        }
+        .tech-kv-label {
+            color: var(--muted);
+            font-weight: 600;
+        }
+        .alert-banner {
+            border: 1px solid transparent;
+            border-radius: 18px;
+            padding: 16px 18px;
+            margin-bottom: 16px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+        }
+        .alert-banner--warning {
+            background: rgba(254, 243, 199, 0.75);
+            border-color: rgba(180, 83, 9, 0.16);
+            color: #92400e;
+        }
+        .alert-banner--danger {
+            background: rgba(254, 226, 226, 0.78);
+            border-color: rgba(185, 28, 28, 0.16);
+            color: #991b1b;
+        }
+        .alert-banner--info {
+            background: rgba(204, 251, 241, 0.72);
+            border-color: rgba(13, 148, 136, 0.14);
+            color: #115e59;
+        }
+        .page-kicker {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        .page-title {
+            margin: 0;
+            font-size: clamp(1.8rem, 2.2vw, 2.5rem);
+            font-weight: 800;
+        }
+        .page-subtitle {
+            color: var(--muted);
+            margin: 10px 0 0;
+            max-width: 760px;
+            line-height: 1.7;
+        }
+        @media (max-width: 992px) {
+            .maintenance-shell {
+                grid-template-columns: 1fr;
+            }
+            .maintenance-sidebar {
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+            }
+            .maintenance-main {
+                padding: 20px;
+            }
+            .result-box__detail {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+    <meta data-app-head-boundary="end">
+</head>
+<body>
+    {% set endpoint = request.endpoint or '' %}
+    <div class="maintenance-shell">
+        <aside id="app-navbar" class="maintenance-sidebar">
+            <a class="maintenance-brand" href="{{ url_for('maintenance.dashboard') }}">
+                <i class="bi bi-tools"></i>
+                <span>Maintenance</span>
+            </a>
+            <div class="maintenance-nav">
+                <a class="{% if endpoint == 'maintenance.dashboard' %}active{% endif %}" href="{{ url_for('maintenance.dashboard') }}">
+                    <i class="bi bi-activity me-2"></i>Centre
+                </a>
+                <a class="{% if endpoint == 'maintenance.logs' %}active{% endif %}" href="{{ url_for('maintenance.logs') }}">
+                    <i class="bi bi-file-text me-2"></i>Journal
+                </a>
+                <a class="{% if endpoint == 'maintenance.migrations' %}active{% endif %}" href="{{ url_for('maintenance.migrations') }}">
+                    <i class="bi bi-diagram-3 me-2"></i>Historique
+                </a>
+                <a class="{% if endpoint == 'maintenance.backups' %}active{% endif %}" href="{{ url_for('maintenance.backups') }}">
+                    <i class="bi bi-save me-2"></i>Sauvegardes
+                </a>
+                <a class="{% if endpoint == 'maintenance.active_sessions' %}active{% endif %}" href="{{ url_for('maintenance.active_sessions') }}">
+                    <i class="bi bi-person-badge me-2"></i>Connexions
+                </a>
+                <a class="{% if endpoint == 'maintenance.diagnostic' %}active{% endif %}" href="{{ url_for('maintenance.diagnostic') }}">
+                    <i class="bi bi-cpu me-2"></i>Configuration
+                </a>
+                <a class="{% if endpoint == 'maintenance.push_subscriptions' %}active{% endif %}" href="{{ url_for('maintenance.push_subscriptions') }}">
+                    <i class="bi bi-bell me-2"></i>Notifications
+                </a>
+                <a class="{% if endpoint == 'maintenance.audit' %}active{% endif %}" href="{{ url_for('maintenance.audit') }}">
+                    <i class="bi bi-journal-text me-2"></i>Activite
+                </a>
+                <a href="{{ url_for('main.logout') }}">
+                    <i class="bi bi-box-arrow-right me-2"></i>Deconnexion
+                </a>
+            </div>
+        </aside>
+
+        <main id="app-main" class="maintenance-main" data-app-region="main">
+            <div id="app-flash-stack">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        {% set mapped = 'success' if category == 'success' else 'danger' if category in ['danger', 'error'] else 'warning' if category == 'warning' else 'info' %}
+                        <div class="alert alert-{{ mapped }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            </div>
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/page-init.js') }}"></script>
+    <script>
+        function csrfHeaders() {
+            const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            return {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': token
+            };
+        }
+
+        function formatNumber(value) {
+            if (typeof value !== 'number' || Number.isNaN(value)) {
+                return value;
+            }
+            return new Intl.NumberFormat('fr-FR').format(value);
+        }
+
+        function formatBytes(value) {
+            if (typeof value !== 'number' || Number.isNaN(value)) {
+                return null;
+            }
+            if (value < 1024) {
+                return `${formatNumber(value)} o`;
+            }
+            const units = ['Ko', 'Mo', 'Go', 'To'];
+            let size = value / 1024;
+            let unitIndex = 0;
+            while (size >= 1024 && unitIndex < units.length - 1) {
+                size /= 1024;
+                unitIndex += 1;
+            }
+            return `${size.toFixed(size >= 10 ? 0 : 1)} ${units[unitIndex]}`;
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function cacheZoneLabel(zone) {
+            return {
+                app: "de l'application",
+                piper: 'audio',
+                all: 'complet'
+            }[zone] || zone || 'selectionne';
+        }
+
+        function formatKeyLabel(key) {
+            return String(key || '')
+                .replace(/_/g, ' ')
+                .replace(/\b\w/g, (char) => char.toUpperCase());
+        }
+
+        function primitiveDetailsFromObject(data, excludedKeys = []) {
+            return Object.entries(data || {})
+                .filter(([key, value]) => !excludedKeys.includes(key) && value !== null && value !== undefined && typeof value !== 'object')
+                .map(([key, value]) => {
+                    let finalValue = value;
+                    if (typeof value === 'number') {
+                        finalValue = formatNumber(value);
+                    } else if (typeof value === 'boolean') {
+                        finalValue = value ? 'Oui' : 'Non';
+                    }
+                    return { label: formatKeyLabel(key), value: finalValue };
+                });
+        }
+
+        function buildMaintenanceResultState(url, data, payload, ok) {
+            if (!ok || data?.success === false) {
+                return {
+                    tone: 'error',
+                    title: 'Action non effectuee',
+                    message: data?.message || 'Cette action n a pas pu etre terminee.',
+                    chips: [],
+                    details: primitiveDetailsFromObject(data, ['success', 'message'])
+                };
+            }
+
+            if (url.includes('/backup')) {
+                return {
+                    tone: 'success',
+                    title: 'Sauvegarde creee',
+                    message: `${data.filename || 'La sauvegarde'} est disponible et prete a etre utilisee.`,
+                    chips: [
+                        data.size ? `Taille: ${formatBytes(data.size)}` : null,
+                        Array.isArray(data.deleted) ? `${formatNumber(data.deleted.length)} ancien(s) fichier(s) nettoye(s)` : null
+                    ].filter(Boolean),
+                    details: [
+                        data.filename ? { label: 'Nom', value: data.filename } : null,
+                        data.sha256 ? { label: 'Code de verification', value: `${data.sha256.slice(0, 16)}...` } : null
+                    ].filter(Boolean)
+                };
+            }
+
+            if (url.includes('/vider-cache')) {
+                const zone = data.zone || payload?.zone || 'all';
+                return {
+                    tone: 'success',
+                    title: 'Nettoyage termine',
+                    message: `Le cache ${cacheZoneLabel(zone)} a ete vide avec succes.`,
+                    chips: [
+                        `Elements supprimes: ${formatNumber(data.total_removed || 0)}`,
+                        `Zone: ${cacheZoneLabel(zone)}`
+                    ],
+                    details: Object.entries(data.removed || {}).map(([key, value]) => ({
+                        label: formatKeyLabel(key),
+                        value: `${formatNumber(value)} element(s)`
+                    }))
+                };
+            }
+
+            if (url.includes('/envoyer-rappel')) {
+                return {
+                    tone: 'success',
+                    title: 'Rappel envoye',
+                    message: `${formatNumber(data.envoyes || 0)} notification(s) envoyee(s) sur ${formatNumber(data.cibles || 0)} cible(s).`,
+                    chips: [
+                        `Cibles: ${formatNumber(data.cibles || 0)}`,
+                        `Envois: ${formatNumber(data.envoyes || 0)}`,
+                        `Push: ${formatNumber(data.push_sent || 0)}`
+                    ],
+                    details: data.threshold_hours !== undefined ? [
+                        { label: 'Seuil de rappel', value: `${formatNumber(data.threshold_hours)} heure(s)` }
+                    ] : []
+                };
+            }
+
+            if (url.includes('/mode')) {
+                const enabled = Boolean(data.maintenance_mode?.enabled);
+                return {
+                    tone: 'success',
+                    title: enabled ? 'Maintenance activee' : 'Maintenance desactivee',
+                    message: enabled
+                        ? 'Le site public est maintenant limite aux comptes autorises.'
+                        : 'Le site public est de nouveau accessible a tous les utilisateurs.',
+                    chips: [enabled ? 'Statut: filtre actif' : 'Statut: acces public'],
+                    details: data.maintenance_mode?.note ? [
+                        { label: 'Note', value: data.maintenance_mode.note }
+                    ] : []
+                };
+            }
+
+            if (url.includes('/sessions/revoke-all')) {
+                const includeCurrent = Boolean(data.include_current);
+                return {
+                    tone: 'success',
+                    title: 'Deconnexion lancee',
+                    message: includeCurrent
+                        ? `${formatNumber(data.revoked || 0)} session(s) ont ete fermee(s), y compris la votre.`
+                        : `${formatNumber(data.revoked || 0)} session(s) ont ete fermee(s), sauf la votre.`,
+                    chips: [`Sessions fermees: ${formatNumber(data.revoked || 0)}`],
+                    details: []
+                };
+            }
+
+            if (url.includes('/sessions/user/')) {
+                return {
+                    tone: 'success',
+                    title: 'Utilisateur deconnecte',
+                    message: `${formatNumber(data.revoked || 0)} session(s) ont ete fermee(s) pour cet utilisateur.`,
+                    chips: [`Sessions fermees: ${formatNumber(data.revoked || 0)}`],
+                    details: data.user_id ? [{ label: 'Utilisateur', value: `#${data.user_id}` }] : []
+                };
+            }
+
+            if (url.includes('/push-subscriptions/')) {
+                return {
+                    tone: 'success',
+                    title: 'Notification desactivee',
+                    message: 'Cet abonnement push a bien ete desactive.',
+                    chips: data.subscription_id ? [`Abonnement #${data.subscription_id}`] : [],
+                    details: []
+                };
+            }
+
+            return {
+                tone: 'success',
+                title: 'Action terminee',
+                message: data?.message || 'L operation a ete effectuee avec succes.',
+                chips: [],
+                details: primitiveDetailsFromObject(data, ['success', 'message'])
+            };
+        }
+
+        function renderMaintenanceResult(resultBox, state) {
+            const chips = (state.chips || [])
+                .filter(Boolean)
+                .map((chip) => `<span class="result-chip">${escapeHtml(chip)}</span>`)
+                .join('');
+            const details = (state.details || [])
+                .filter((item) => item && item.value !== null && item.value !== undefined && item.value !== '')
+                .map((item) => `
+                    <div class="result-box__detail">
+                        <span class="result-box__detail-label">${escapeHtml(item.label)}</span>
+                        <span class="result-box__detail-value">${escapeHtml(item.value)}</span>
+                    </div>
+                `)
+                .join('');
+            const icon = state.tone === 'error' ? 'bi-exclamation-octagon' : 'bi-check2-circle';
+
+            resultBox.className = `result-box result-box--${state.tone === 'error' ? 'error' : 'success'}`;
+            resultBox.innerHTML = `
+                <div class="result-box__header">
+                    <span class="result-box__icon"><i class="bi ${icon}"></i></span>
+                    <div class="result-box__title">${escapeHtml(state.title || 'Resultat')}</div>
+                </div>
+                <div class="result-box__message">${escapeHtml(state.message || '')}</div>
+                ${chips ? `<div class="result-box__chips">${chips}</div>` : ''}
+                ${details ? `<div class="result-box__details">${details}</div>` : ''}
+            `;
+        }
+
+        async function postMaintenanceAction(url, resultId, payload = {}, options = {}) {
+            const resultBox = document.getElementById(resultId);
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: csrfHeaders(),
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (resultBox) {
+                    resultBox.style.display = 'block';
+                    renderMaintenanceResult(resultBox, buildMaintenanceResultState(url, data, payload, response.ok));
+                }
+                if (options.reloadOnSuccess && response.ok) {
+                    window.setTimeout(() => window.location.reload(), options.reloadDelay || 900);
+                }
+            } catch (error) {
+                if (resultBox) {
+                    resultBox.style.display = 'block';
+                    renderMaintenanceResult(resultBox, {
+                        tone: 'error',
+                        title: 'Action non effectuee',
+                        message: 'Une erreur est survenue pendant l operation.',
+                        chips: [],
+                        details: [{ label: 'Detail', value: error.toString() }]
+                    });
+                }
+            }
+        }
+
+        function postMaintenanceActionFromButton(button) {
+            if (!button) {
+                return false;
+            }
+
+            let payload = {};
+            let options = {};
+
+            try {
+                payload = button.dataset.payload ? JSON.parse(button.dataset.payload) : {};
+                options = button.dataset.options ? JSON.parse(button.dataset.options) : {};
+            } catch (error) {
+                console.error('Invalid maintenance action payload', error);
+                return false;
+            }
+
+            postMaintenanceAction(
+                button.dataset.url,
+                button.dataset.resultId,
+                payload,
+                options
+            );
+            return false;
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/native-nav.js') }}"></script>
+    <div id="app-page-scripts" hidden>{% block extra_js %}{% endblock %}</div>
+</body>
+</html>

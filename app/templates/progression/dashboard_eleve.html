@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Ma progression') }} | LabeeB Arabic{% endblock %}
+
+{% block extra_css %}
+<style>
+.gamification-hero {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: #fff;
+}
+
+.xp-highlight {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 14px;
+    padding: 1rem 1.25rem;
+}
+
+.cours-chemin-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.chemin-lecon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.lecon-cercle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border: 4px solid;
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-decoration: none;
+    position: relative;
+    z-index: 1;
+}
+
+.lecon-cercle:hover {
+    transform: scale(1.1);
+}
+
+.lecon-cercle.terminee {
+    background: #f0fdf4;
+    border-color: #16a34a;
+    color: #16a34a;
+}
+
+.lecon-cercle.courante {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #2563eb;
+    animation: pulse-blue 2s infinite;
+}
+
+.lecon-cercle.verrouillee {
+    background: #f9fafb;
+    border-color: #d1d5db;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.chemin-ligne {
+    width: 4px;
+    height: 40px;
+    background: #e5e7eb;
+    margin: -2px 0;
+}
+
+.chemin-ligne.terminee {
+    background: #16a34a;
+}
+
+.chemin-item {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 1rem;
+    align-items: start;
+}
+
+.chemin-meta {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem 1.1rem;
+    background: #fff;
+}
+
+.chemin-meta.current {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+
+.chemin-meta.done {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+}
+
+@keyframes pulse-blue {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37,99,235,0.4); }
+  50% { box-shadow: 0 0 0 12px rgba(37,99,235,0); }
+}
+
+@media (max-width: 768px) {
+    .chemin-item {
+        grid-template-columns: 70px 1fr;
+    }
+
+    .lecon-cercle {
+        width: 56px;
+        height: 56px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="card-platform gamification-hero p-4 p-lg-5 mb-4" data-progress-stream="xp">
+    <div class="row g-3 align-items-center">
+        <div class="col-lg-6">
+            <h1 class="h3 fw-bold mb-2">{{ _("Mon parcours d'apprentissage") }}</h1>
+            <p class="mb-0 opacity-75">
+                {{ _("Continue tes leçons, garde ta série active et débloque les étapes suivantes.") }}
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <div class="row g-3">
+                <div class="col-4">
+                    <div class="xp-highlight text-center">
+                        <div class="small text-white-50 mb-1">{{ _('Points XP') }}</div>
+                        <div class="fs-3 fw-bold" data-xp-points>{{ xp.points or 0 }}</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="xp-highlight text-center">
+                        <div class="small text-white-50 mb-1">{{ _('Jours consécutifs') }}</div>
+                        <div class="fs-3 fw-bold" data-xp-streak>{{ xp.streak_jours or 0 }}</div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="xp-highlight text-center">
+                        <div class="small text-white-50 mb-1">{{ _('Leçons terminées') }}</div>
+                        <div class="fs-3 fw-bold" data-xp-lessons>{{ xp.total_lecons_terminees or 0 }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="page-header">
+    <div>
+        <h2 class="h4 fw-bold mb-1">{{ _('Mes cours inscrits') }}</h2>
+        <p class="text-muted mb-0">{{ _('Chaque chemin avance de leçon en leçon, comme une carte de progression.') }}</p>
+    </div>
+    <a href="{{ url_for('courses.liste') }}" class="btn btn-outline-platform">
+        <i class="bi bi-book me-2"></i>{{ _('Voir les cours') }}
+    </a>
+</div>
+
+{% if progression_data %}
+    <div class="d-grid gap-4">
+        {% for item in progression_data %}
+            <div class="card-platform p-4 cours-chemin-card">
+                <div class="page-header mb-4">
+                    <div>
+                        <h3 class="h5 fw-bold mb-1">{{ item.cours.nom }}</h3>
+                        <p class="text-muted mb-0">
+                            <span class="badge-niveau badge-{{ item.cours.niveau }}">{{ item.cours.niveau }}</span>
+                            <span class="ms-2">{{ item.cours.enseignant_nom }}</span>
+                        </p>
+                    </div>
+                    <div class="d-flex flex-wrap gap-3 small">
+                        <span class="badge text-bg-light">{{ item.pourcentage }}%</span>
+                        <span class="text-muted">{{ _('%(seen)s/%(total)s leçons vues', seen=item.lecons_vues, total=item.total_lecons) }}</span>
+                        <span class="text-muted">
+                            {{ _('Score moyen') }} : {% if item.score_moyen is not none %}{{ item.score_moyen }}%{% else %}-{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                {% if item.lecons_path %}
+                    <div class="d-grid gap-0">
+                        {% for step in item.lecons_path %}
+                            <div class="chemin-item">
+                                <div class="chemin-lecon">
+                                    {% if step.est_debloquee %}
+                                        <a
+                                            href="{{ url_for('lessons.start', lecon_id=step.lecon.id) }}"
+                                            class="lecon-cercle {% if step.est_terminee %}terminee{% elif step.est_courante %}courante{% endif %}"
+                                            title="{% if step.est_terminee %}{{ _('Leçon terminée') }}{% elif step.est_courante %}{{ _('Leçon en cours') }}{% else %}{{ _('Leçon débloquée') }}{% endif %}"
+                                        >
+                                            {% if step.est_terminee %}
+                                                ★
+                                            {% elif step.est_courante %}
+                                                ▶
+                                            {% else %}
+                                                ○
+                                            {% endif %}
+                                        </a>
+                                    {% else %}
+                                        <span
+                                            class="lecon-cercle verrouillee"
+                                            title="{{ _('Termine d’abord la leçon précédente') }}"
+                                        >
+                                            🔒
+                                        </span>
+                                    {% endif %}
+                                    {% if not loop.last %}
+                                        <div class="chemin-ligne {% if step.est_terminee %}terminee{% endif %}"></div>
+                                    {% endif %}
+                                </div>
+
+                                <div class="chemin-meta {% if step.est_terminee %}done{% elif step.est_courante %}current{% endif %}">
+                                    <div class="d-flex justify-content-between align-items-start gap-2 mb-1">
+                                        <h4 class="h6 fw-bold mb-0">{{ step.lecon.titre }}</h4>
+                                        {% if step.est_terminee %}
+                                            <span class="badge text-bg-success">{{ _('Terminé') }}</span>
+                                        {% elif step.est_courante %}
+                                            <span class="badge text-bg-primary">{{ _('En cours') }}</span>
+                                        {% elif step.est_debloquee %}
+                                            <span class="badge text-bg-light">{{ _('Débloqué') }}</span>
+                                        {% else %}
+                                            <span class="badge text-bg-secondary">{{ _('Verrouillé') }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="small text-muted">
+                                        {% if step.lecon.duree_minutes %}{{ step.lecon.duree_minutes }} min{% else %}{{ _('Durée libre') }}{% endif %}
+                                        {% if step.progression and step.progression.score_quiz is not none %}
+                                            | {{ _('Score') }} {{ step.progression.pourcentage_score }}%
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="bi bi-journal-x fs-1 d-block mb-2 opacity-25"></i>
+                        {{ _("Ce cours n'a pas encore de leçons.") }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card-platform empty-state">
+        <i class="bi bi-compass fs-1 d-block mb-3 opacity-25"></i>
+        {{ _("Vous n'êtes inscrit à aucun cours pour le moment.") }}
+    </div>
+{% endif %}
+{% endblock %}

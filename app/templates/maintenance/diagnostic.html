@@ -1,0 +1,52 @@
+{% extends "maintenance/base_maintenance.html" %}
+
+{% block title %}Diagnostic | Maintenance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Diagnostic configuration</h1>
+        <p class="text-secondary mb-0">Debug, cookies, secrets, chemins et espace disque.</p>
+    </div>
+    <a class="btn btn-outline-light" href="{{ url_for('maintenance.dashboard') }}">
+        <i class="bi bi-arrow-left me-2"></i>Retour
+    </a>
+</div>
+
+<div class="tech-card">
+    <div class="tech-kv">
+        <div class="tech-kv-label">DEBUG</div>
+        <div>{{ diagnostics.debug }}</div>
+        <div class="tech-kv-label">TESTING</div>
+        <div>{{ diagnostics.testing }}</div>
+        <div class="tech-kv-label">SESSION_COOKIE_SECURE</div>
+        <div>{{ diagnostics.session_cookie_secure }}</div>
+        <div class="tech-kv-label">SESSION_COOKIE_SAMESITE</div>
+        <div>{{ diagnostics.session_cookie_samesite }}</div>
+        <div class="tech-kv-label">PREFERRED_URL_SCHEME</div>
+        <div>{{ diagnostics.preferred_url_scheme }}</div>
+        <div class="tech-kv-label">SECRET_KEY</div>
+        <div>{{ 'configuree' if diagnostics.secret_key_configured else 'par defaut / manquante' }}</div>
+        <div class="tech-kv-label">SECURITY_PASSWORD_SALT</div>
+        <div>{{ 'configuree' if diagnostics.password_salt_configured else 'par defaut / manquante' }}</div>
+        <div class="tech-kv-label">SQLALCHEMY_DATABASE_URI</div>
+        <div style="word-break: break-all;">{{ diagnostics.database_uri }}</div>
+        <div class="tech-kv-label">LOG_FILE</div>
+        <div style="word-break: break-all;">{{ diagnostics.log_file }}</div>
+        <div class="tech-kv-label">BACKUP_FOLDER</div>
+        <div style="word-break: break-all;">{{ diagnostics.backup_folder }}</div>
+        <div class="tech-kv-label">CACHE_DIR</div>
+        <div style="word-break: break-all;">{{ diagnostics.cache_dir }}</div>
+        <div class="tech-kv-label">PIPER_CACHE_FOLDER</div>
+        <div style="word-break: break-all;">{{ diagnostics.piper_cache_folder }}</div>
+        <div class="tech-kv-label">MEDIA_ROOT</div>
+        <div style="word-break: break-all;">{{ diagnostics.media_root }}</div>
+        {% if diagnostics.disk_usage %}
+        <div class="tech-kv-label">Espace disque libre</div>
+        <div>{{ "%.2f GB"|format(diagnostics.disk_usage.free / 1073741824) }}</div>
+        <div class="tech-kv-label">Espace disque total</div>
+        <div>{{ "%.2f GB"|format(diagnostics.disk_usage.total / 1073741824) }}</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

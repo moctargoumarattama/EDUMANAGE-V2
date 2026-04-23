@@ -1,0 +1,217 @@
+{% extends "maintenance/base_maintenance.html" %}
+
+{% block title %}Dashboard maintenance | LabeeB Arabic{% endblock %}
+
+{% block content %}
+{% if stats.uptime %}
+    {% set uptime_seconds = stats.uptime.total_seconds()|int %}
+    {% set uptime_days = uptime_seconds // 86400 %}
+    {% set uptime_hours = (uptime_seconds % 86400) // 3600 %}
+    {% set uptime_minutes = (uptime_seconds % 3600) // 60 %}
+    {% if uptime_days > 0 %}
+        {% set uptime_text = uptime_days ~ ' j ' ~ uptime_hours ~ ' h' %}
+    {% elif uptime_hours > 0 %}
+        {% set uptime_text = uptime_hours ~ ' h ' ~ uptime_minutes ~ ' min' %}
+    {% else %}
+        {% set uptime_text = uptime_minutes ~ ' min' %}
+    {% endif %}
+{% else %}
+    {% set uptime_text = 'Indisponible' %}
+{% endif %}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-3 mb-4">
+    <div>
+        <div class="page-kicker">Tableau de bord public</div>
+        <h1 class="page-title">Centre de maintenance</h1>
+        <p class="page-subtitle">Suivez l etat du site, lancez les actions utiles et gardez une lecture simple de ce qui se passe sans jargon technique.</p>
+    </div>
+    <div class="status-pill {{ 'status-warn' if stats.maintenance_mode.enabled else 'status-ok' }}">
+        <i class="bi bi-shield-exclamation"></i>
+        {{ 'Site filtre' if stats.maintenance_mode.enabled else 'Site accessible' }}
+    </div>
+</div>
+
+{% if stats.backups.is_stale %}
+<div class="alert-banner alert-banner--warning">
+    <strong>Sauvegarde a verifier :</strong>
+    {% if stats.backups.latest %}
+        la derniere sauvegarde remonte au {{ stats.backups.latest.modified_at.strftime('%d/%m/%Y a %H:%M') }}.
+    {% else %}
+        aucune sauvegarde n est disponible pour le moment.
+    {% endif %}
+</div>
+{% endif %}
+
+{% if stats.recent_http_500_count %}
+<div class="alert-banner alert-banner--danger">
+    <strong>Attention :</strong> {{ stats.recent_http_500_count }} erreur(s) serveur detectee(s) sur la derniere heure.
+</div>
+{% endif %}
+
+{% if stats.error_spike %}
+<div class="alert-banner alert-banner--danger">
+    <strong>Volume d incidents eleve :</strong> {{ stats.recent_error_count }} alerte(s) importantes sur la derniere heure.
+</div>
+{% endif %}
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="tech-stat">
+            <div class="tech-label">Etat du site</div>
+            <div class="tech-value">{{ 'Maintenance' if stats.maintenance_mode.enabled else 'Ouvert' }}</div>
+            <div class="tech-note">{{ 'Acces reserve a l equipe autorisee.' if stats.maintenance_mode.enabled else 'Tous les utilisateurs peuvent acceder au site.' }}</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="tech-stat">
+            <div class="tech-label">Sessions ouvertes</div>
+            <div class="tech-value">{{ stats.active_sessions_count }}</div>
+            <div class="tech-note">Compte(s) actuellement connecte(s).</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="tech-stat">
+            <div class="tech-label">Incidents sur 1 h</div>
+            <div class="tech-value">{{ stats.recent_error_count }}</div>
+            <div class="tech-note">{{ stats.recent_http_500_count }} erreur(s) serveur parmi les alertes recentes.</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="tech-stat">
+            <div class="tech-label">Sauvegardes conservees</div>
+            <div class="tech-value">{{ stats.backups.entries|length }}</div>
+            <div class="tech-note">Conservation automatique: {{ stats.backups.retention_count }} fichier(s).</div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-lg-7">
+        <div class="tech-card h-100">
+            <h2 class="h5 mb-3">Vue d ensemble</h2>
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <div class="small text-secondary">Temps de fonctionnement</div>
+                    <div class="fw-semibold mt-1">{{ uptime_text }}</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="small text-secondary">Prochaine verification auto</div>
+                    <div class="fw-semibold mt-1">{% if stats.scheduler_next_run %}{{ stats.scheduler_next_run.strftime('%d/%m/%Y a %H:%M') }}{% else %}Aucune programmee{% endif %}</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="small text-secondary">Dernier passage automatique</div>
+                    <div class="fw-semibold mt-1">
+                        {% if stats.scheduler_status.last_run_at %}
+                            {% if stats.scheduler_status.last_run_at is string %}
+                                {{ stats.scheduler_status.last_run_at[:16].replace('T', ' ').replace('-', '/') }}
+                            {% else %}
+                                {{ stats.scheduler_status.last_run_at.strftime('%d/%m/%Y a %H:%M') }}
+                            {% endif %}
+                        {% else %}
+                            Pas encore disponible
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="small text-secondary">Derniere execution reussie</div>
+                    <div class="fw-semibold mt-1">
+                        {% if stats.scheduler_status.last_success_at %}
+                            {% if stats.scheduler_status.last_success_at is string %}
+                                {{ stats.scheduler_status.last_success_at[:16].replace('T', ' ').replace('-', '/') }}
+                            {% else %}
+                                {{ stats.scheduler_status.last_success_at.strftime('%d/%m/%Y a %H:%M') }}
+                            {% endif %}
+                        {% else %}
+                            Aucune execution reussie
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="small text-secondary">Notifications actives</div>
+                    <div class="fw-semibold mt-1">{{ stats.active_push_subscriptions }}</div>
+                </div>
+                <div class="col-12 col-md-6">
+                    <div class="small text-secondary">Version du site</div>
+                    <div class="fw-semibold mt-1">{{ stats.version }}</div>
+                </div>
+                {% if stats.scheduler_status.last_error %}
+                <div class="col-12">
+                    <div class="small text-secondary">Dernier incident automatique</div>
+                    <div class="fw-semibold mt-1">{{ stats.scheduler_status.last_error }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+        <div class="tech-card h-100">
+            <h2 class="h5 mb-3">Actions rapides</h2>
+            <div class="action-row mb-3">
+                <button class="btn btn-outline-light" data-url="{{ url_for('maintenance.backup') }}" data-result-id="maintenance-actions-result" data-payload='{{ {}|tojson }}' data-options='{{ {"reloadOnSuccess": true}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-save me-2"></i>Creer une sauvegarde
+                </button>
+                <button class="btn btn-outline-warning" data-url="{{ url_for('maintenance.vider_cache') }}" data-result-id="maintenance-actions-result" data-payload='{{ {"zone": "app"}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-trash3 me-2"></i>Vider le cache du site
+                </button>
+                <button class="btn btn-outline-info" data-url="{{ url_for('maintenance.envoyer_rappel') }}" data-result-id="maintenance-actions-result" data-payload='{{ {}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-bell me-2"></i>Relancer les rappels
+                </button>
+            </div>
+            <div class="action-row mb-3">
+                <button class="btn btn-outline-warning" data-url="{{ url_for('maintenance.vider_cache') }}" data-result-id="maintenance-actions-result" data-payload='{{ {"zone": "piper"}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-music-note me-2"></i>Vider le cache audio
+                </button>
+                <button class="btn btn-outline-danger" data-url="{{ url_for('maintenance.vider_cache') }}" data-result-id="maintenance-actions-result" data-payload='{{ {"zone": "all"}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-x-octagon me-2"></i>Tout nettoyer
+                </button>
+            </div>
+            <div class="action-row">
+                {% if stats.maintenance_mode.enabled %}
+                <button class="btn btn-outline-success" data-url="{{ url_for('maintenance.toggle_maintenance_mode') }}" data-result-id="maintenance-actions-result" data-payload='{{ {"enabled": false}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-unlock me-2"></i>Rouvrir le site
+                </button>
+                {% else %}
+                <button class="btn btn-outline-danger" data-url="{{ url_for('maintenance.toggle_maintenance_mode') }}" data-result-id="maintenance-actions-result" data-payload='{{ {"enabled": true, "note": "Activation manuelle depuis dashboard maintenance"}|tojson }}' data-options='{{ {"reloadOnSuccess": true}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-lock me-2"></i>Passer le site en maintenance
+                </button>
+                {% endif %}
+            </div>
+            <div id="maintenance-actions-result" class="result-box"></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-lg-6">
+        <div class="tech-card h-100">
+            <h2 class="h5 mb-3">Dernier incident important</h2>
+            {% if stats.latest_critical_error %}
+                <div class="small text-secondary">{{ stats.latest_critical_error.timestamp.strftime('%d/%m/%Y a %H:%M') if stats.latest_critical_error.timestamp else '-' }}</div>
+                <div class="fw-semibold mt-2">{{ stats.latest_critical_error.action }}</div>
+                <div class="mt-2 text-secondary">{{ stats.latest_critical_error.details or 'Aucun detail supplementaire.' }}</div>
+            {% else %}
+                <div class="text-secondary">Aucun incident critique recent.</div>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="tech-card h-100">
+            <h2 class="h5 mb-3">Sauvegardes</h2>
+            {% if stats.backups.latest %}
+                <div class="small text-secondary">Derniere sauvegarde</div>
+                <div class="fw-semibold mt-1">{{ stats.backups.latest.name }}</div>
+                <div class="small text-secondary mt-2">{{ stats.backups.latest.modified_at.strftime('%d/%m/%Y a %H:%M') }} - {{ "%.2f Mo"|format(stats.backups.latest.size / 1048576) }}</div>
+            {% else %}
+                <div class="text-secondary">Aucune sauvegarde disponible.</div>
+            {% endif %}
+            <div class="small text-secondary mt-3">Conservation automatique: {{ stats.backups.retention_count }} fichier(s).</div>
+            <div class="mt-3">
+                <a class="btn btn-outline-light btn-sm" href="{{ url_for('maintenance.backups') }}">
+                    <i class="bi bi-arrow-right me-2"></i>Voir les sauvegardes
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

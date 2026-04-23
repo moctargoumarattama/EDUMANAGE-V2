@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Valider les comptes | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="admin-page-shell admin-account-approval-shell">
+    <div class="page-header">
+        <div class="admin-page-heading">
+            <h1 class="h3 fw-bold mb-1">Comptes etudiants a valider ({{ pending_students|length }})</h1>
+            <p class="text-muted mb-0">Les nouveaux etudiants apparaissent ici en attente. Une fois valides, ils peuvent se connecter avec leur email et leur mot de passe.</p>
+        </div>
+        <a href="{{ url_for('main.gestion_utilisateurs') }}" class="btn btn-outline-platform">
+            <i class="bi bi-arrow-left me-2"></i>Retour aux utilisateurs
+        </a>
+    </div>
+
+    {% if pending_students %}
+        <div class="card-platform p-3 p-md-4">
+            <div class="d-grid gap-3">
+                {% for utilisateur in pending_students %}
+                    <div class="approval-row">
+                        <div class="approval-row-main">
+                            <div class="fw-semibold">{{ utilisateur.email }}</div>
+                            <div class="small text-muted">
+                                {% if utilisateur.prenom or utilisateur.nom %}
+                                    {{ ((utilisateur.prenom or '') ~ ' ' ~ (utilisateur.nom or '')).strip() }} -
+                                {% endif %}
+                                inscrit le {{ utilisateur.date_creation.strftime('%d/%m/%Y') if utilisateur.date_creation else '-' }}
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ url_for('main.valider_utilisateur', user_id=utilisateur.id) }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-primary-platform">Valider</button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% else %}
+        <div class="card-platform empty-state">
+            <i class="bi bi-check-circle fs-1 d-block mb-3 opacity-25"></i>
+            Aucun compte etudiant en attente pour le moment.
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

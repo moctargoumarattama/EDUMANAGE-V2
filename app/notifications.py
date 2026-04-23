@@ -1,78 +1,52 @@
-import smtplib
-from email.mime.text import MIMEText
-import requests
+import json
 import logging
-import io
+import os
 
-# app/notifications.py
+from flask import current_app, has_app_context
 
-# ========================
-# Configuration
-# ========================
-TELEGRAM_BOT_TOKEN = "8029594293:AAHlPe-14bhZUw9MHM9IgGcBbVDBm4wAU9M"
-TELEGRAM_CHAT_ID = "6724470801"
+try:
+    from pywebpush import WebPushException, webpush
+except ImportError:  # pragma: no cover - optional dependency for local setups
+    WebPushException = Exception
+    webpush = None
 
-# Configurer le logger
-logging.basicConfig(level=logging.INFO)
+
 logger = logging.getLogger(__name__)
 
-# ========================
-# Email
-# ========================
-def envoyer_email(to, sujet, corps):
-    """Envoie un email via SMTP Gmail."""
+
+def envoyer_notification_push(subscription, payload, app=None):
+    target_app = app
+    if target_app is None and has_app_context():
+        target_app = current_app._get_current_object()
+
+    if target_app is None:
+        logger.warning("Application Flask absente: notification push ignoree.")
+        return False
+
+    if webpush is None:
+        logger.warning("pywebpush indisponible: notification push ignoree.")
+        return False
+
+    private_key = target_app.config.get("VAPID_PRIVATE_KEY")
+    vapid_claims = target_app.config.get("VAPID_CLAIMS", {})
+    if not private_key or not os.path.exists(private_key):
+        logger.warning("Cle VAPID introuvable: notification push ignoree.")
+        return False
+
     try:
-        msg = MIMEText(corps, "html")  # HTML pour afficher le QR code
-        msg['Subject'] = sujet
-        msg['From'] = "moctargoumarattama@gmail.com"
-        msg['To'] = to
-
-        server = smtplib.SMTP('smtp.gmail.com', 587)
-        server.starttls()
-        server.login("moctargoumarattama@gmail.com", "pmcfedouowvrtztx")  # mot de passe d'application Gmail
-        server.send_message(msg)
-        server.quit()
-
-        logger.info(f"Email envoyé à {to}")
+        webpush(
+            subscription_info={
+                "endpoint": subscription.endpoint,
+                "keys": {
+                    "p256dh": subscription.p256dh,
+                    "auth": subscription.auth,
+                },
+            },
+            data=json.dumps(payload),
+            vapid_private_key=private_key,
+            vapid_claims=vapid_claims,
+        )
         return True
-    except Exception as e:
-        logger.error(f"Erreur Email: {e}")
-        return False
-
-# ========================
-# Telegram
-# ========================
-def envoyer_telegram(message, chat_id=TELEGRAM_CHAT_ID):
-    """Envoie un message Telegram via un bot."""
-    try:
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
-        r = requests.post(url, data={"chat_id": chat_id, "text": message}, timeout=5)
-        if r.status_code == 200:
-            logger.info("Message Telegram envoyé")
-        else:
-            logger.warning(f"Erreur Telegram: {r.text}")
-        return r.status_code == 200
-    except Exception as e:
-        logger.error(f"Exception Telegram: {e}")
-        return False
-
-def envoyer_telegram_image(image_buffer, caption="", chat_id=TELEGRAM_CHAT_ID):
-    """
-    Envoie une image via Telegram en utilisant un buffer en mémoire.
-    image_buffer : BytesIO contenant l'image PNG
-    caption : texte optionnel à afficher avec l'image
-    """
-    try:
-        image_buffer.seek(0)  # s'assurer que le buffer est au début
-        files = {'photo': ('qr.png', image_buffer)}
-        data = {'chat_id': chat_id, 'caption': caption}
-        url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendPhoto"
-        r = requests.post(url, files=files, data=data, timeout=10)
-        if r.status_code == 200:
-            logger.info("Image Telegram envoyée")
-        else:
-            logger.warning(f"Erreur Telegram (image): {r.text}")
-        return r.status_code == 200
-    except Exception as e:
-        logger.error(f"Exception Telegram (image): {e}")
+    except WebPushException as exc:
+        logger.warning("Erreur push pour %s: %s", subscription.endpoint, exc)
         return False

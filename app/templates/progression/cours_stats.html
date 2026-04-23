@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Statistiques du cours | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{{ url_for('progress.dashboard_enseignant') }}" class="text-decoration-none small text-muted">
+            <i class="bi bi-arrow-left me-1"></i>Retour à la progression
+        </a>
+        <h1 class="h3 fw-bold mt-2 mb-1">{{ cours.nom }}</h1>
+        <p class="text-muted mb-0">
+            <span class="badge-niveau badge-{{ cours.niveau }}">{{ cours.niveau }}</span>
+            <span class="ms-2">{{ cours.lecons|selectattr('est_publie')|list|length }} leçon(s)</span>
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('courses.detail', cours_id=cours.id) }}" class="btn btn-outline-platform">
+            Voir le cours
+        </a>
+        <a href="{{ url_for('progress.api_cours_json', cours_id=cours.id, raw=1) }}" class="btn btn-outline-platform">
+            JSON
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_eleves }}</div>
+            <div class="stat-label">Élèves inscrits</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card" style="border-left-color:var(--secondary)">
+            <div class="stat-number" style="color:var(--secondary)">{{ moyenne_progression }}%</div>
+            <div class="stat-label">Progression moyenne</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card" style="border-left-color:var(--success)">
+            <div class="stat-number" style="color:var(--success)">
+                {% if moyenne_score is not none %}{{ moyenne_score }}%{% else %}-{% endif %}
+            </div>
+            <div class="stat-label">Score moyen</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card" style="border-left-color:var(--primary-dark)">
+            <div class="stat-number" style="color:var(--primary-dark)">{{ eleves_actifs }}</div>
+            <div class="stat-label">Élèves actifs</div>
+        </div>
+    </div>
+</div>
+
+{% if eleves_data %}
+    <div class="d-grid gap-3">
+        {% for item in eleves_data %}
+            <div class="card-platform p-4">
+                <div class="d-flex flex-column flex-lg-row justify-content-between gap-3">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center gap-3 mb-2">
+                            <span class="avatar-chip">{{ (item.prenom or item.nom or item.email)[:1]|upper }}</span>
+                            <div>
+                                <div class="fw-semibold">{{ (item.prenom or '') ~ ' ' ~ (item.nom or '') }}</div>
+                                <div class="small text-muted">{{ item.email }}</div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2 mb-3">
+                            <span class="badge text-bg-light">{{ item.lecons_vues }}/{{ item.total_lecons }} leçon(s) vues</span>
+                            <span class="badge {% if item.pourcentage >= 80 %}text-bg-success{% elif item.pourcentage >= 40 %}text-bg-primary{% else %}text-bg-secondary{% endif %}">
+                                {{ item.pourcentage }}% complété
+                            </span>
+                            <span class="badge {% if item.score_moyen is not none and item.score_moyen >= 70 %}text-bg-success{% elif item.score_moyen is not none and item.score_moyen >= 40 %}text-bg-warning{% else %}text-bg-light{% endif %}">
+                                Score : {% if item.score_moyen is not none %}{{ item.score_moyen }}%{% else %}-{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="progress-platform mb-2">
+                            <div class="progress-fill" style="width: {{ item.pourcentage }}%;"></div>
+                        </div>
+                        <div class="small text-muted">
+                            {% if item.derniere_activite %}
+                                Dernière activité : {{ item.derniere_activite.strftime('%d/%m/%Y %H:%M') }}
+                            {% else %}
+                                Aucune activité pour le moment
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="text-lg-end d-flex flex-lg-column align-items-lg-end justify-content-between gap-2" style="min-width: 160px;">
+                        <div>
+                            <div class="small text-muted">Progression</div>
+                            <div class="fs-3 fw-bold" style="color:var(--primary)">{{ item.pourcentage }}%</div>
+                        </div>
+                        <div>
+                            <div class="small text-muted">Score quiz</div>
+                            <div class="fs-4 fw-bold" style="color:{% if item.score_moyen is not none and item.score_moyen >= 70 %}var(--success){% elif item.score_moyen is not none and item.score_moyen >= 40 %}var(--secondary){% else %}var(--text-muted){% endif %};">
+                                {% if item.score_moyen is not none %}{{ item.score_moyen }}%{% else %}-{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card-platform empty-state">
+        <i class="bi bi-people fs-1 d-block mb-2 opacity-25"></i>
+        Aucun élève n'est encore inscrit à ce cours.
+    </div>
+{% endif %}
+{% endblock %}

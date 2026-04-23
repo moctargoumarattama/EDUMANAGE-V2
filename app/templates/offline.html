@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6C3CE1">
+    <title>Hors ligne | LabeeB Arabic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <style>
+        body {
+            display: grid;
+            place-items: center;
+            padding: 24px;
+        }
+
+        .offline-shell {
+            width: 100%;
+            max-width: 760px;
+        }
+
+        .offline-card {
+            overflow: hidden;
+        }
+
+        .offline-hero {
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 48%, var(--secondary) 100%);
+            color: #fff;
+        }
+
+        .offline-body {
+            padding: 2rem;
+        }
+
+        .offline-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .offline-tips {
+            display: grid;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .offline-tip {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1rem 1rem 1rem 1.1rem;
+            background: #fff;
+        }
+
+        .offline-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .offline-hero,
+            .offline-body {
+                padding: 1.5rem;
+            }
+
+            .offline-actions a,
+            .offline-actions button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="offline-shell">
+        <section class="card-platform offline-card">
+            <div class="offline-hero">
+                <div class="offline-pill">Mode hors ligne</div>
+                <div style="font-size: 3rem; margin-top: 1rem;">🕌</div>
+                <h1 class="display-6 fw-bold mt-3 mb-2">Connexion indisponible pour l'instant</h1>
+                <p class="mb-0" style="max-width: 560px; color: rgba(255,255,255,0.88);">
+                    L'application n'arrive pas à joindre le serveur. Si une page a déjà été consultée récemment,
+                    elle pourra encore s'ouvrir hors ligne via le cache.
+                </p>
+            </div>
+
+            <div class="offline-body">
+                <p class="arabic-text mb-3" style="font-size: 1.45rem; color: var(--primary);">
+                    يمكنك متابعة التعلم عندما يعود الاتصال بالإنترنت
+                </p>
+                <p class="text-muted mb-0">
+                    Nous avons préparé un mode PWA plus sûr : les ressources principales restent disponibles,
+                    et les dernières pages visitées peuvent être réutilisées quand la connexion revient mal.
+                </p>
+
+                <div class="offline-actions">
+                    <button type="button" class="btn btn-primary-platform" onclick="window.location.reload()">
+                        Réessayer maintenant
+                    </button>
+                    <a href="{{ url_for('main.index') }}" class="btn btn-outline-platform">
+                        Retour à l'accueil
+                    </a>
+                </div>
+
+                <div class="offline-tips">
+                    <div class="offline-tip">
+                        <strong>Conseil 1</strong>
+                        <div class="text-muted small mt-1">Rouvre d'abord une page que tu as déjà consultée récemment, comme le catalogue des cours.</div>
+                    </div>
+                    <div class="offline-tip">
+                        <strong>Conseil 2</strong>
+                        <div class="text-muted small mt-1">Une fois la connexion revenue, recharge la page pour resynchroniser les données et les notifications.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

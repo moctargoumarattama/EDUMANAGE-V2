@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 420" role="img" aria-label="Tableau de l'alphabet arabe">
+  <defs>
+    <linearGradient id="panelGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f8fbff"/>
+      <stop offset="100%" stop-color="#e8eef8"/>
+    </linearGradient>
+    <filter id="softShadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#120a30" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="420" fill="none"/>
+
+  <g id="alphabet-board" transform="translate(405 28)" filter="url(#softShadow)">
+    <rect x="0" y="0" width="735" height="364" rx="20" fill="url(#panelGlow)" fill-opacity="0.985"/>
+    <rect x="0.5" y="0.5" width="734" height="363" rx="19.5" fill="none" stroke="#b6c2d1" stroke-width="1.8"/>
+
+    <g stroke="#aab7c8" stroke-width="1.5">
+      <line x1="105" y1="0" x2="105" y2="364"/>
+      <line x1="210" y1="0" x2="210" y2="364"/>
+      <line x1="315" y1="0" x2="315" y2="364"/>
+      <line x1="420" y1="0" x2="420" y2="364"/>
+      <line x1="525" y1="0" x2="525" y2="364"/>
+      <line x1="630" y1="0" x2="630" y2="364"/>
+      <line x1="0" y1="91" x2="735" y2="91"/>
+      <line x1="0" y1="182" x2="735" y2="182"/>
+      <line x1="0" y1="273" x2="735" y2="273"/>
+    </g>
+
+    <g stroke="#d4ddea" stroke-width="1.1" stroke-dasharray="2 4">
+      <line x1="52.5" y1="0" x2="52.5" y2="364"/>
+      <line x1="157.5" y1="0" x2="157.5" y2="364"/>
+      <line x1="262.5" y1="0" x2="262.5" y2="364"/>
+      <line x1="367.5" y1="0" x2="367.5" y2="364"/>
+      <line x1="472.5" y1="0" x2="472.5" y2="364"/>
+      <line x1="577.5" y1="0" x2="577.5" y2="364"/>
+      <line x1="682.5" y1="0" x2="682.5" y2="364"/>
+      <line x1="0" y1="45.5" x2="735" y2="45.5"/>
+      <line x1="0" y1="136.5" x2="735" y2="136.5"/>
+      <line x1="0" y1="227.5" x2="735" y2="227.5"/>
+      <line x1="0" y1="318.5" x2="735" y2="318.5"/>
+    </g>
+
+    <g fill="#ffffff" fill-opacity="0.12">
+      <circle cx="690" cy="48" r="30"/>
+      <circle cx="56" cy="312" r="22"/>
+    </g>
+
+    <g fill="#ffffff" fill-opacity="0.98" stroke="#111111" stroke-width="3.1" stroke-linejoin="round" font-family="'Noto Naskh Arabic', serif" text-anchor="middle" dominant-baseline="middle">
+      <text x="682.5" y="45.5" font-size="54">ا</text>
+      <text x="577.5" y="45.5" font-size="54">ب</text>
+      <text x="472.5" y="45.5" font-size="54">ت</text>
+      <text x="367.5" y="45.5" font-size="54">ث</text>
+      <text x="262.5" y="45.5" font-size="54">ج</text>
+      <text x="157.5" y="45.5" font-size="54">ح</text>
+      <text x="52.5" y="45.5" font-size="54">خ</text>
+
+      <text x="682.5" y="136.5" font-size="54">د</text>
+      <text x="577.5" y="136.5" font-size="54">ذ</text>
+      <text x="472.5" y="136.5" font-size="54">ر</text>
+      <text x="367.5" y="136.5" font-size="54">ز</text>
+      <text x="262.5" y="136.5" font-size="54">س</text>
+      <text x="157.5" y="136.5" font-size="54">ش</text>
+      <text x="52.5" y="136.5" font-size="54">ص</text>
+
+      <text x="682.5" y="227.5" font-size="54">ض</text>
+      <text x="577.5" y="227.5" font-size="54">ط</text>
+      <text x="472.5" y="227.5" font-size="54">ظ</text>
+      <text x="367.5" y="227.5" font-size="54">ع</text>
+      <text x="262.5" y="227.5" font-size="54">غ</text>
+      <text x="157.5" y="227.5" font-size="54">ف</text>
+      <text x="52.5" y="227.5" font-size="54">ق</text>
+
+      <text x="682.5" y="318.5" font-size="54">ك</text>
+      <text x="577.5" y="318.5" font-size="54">ل</text>
+      <text x="472.5" y="318.5" font-size="54">م</text>
+      <text x="367.5" y="318.5" font-size="54">ن</text>
+      <text x="262.5" y="318.5" font-size="54">ه</text>
+      <text x="157.5" y="318.5" font-size="54">و</text>
+      <text x="52.5" y="318.5" font-size="54">ي</text>
+    </g>
+  </g>
+</svg>

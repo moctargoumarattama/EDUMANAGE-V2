@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Centre Support | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="admin-page-shell">
+    <div class="page-header mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Centre support</h1>
+            <p class="text-muted mb-0">Un seul fil par etudiant, visible par tous les admins.</p>
+        </div>
+        <a href="{{ url_for('notifications.inbox') }}" class="btn btn-outline-platform">
+            <i class="bi bi-arrow-left me-2"></i>Retour aux notifications
+        </a>
+    </div>
+
+    <div class="card-platform p-4">
+        <div class="d-grid gap-3">
+            {% if support_threads %}
+                {% for thread in support_threads %}
+                    <a href="{{ thread.open_url }}" class="approval-row text-decoration-none text-reset">
+                        <div class="approval-row-main">
+                            <div class="fw-semibold">{{ thread.student_name }}</div>
+                            <div class="small text-muted">{{ thread.student_email }}</div>
+                            <div class="small text-muted mt-1">{{ thread.last_message }}</div>
+                        </div>
+                        <div class="text-end">
+                            <div class="small text-muted">{{ thread.last_activity_label }}</div>
+                            {% if thread.has_active_grant %}
+                                <span class="badge text-bg-success mt-2">Reset actif</span>
+                            {% elif thread.pending_request %}
+                                <span class="badge text-bg-warning mt-2">Demande en attente</span>
+                            {% else %}
+                                <span class="badge text-bg-light mt-2">Discussion</span>
+                            {% endif %}
+                        </div>
+                    </a>
+                {% endfor %}
+            {% else %}
+                <div class="notification-empty">
+                    <i class="bi bi-chat-left-text fs-1 d-block mb-2 opacity-25"></i>
+                    Aucun fil support pour le moment.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endblock %}

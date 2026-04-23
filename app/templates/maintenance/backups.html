@@ -1,0 +1,62 @@
+{% extends "maintenance/base_maintenance.html" %}
+
+{% block title %}Backups | Maintenance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <div class="page-kicker">Protection des donnees</div>
+        <h1 class="page-title fs-2">Sauvegardes du site</h1>
+        <p class="page-subtitle">Retrouvez les copies disponibles, leur date et leur taille dans une presentation plus simple.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-light" data-url="{{ url_for('maintenance.backup') }}" data-result-id="backup-result" data-payload='{{ {}|tojson }}' data-options='{{ {"reloadOnSuccess": true}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+            <i class="bi bi-save me-2"></i>Creer une sauvegarde
+        </button>
+        <a class="btn btn-outline-secondary" href="{{ url_for('maintenance.dashboard') }}">
+            <i class="bi bi-arrow-left me-2"></i>Retour
+        </a>
+    </div>
+</div>
+
+<div class="tech-card mb-4">
+    <div class="tech-kv">
+        <div class="tech-kv-label">Conservation automatique</div>
+        <div>{{ backup_state.retention_count }} fichier(s)</div>
+        <div class="tech-kv-label">Alerte de verification</div>
+        <div>{{ backup_state.alert_hours }} heure(s)</div>
+        <div class="tech-kv-label">Etat</div>
+        <div>{{ 'A verifier' if backup_state.is_stale else 'A jour' }}</div>
+    </div>
+    <div id="backup-result" class="result-box"></div>
+</div>
+
+<div class="tech-card">
+    {% if backup_state.entries %}
+    <div class="table-responsive">
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Nom</th>
+                    <th>Date</th>
+                    <th>Taille</th>
+                    <th>Code de verification</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in backup_state.entries %}
+                <tr>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.modified_at.strftime('%d/%m/%Y a %H:%M') }}</td>
+                    <td>{{ "%.2f Mo"|format(item.size / 1048576) }}</td>
+                    <td style="word-break: break-all;">{{ item.sha256 }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-secondary">Aucune sauvegarde disponible.</div>
+    {% endif %}
+</div>
+{% endblock %}

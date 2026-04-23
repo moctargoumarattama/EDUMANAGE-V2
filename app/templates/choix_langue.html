@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Choix de la langue') }} | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="auth-shell">
+    <div class="hero-panel card-platform text-center p-4 p-lg-5 mb-4">
+        <div class="arabic-text mb-3" style="color:#fff;font-size:2rem;text-align:center;">مرحباً بك</div>
+        <h1 class="display-6 fw-bold mb-3">{{ _('Choisissez votre langue') }}</h1>
+        <p class="mb-0 text-white-50">{{ _('Choose your language / Elige tu idioma') }}</p>
+    </div>
+
+    <div class="row g-4 justify-content-center">
+        <div class="col-12 col-md-4">
+            <a class="card-platform p-4 h-100 d-flex flex-column justify-content-center align-items-center text-decoration-none text-reset"
+               href="{{ url_for('main.changer_langue', code='fr') }}">
+                <div style="font-size:2.5rem" class="mb-3">🇫🇷</div>
+                <h2 class="h4 fw-bold mb-2">Français</h2>
+                <p class="text-muted mb-0">{{ _('Continuer en français') }}</p>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a class="card-platform p-4 h-100 d-flex flex-column justify-content-center align-items-center text-decoration-none text-reset"
+               href="{{ url_for('main.changer_langue', code='en') }}">
+                <div style="font-size:2.5rem" class="mb-3">🇬🇧</div>
+                <h2 class="h4 fw-bold mb-2">English</h2>
+                <p class="text-muted mb-0">{{ _('Continue in English') }}</p>
+            </a>
+        </div>
+        <div class="col-12 col-md-4">
+            <a class="card-platform p-4 h-100 d-flex flex-column justify-content-center align-items-center text-decoration-none text-reset"
+               href="{{ url_for('main.changer_langue', code='es') }}">
+                <div style="font-size:2.5rem" class="mb-3">🇪🇸</div>
+                <h2 class="h4 fw-bold mb-2">Español</h2>
+                <p class="text-muted mb-0">{{ _('Continuar en español') }}</p>
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}

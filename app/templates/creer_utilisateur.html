@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+
+{% block title %}Créer un utilisateur | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<div class="form-shell">
+    <div class="page-header">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Créer un utilisateur</h1>
+            <p class="text-muted mb-0">Ajoutez un nouveau compte avec l’un des quatre rôles officiels de la plateforme.</p>
+        </div>
+        <a href="{{ url_for('main.gestion_utilisateurs') }}" class="btn btn-outline-platform">
+            <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+        </a>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-lg-8">
+            <div class="form-panel">
+                <div class="form-panel-title">Informations du compte</div>
+                <p class="text-muted mb-4">Les identifiants sont utilisés directement pour la connexion à la plateforme.</p>
+
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            {{ form.nom.label(class="form-label fw-semibold") }}
+                            {{ form.nom(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.prenom.label(class="form-label fw-semibold") }}
+                            {{ form.prenom(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.email.label(class="form-label fw-semibold") }}
+                            {{ form.email(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.telephone.label(class="form-label fw-semibold") }}
+                            {{ form.telephone(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.role.label(class="form-label fw-semibold") }}
+                            {{ form.role(class="form-select") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.password.label(class="form-label fw-semibold") }}
+                            {{ form.password(class="form-control") }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form.confirm_password.label(class="form-label fw-semibold") }}
+                            {{ form.confirm_password(class="form-control") }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        {{ form.submit(class="btn btn-primary-platform") }}
+                        <a href="{{ url_for('main.gestion_utilisateurs') }}" class="btn btn-outline-platform">Annuler</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+            <div class="form-panel">
+                <div class="form-panel-title">Rôles disponibles</div>
+                <p class="text-muted mb-3">Chaque rôle ouvre un périmètre clair dans la plateforme.</p>
+                <div class="role-legend">
+                    <div class="role-legend-item">
+                        <span class="badge-role badge-role-admin">admin</span>
+                        <p>Gère les contenus, les utilisateurs et les vues globales.</p>
+                    </div>
+                    <div class="role-legend-item">
+                        <span class="badge-role badge-role-enseignant">enseignant</span>
+                        <p>Crée et suit ses cours, leçons et progressions.</p>
+                    </div>
+                    <div class="role-legend-item">
+                        <span class="badge-role badge-role-eleve">eleve</span>
+                        <p>Suit les cours, réalise les exercices et voit sa progression.</p>
+                    </div>
+                    <div class="role-legend-item">
+                        <span class="badge-role badge-role-maintenance">maintenance</span>
+                        <p>Accède uniquement aux outils techniques et de supervision.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

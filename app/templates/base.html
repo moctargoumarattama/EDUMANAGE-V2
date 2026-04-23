@@ -1,1094 +1,1033 @@
 <!DOCTYPE html>
-<html lang="fr" data-bs-theme="light">
+<html lang="{{ session.get('langue', 'fr') }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}EduManage - Excellence Éducative{% endblock %}</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto+Slab:wght@300;400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Custom CSS -->
-    <style>
-        :root {
-            --primary: #4361ee;
-            --primary-dark: #3a0ca3;
-            --secondary: #7209b7;
-            --success: #2ecc71;
-            --info: #3498db;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --light: #f8f9fa;
-            --dark: #2c3e50;
-            --gray-100: #f8f9fc;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-800: #2d3748;
-            
-            --gradient-primary: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
-            --gradient-primary-hover: linear-gradient(135deg, #3a56d4 0%, #320b8f 100%);
-            --gradient-success: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-            --gradient-info: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-            --gradient-warning: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
-            --gradient-dark: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            --gradient-glass: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
-            
-            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.08);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
-            --shadow-strong: 0 15px 40px rgba(0, 0, 0, 0.15);
-            --shadow-nav: 0 4px 18px rgba(0, 0, 0, 0.15);
-            --border-radius: 12px;
-            --border-radius-lg: 16px;
-            --border-radius-xl: 20px;
-            
-            --transition: all 0.3s ease;
-        }
+    <meta name="theme-color" content="#6C3CE1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="LabeeB Arabic">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="app-auth-fingerprint" content="{% if current_user.is_authenticated %}user:{{ current_user.id }}:{{ current_user.role }}{% else %}anonymous{% endif %}">
+    <title>{% block title %}LabeeB Arabic{% endblock %}</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--gray-100);
-            color: #4a5568;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Roboto Slab', serif;
-            font-weight: 600;
-            color: var(--gray-800);
-            letter-spacing: -0.025em;
-        }
-
-        /* Navigation améliorée */
-        .navbar {
-            background: var(--gradient-primary);
-            box-shadow: var(--shadow-nav);
-            padding: 0.8rem 1rem;
-            backdrop-filter: blur(10px);
-            transition: var(--transition);
-            z-index: 1030;
-        }
-
-        .navbar-brand {
-            font-weight: 800;
-            font-size: 1.9rem;
-            display: flex;
-            align-items: center;
-            color: white !important;
-            letter-spacing: -0.025em;
-        }
-
-        .navbar-brand i {
-            font-size: 2.1rem;
-            margin-right: 0.5rem;
-            transition: transform 0.3s ease;
-        }
-
-        .navbar-brand:hover i {
-            transform: rotate(-15deg);
-        }
-
-        .nav-link {
-            font-weight: 500;
-            padding: 0.6rem 1rem !important;
-            border-radius: 10px;
-            margin: 0 0.2rem;
-            transition: var(--transition);
-            color: rgba(255, 255, 255, 0.9) !important;
-            position: relative;
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json', v='20260422-premium-loader-v1') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/icon-192.png', v='20260422-premium-loader-v1') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png', v='20260422-premium-loader-v1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css', v='20260422-premium-loader-v1') }}">
+    <style data-premium-loader-critical>
+        .app-premium-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 2200;
+            display: grid;
+            place-items: center;
+            padding:
+                max(calc(env(safe-area-inset-top) + 24px), 24px)
+                24px
+                max(calc(env(safe-area-inset-bottom) + 24px), 24px);
+            opacity: 0;
+            pointer-events: none;
             overflow: hidden;
+            transition: opacity 220ms ease;
+            background:
+                radial-gradient(circle at 16% 18%, rgba(255, 219, 153, 0.22) 0%, transparent 30%),
+                radial-gradient(circle at 84% 14%, rgba(255, 244, 216, 0.16) 0%, transparent 24%),
+                radial-gradient(circle at 50% 60%, rgba(186, 143, 255, 0.18) 0%, transparent 42%),
+                linear-gradient(180deg, #250847 0%, #3d1172 48%, #1c0637 100%);
         }
 
-        .nav-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.1);
-            transition: left 0.4s ease;
-            z-index: -1;
+        .app-premium-loader--visible {
+            opacity: 1;
+            pointer-events: auto;
         }
 
-        .nav-link:hover::before, .nav-link.active::before {
-            left: 0;
+        .app-premium-loader--hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: white !important;
-            transform: translateY(-2px);
-        }
-
-        .dropdown-menu {
-            border: none;
-            box-shadow: var(--shadow-strong);
-            border-radius: var(--border-radius);
-            padding: 0.5rem;
-            background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(10px);
-            animation: fadeIn 0.3s ease;
-        }
-
-        .dropdown-item {
-            border-radius: 8px;
-            padding: 0.6rem 1rem;
-            transition: var(--transition);
-            font-weight: 500;
-        }
-
-        .dropdown-item:hover {
-            background: var(--primary);
-            color: white;
-            transform: translateX(5px);
-        }
-
-        /* Alertes améliorées */
-        .alert {
-            border: none;
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow-soft);
-            font-weight: 500;
-            backdrop-filter: blur(4px);
-        }
-
-        .alert-dismissible .btn-close {
-            padding: 1rem;
-        }
-
-        /* Contenu principal */
-        .main-content {
-            flex: 1 0 auto;
-            padding: 2.5rem 0;
-        }
-
-        /* Footer amélioré */
-        footer {
-            margin-top: auto;
-            background: var(--gradient-dark);
-            color: white;
-            padding: 3rem 0 1.5rem;
+        .app-premium-loader__panel {
             position: relative;
-            overflow: hidden;
-        }
-
-        footer::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-        }
-
-        footer h5 {
-            color: white;
-            font-weight: 600;
-            margin-bottom: 1.2rem;
-            position: relative;
-            display: inline-block;
-        }
-
-        footer h5::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 40px;
-            height: 2px;
-            background: var(--primary);
-        }
-
-        footer a {
-            color: rgba(255, 255, 255, 0.8);
-            text-decoration: none;
-            transition: var(--transition);
-            display: inline-block;
-        }
-
-        footer a:hover {
-            color: white;
-            transform: translateX(5px);
-        }
-
-        footer .list-unstyled li {
-            margin-bottom: 0.8rem;
-        }
-
-        footer hr {
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            height: 1px;
+            display: grid;
+            place-self: center;
+            justify-items: center;
+            gap: 0.75rem;
+            width: min(100%, 360px);
+            padding: 1.6rem 1.5rem 1.45rem;
+            border-radius: 32px;
+            border: 1px solid rgba(255, 228, 176, 0.26);
+            background:
+                linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%),
+                linear-gradient(145deg, rgba(84, 25, 157, 0.74) 0%, rgba(55, 14, 107, 0.9) 100%);
+            box-shadow:
+                0 28px 70px rgba(11, 2, 28, 0.48),
+                inset 0 1px 0 rgba(255, 255, 255, 0.16);
+            backdrop-filter: blur(16px);
+            transform: translateY(0) scale(1);
             opacity: 1;
         }
 
-        /* Cards améliorées */
-        .card {
-            border: none;
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-soft);
-            transition: var(--transition);
-            overflow: hidden;
+        .app-premium-loader__panel--nav {
+            display: none;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: var(--shadow-medium);
-        }
-
-        .card-header {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0 !important;
-            font-weight: 600;
-            background: white;
-            padding: 1.25rem 1.5rem;
-        }
-
-        /* Boutons améliorés */
-        .btn {
-            border-radius: var(--border-radius);
-            font-weight: 500;
-            transition: var(--transition);
-            box-shadow: var(--shadow-soft);
-            padding: 0.7rem 1.6rem;
+        .app-premium-loader__logo-shell {
             position: relative;
+            display: grid;
+            place-items: center;
+            width: 108px;
+            height: 108px;
+            border-radius: 50%;
+            background:
+                linear-gradient(145deg, rgba(255, 229, 180, 0.95) 0%, rgba(244, 183, 74, 0.94) 36%, rgba(120, 67, 217, 0.9) 100%);
+            box-shadow: 0 20px 34px rgba(18, 4, 45, 0.34), inset 0 1px 10px rgba(255, 255, 255, 0.32);
             overflow: hidden;
-            border: none;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.7s ease;
+        .app-premium-loader__logo-image {
+            width: 76px;
+            height: 76px;
+            object-fit: contain;
         }
 
-        .btn:hover::before {
-            left: 100%;
+        .app-premium-loader__brand {
+            color: #fff9ec;
+            font-size: 1.22rem;
+            line-height: 1.1;
+            font-weight: 800;
+            letter-spacing: 0.03em;
+            text-align: center;
         }
 
-        .btn:hover {
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-medium);
+        .app-premium-loader__tagline {
+            color: rgba(255, 236, 198, 0.84);
+            font-size: 0.74rem;
+            font-weight: 700;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            text-align: center;
         }
 
-        .btn-primary {
-            background: var(--gradient-primary);
-        }
-
-        .btn-primary:hover {
-            background: var(--gradient-primary-hover);
-        }
-
-        .btn-success {
-            background: var(--gradient-success);
-        }
-
-        .btn-info {
-            background: var(--gradient-info);
-        }
-
-        .btn-warning {
-            background: var(--gradient-warning);
-        }
-
-        /* User badge */
-        .user-badge {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 50px;
-            padding: 0.5rem 1rem;
-            display: flex;
-            align-items: center;
-            transition: var(--transition);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .user-badge:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateY(-2px);
-        }
-
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            background: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 0.6rem;
-            color: var(--primary);
-            font-weight: bold;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-            transition: var(--transition);
-        }
-
-        .user-badge:hover .user-avatar {
-            transform: scale(1.1);
-        }
-
-        /* Notification badge */
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: var(--danger);
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 1.5s infinite;
-        }
-
-        /* Theme toggle */
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: var(--transition);
-            padding: 0.5rem;
-            border-radius: 50%;
-        }
-
-        .theme-toggle:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .animate-pop-in {
-            animation: fadeIn 0.6s ease forwards;
-            opacity: 0;
-        }
-
-        .pulse {
-            animation: pulse 2s infinite ease-in-out;
-        }
-
-        /* Scrollbar personnalisée */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: var(--gray-200);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
-        }
-
-        /* Dark mode support */
-        [data-bs-theme="dark"] {
-            --gray-100: #1a1d21;
-            --gray-200: #24272b;
-            --gray-300: #2c3035;
-            --gray-800: #e4e6ea;
-            
-            --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.3);
-            --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.35);
-            --shadow-strong: 0 15px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        [data-bs-theme="dark"] body {
-            background-color: var(--gray-100);
-            color: #adb5bd;
-        }
-
-        [data-bs-theme="dark"] .card {
-            background-color: var(--gray-200);
-        }
-
-        [data-bs-theme="dark"] .card-header {
-            background-color: var(--gray-200);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        [data-bs-theme="dark"] .dropdown-menu {
-            background: var(--gray-200);
-        }
-
-        [data-bs-theme="dark"] .dropdown-item {
-            color: #adb5bd;
-        }
-
-        [data-bs-theme="dark"] .dropdown-item:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        [data-bs-theme="dark"] .alert {
-            background-color: var(--gray-200);
-            color: #adb5bd;
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 992px) {
-            .navbar-nav {
-                padding: 1rem 0;
-            }
-            
-            .nav-link {
-                margin: 0.3rem 0;
-            }
-            
-            .dropdown-menu {
-                margin: 0.5rem 0;
-                border-radius: var(--border-radius);
-            }
-            
-            .user-badge {
-                margin-top: 0.5rem;
-            }
+        .app-premium-loader__glow,
+        .app-premium-loader__ring,
+        .app-premium-loader__shine,
+        .app-premium-loader__orb,
+        .app-premium-loader__pulse-track {
+            display: none;
         }
     </style>
-
-    
+    <meta data-app-head-boundary="start">
+    {% block extra_css %}{% endblock %}
+    <meta data-app-head-boundary="end">
 </head>
-<body data-role="{{ current_user.role if current_user.is_authenticated else 'guest' }}">
-    <nav class="navbar navbar-expand-lg navbar-dark">
-        <div class="container">
-            <a class="navbar-brand" href="{{ url_for('main.index') }}">
-                <i class="fas fa-graduation-cap"></i>EduManage
+<body>
+    {% set asset_version = '20260422-premium-loader-v1' %}
+    {% set endpoint = request.endpoint or '' %}
+    {% set notification_unread = notification_summary['unread_count'] if notification_summary else 0 %}
+    {% set notification_items = notification_summary['items'] if notification_summary else [] %}
+    {% set lang_label = {'fr': '🇫🇷 FR', 'en': '🇬🇧 EN', 'es': '🇪🇸 ES'}.get(session.get('langue', 'fr'), '🇫🇷 FR') %}
+
+    <div class="app-nav-progress" aria-hidden="true"></div>
+    <div id="app-premium-loader" class="app-premium-loader app-premium-loader--visible app-premium-loader--boot" aria-hidden="true">
+        <div class="app-premium-loader__backdrop"></div>
+        <div class="app-premium-loader__orb app-premium-loader__orb--one"></div>
+        <div class="app-premium-loader__orb app-premium-loader__orb--two"></div>
+        <div class="app-premium-loader__orb app-premium-loader__orb--three"></div>
+
+        <div class="app-premium-loader__panel app-premium-loader__panel--boot" data-premium-loader-state="boot">
+            <span class="app-premium-loader__glow"></span>
+            <span class="app-premium-loader__ring"></span>
+            <span class="app-premium-loader__shine"></span>
+            <span class="app-premium-loader__logo-shell">
+                <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg') }}" alt="" class="app-premium-loader__logo-image">
+            </span>
+            <span class="app-premium-loader__brand">LabeeB Arabic</span>
+            <span class="app-premium-loader__tagline">Version 4.0 · Luxe dore</span>
+            <span class="app-premium-loader__pulse-track" aria-hidden="true">
+                <span class="app-premium-loader__pulse-dot"></span>
+            </span>
+        </div>
+
+        <div class="app-premium-loader__panel app-premium-loader__panel--nav" data-premium-loader-state="nav">
+            <span class="app-premium-loader__glow"></span>
+            <span class="app-premium-loader__ring"></span>
+            <span class="app-premium-loader__shine"></span>
+            <span class="app-premium-loader__logo-shell app-premium-loader__logo-shell--nav">
+                <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg') }}" alt="" class="app-premium-loader__logo-image">
+            </span>
+            <span class="app-premium-loader__brand app-premium-loader__brand--nav">LabeeB Arabic</span>
+        </div>
+    </div>
+
+    <nav id="app-navbar" class="navbar navbar-expand-lg navbar-platform fixed-top">
+        <div class="container-fluid px-4">
+            <a class="navbar-brand brand-signature d-flex align-items-center gap-3" href="{{ url_for('main.index') }}">
+                <span class="brand-mark" aria-hidden="true">
+                    <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg') }}" alt="" class="brand-mark-image">
+                </span>
+                <span class="brand-copy">
+                    <span class="brand-title">LabeeB <span class="brand-title-accent">Arabic</span></span>
+                    <span class="brand-tagline">apprendre avec douceur</span>
+                </span>
             </a>
 
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-expanded="false">
-                <span class="navbar-toggler-icon"></span>
+            <button class="navbar-toggler nav-premium-toggle border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain" aria-expanded="false" aria-label="{{ _('Open menu') }}">
+                <span class="nav-toggle-box" aria-hidden="true">
+                    <span class="nav-toggle-line"></span>
+                    <span class="nav-toggle-line"></span>
+                    <span class="nav-toggle-line"></span>
+                </span>
             </button>
-            
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <!-- Navigation principale selon le rôle -->
-                <ul class="navbar-nav me-auto">
+
+            <div class="collapse navbar-collapse navbar-platform-collapse" id="navbarMain">
+                <div class="navbar-mobile-panel w-100">
                     {% if current_user.is_authenticated %}
-                        
-                        <!-- 🔹 SUPER ADMIN : Accès à tout le système -->
-                        {% if current_user.role == 'super_admin' %}
-                            <li class="nav-item">
-                                <a class="nav-link {{ 'active' if request.endpoint == 'main.index' }}" href="{{ url_for('main.index') }}">
-                                    <i class="fas fa-home me-1"></i>Accueil
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-school me-1"></i>Écoles
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ url_for('main.gestion_ecoles') }}"><i class="fas fa-cog me-2"></i>Gérer les écoles</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.ajouter_ecole') }}"><i class="fas fa-plus me-2"></i>Ajouter une école</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.choisir_ecole') }}"><i class="fas fa-exchange-alt me-2"></i>Changer d'école</a></li>
-                                </ul>
-                            </li>
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-users me-1"></i>Utilisateurs
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ url_for('main.gestion_utilisateurs') }}"><i class="fas fa-list me-2"></i>Tous les utilisateurs</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.creer_utilisateur') }}"><i class="fas fa-user-plus me-2"></i>Créer utilisateur</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.gerer_ecoles_utilisateur', user_id=1) }}"><i class="fas fa-school me-2"></i>Gérer écoles utilisateur</a></li>
-                                </ul>
-                            </li>
-
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-archive me-1"></i>Archives
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ url_for('admin.archive_data') }}"><i class="fas fa-archive me-2"></i>Archives</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('admin.view_logs') }}"><i class="fas fa-file-alt me-2"></i>Logs</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.journaux_corrections') }}"><i class="fas fa-edit me-2"></i>Journal corrections</a></li>
-                                </ul>
-                            </li>
-
-                        <!-- 🔹 ADMIN : Accès limité à ses écoles -->
-                        {% elif current_user.role == 'admin' %}
-                            <li class="nav-item">
-                                <a class="nav-link {{ 'active' if request.endpoint == 'main.index' }}" href="{{ url_for('main.index') }}">
-                                    <i class="fas fa-home me-1"></i>Accueil
-                                </a>
-                            </li>
-
-                            <!-- Sélecteur d'école pour admin multi-écoles -->
-                            {% if current_user.ecoles_gerees.count() > 1 %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.choisir_ecole') }}">
-                                    <i class="fas fa-exchange-alt me-1"></i>Changer d'école
-                                </a>
-                            </li>
+                        <ul class="navbar-nav nav-primary-cluster me-auto ms-lg-3 gap-lg-2 mt-3 mt-lg-0">
+                            {% if current_user.role in ['admin', 'maintenance'] %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint in ['main.dashboard', 'admin.dashboard', 'maintenance.dashboard'] or endpoint.startswith('admin.') or endpoint.startswith('progress.dashboard_') or endpoint.startswith('placement.') %}active{% endif %}" href="{{ url_for('main.dashboard') }}">
+                                        <i class="bi bi-house"></i>
+                                        <span>{{ _('Dashboard') }}</span>
+                                    </a>
+                                </li>
                             {% endif %}
-                            
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-graduate me-1"></i>Élèves
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ url_for('main.eleves') }}"><i class="fas fa-list me-2"></i>Liste des élèves</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.ajouter_eleve') }}"><i class="fas fa-plus me-2"></i>Ajouter un élève</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.voir_inscriptions') }}"><i class="fas fa-user-check me-2"></i>Inscriptions</a></li>
-                                </ul>
-                            </li>
-                            
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-chalkboard-teacher me-1"></i>Enseignants
-                                </a>
-                                <ul class="dropdown-menu">
-                                    <li><a class="dropdown-item" href="{{ url_for('main.professeurs') }}"><i class="fas fa-list me-2"></i>Liste des professeurs</a></li>
-                                    <li><a class="dropdown-item" href="{{ url_for('main.ajouter_professeur') }}"><i class="fas fa-plus me-2"></i>Ajouter un professeur</a></li>
-                                </ul>
-                            </li>
-                            
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.cours') }}"><i class="fas fa-book me-1"></i>Cours</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.notes') }}"><i class="fas fa-edit me-1"></i>Notes</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.paiements') }}"><i class="fas fa-money-bill-wave me-1"></i>Paiements</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.absences') }}"><i class="fas fa-calendar-times me-1"></i>Absences</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.bulletins') }}"><i class="fas fa-file-pdf me-1"></i>Bulletins</a></li>
-                            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.admin_emplois') }}"><i class="fas fa-calendar-alt me-1"></i>Emplois du temps</a></li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.alertes') }}">
-                                    <i class="fas fa-bell me-1"></i>Alertes
-                                    <span class="notification-badge">3</span>
-                                </a>
-                            </li>
 
-                        <!-- 🔹 PROFESSEUR/ENSEIGNANT : Accès à ses classes et cours -->
-                        {% elif current_user.role in ['professeur', 'enseignant'] %}
-                            <li class="nav-item">
-                                <a class="nav-link {{ 'active' if request.endpoint == 'main.enseignant_dashboard' }}" href="{{ url_for('main.enseignant_dashboard') }}">
-                                    <i class="fas fa-home me-1"></i>Accueil
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.liste_classes') }}">
-                                    <i class="fas fa-users me-1"></i>Mes Classes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.cours') }}">
-                                    <i class="fas fa-book me-1"></i>Mes Cours
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.notes') }}">
-                                    <i class="fas fa-edit me-1"></i>Notes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.absences') }}">
-                                    <i class="fas fa-calendar-times me-1"></i>Absences
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.enseignant_home') }}">
-                                    <i class="fas fa-calendar-alt me-1"></i>Mon Emploi du temps
-                                </a>
-                            </li>
+                            {% if current_user.role in ['admin', 'enseignant', 'eleve'] %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint.startswith('courses.') or endpoint.startswith('lessons.') or endpoint.startswith('quiz.') %}active{% endif %}" href="{{ url_for('courses.liste') }}">
+                                        <i class="bi bi-book"></i>
+                                        <span>{{ _('Courses') }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
 
-                        <!-- 🔹 ÉLÈVE : Accès à ses propres données -->
-                        {% elif current_user.role == 'eleve' %}
-                            <li class="nav-item">
-                                <a class="nav-link {{ 'active' if request.endpoint == 'main.eleve_dashboard' }}" href="{{ url_for('main.eleve_dashboard') }}">
-                                    <i class="fas fa-home me-1"></i>Accueil
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.mes_notes') }}">
-                                    <i class="fas fa-chart-line me-1"></i>Mes Notes
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.mon_bulletin') }}">
-                                    <i class="fas fa-file-pdf me-1"></i>Mon Bulletin
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.mon_emploi_temps') }}">
-                                    <i class="fas fa-calendar-alt me-1"></i>Mon Emploi du temps
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.mes_alertes') }}">
-                                    <i class="fas fa-bell me-1"></i>Mes Alertes
-                                </a>
-                            </li>
+                            {% if current_user.role in ['eleve', 'admin'] %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint == 'progress.dashboard_eleve' %}active{% endif %}" href="{{ url_for('progress.dashboard_eleve') }}">
+                                        <i class="bi bi-graph-up-arrow"></i>
+                                        <span>{{ _('My progress') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <span id="navbar-xp" class="nav-link nav-link-stat nav-xp-pill">
+                                        <i class="bi bi-lightning-charge-fill"></i>
+                                        <span data-xp-value>{{ current_user.xp.points if current_user.xp else 0 }}</span>
+                                        <span>XP</span>
+                                    </span>
+                                </li>
+                            {% endif %}
 
-                        <!-- 🔹 PARENT : Accès aux données de ses enfants -->
-                        {% elif current_user.role == 'parent' %}
-                            <li class="nav-item">
-                                <a class="nav-link {{ 'active' if request.endpoint == 'main.parent_dashboard' }}" href="{{ url_for('main.parent_dashboard') }}">
-                                    <i class="fas fa-home me-1"></i>Accueil
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.portal_parent') }}">
-                                    <i class="fas fa-user-graduate me-1"></i>Mes Enfants
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-file-pdf me-1"></i>Bulletins
-                                </a>
-                                <ul class="dropdown-menu">
-                                    {% set enfants = current_user.enfants.all() %}
-                                    {% if enfants %}
-                                        {% for enfant in enfants %}
-                                            <li><a class="dropdown-item" href="{{ url_for('main.bulletin_eleve', id=enfant.id) }}">
-                                                <i class="fas fa-user-graduate me-2"></i>{{ enfant.prenom }} {{ enfant.nom }}
-                                            </a></li>
-                                        {% endfor %}
-                                    {% else %}
-                                        <li><span class="dropdown-item text-muted"><i class="fas fa-info-circle me-2"></i>Aucun enfant trouvé</span></li>
-                                    {% endif %}
-                                </ul>
-                            </li>
+                            {% if current_user.role in ['enseignant', 'admin'] %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint == 'progress.dashboard_enseignant' %}active{% endif %}" href="{{ url_for('progress.dashboard_enseignant') }}">
+                                        <i class="bi bi-people"></i>
+                                        <span>{{ _('My students') }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
 
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.paiements_parent') }}">
-                                    <i class="fas fa-money-bill-wave me-1"></i>Paiements
-                                </a>
-                            </li>
-                            
-                            <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('main.absences') }}">
-                                    <i class="fas fa-calendar-times me-1"></i>Absences
-                                </a>
-                            </li>
+                            {% if current_user.role == 'admin' %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint in ['main.gestion_utilisateurs', 'main.creer_utilisateur', 'main.modifier_utilisateur'] %}active{% endif %}" href="{{ url_for('main.gestion_utilisateurs') }}">
+                                        <i class="bi bi-people-fill"></i>
+                                        <span>{{ _('Users') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint == 'main.valider_comptes' %}active{% endif %}" href="{{ url_for('main.valider_comptes') }}">
+                                        <i class="bi bi-shield-check"></i>
+                                        <span>Validations</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint.startswith('placement.') %}active{% endif %}" href="{{ url_for('placement.admin_questions') }}">
+                                        <i class="bi bi-sliders"></i>
+                                        <span>{{ _('Placement') }}</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint == 'main.vocabulaire_admin' %}active{% endif %}" href="{{ url_for('main.vocabulaire_admin') }}">
+                                        <i class="bi bi-translate"></i>
+                                        <span>{{ _('Dictionary') }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
 
-                        {% endif %}
-                    {% endif %}
-                </ul>
+                            {% if current_user.role == 'maintenance' %}
+                                <li class="nav-item">
+                                    <a class="nav-link {% if endpoint.startswith('maintenance.') %}active{% endif %}" href="{{ url_for('maintenance.dashboard') }}">
+                                        <i class="bi bi-tools"></i>
+                                        <span>{{ _('Maintenance') }}</span>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
 
-                <!-- Menu utilisateur à droite -->
-                <ul class="navbar-nav ms-auto">
-                    <!-- Bouton de recherche - Visible pour admin, enseignant, professeur -->
-                    {% if current_user.is_authenticated and current_user.role in ['admin', 'super_admin', 'enseignant', 'professeur'] %}
-                    <li class="nav-item me-2 d-flex align-items-center">
-                        <a href="{{ url_for('main.recherche') }}" class="btn btn-outline-light btn-sm rounded-circle" title="Recherche">
-                            <i class="fas fa-search"></i>
-                        </a>
-                    </li>
-                    {% endif %}
-
-                    <!-- Toggle thème -->
-                    <li class="nav-item me-2 d-flex align-items-center">
-                        <button class="btn btn-outline-light btn-sm rounded-circle" id="themeToggle" title="Changer le thème">
-                            <i class="fas fa-moon"></i>
-                        </button>
-                    </li>
-
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <!-- Avatar avec initiales -->
-                            <div class="user-avatar rounded-circle bg-white text-primary d-flex justify-content-center align-items-center me-2" 
-                                 style="width: 40px; height: 40px; font-weight: bold; font-size: 0.9rem;">
-                                {% if current_user.prenom and current_user.nom %}
-                                    {{ current_user.prenom[0] }}{{ current_user.nom[0] }}
-                                {% elif current_user.prenom %}
-                                    {{ current_user.prenom[0] }}
-                                {% elif current_user.nom %}
-                                    {{ current_user.nom[0] }}
-                                {% else %}
-                                    <i class="fas fa-user"></i>
-                                {% endif %}
-                            </div>
-                            <span>
-                                {% if current_user.prenom and current_user.nom %}
-                                    {{ current_user.prenom }} {{ current_user.nom }}
-                                {% elif current_user.prenom %}
-                                    {{ current_user.prenom }}
-                                {% elif current_user.nom %}
-                                    {{ current_user.nom }}
-                                {% else %}
-                                    {{ current_user.role | capitalize }}
-                                {% endif %}
-                                <small class="text-muted d-block" style="font-size: 0.8rem;">
-                                    {{ current_user.role | capitalize }}
-                                </small>
-                            </span>
-                        </a>
-
-                        <ul class="dropdown-menu dropdown-menu-end shadow border-0 mt-2" aria-labelledby="userDropdown" style="min-width: 250px;">
-                            
-                            <!-- Profil utilisateur -->
-                            <li class="px-3 py-2 bg-light border-bottom">
-                                <div class="d-flex align-items-center">
-                                    <div class="user-avatar rounded-circle bg-primary text-white d-flex justify-content-center align-items-center me-3" 
-                                         style="width: 45px; height: 45px; font-weight: bold;">
-                                        {% if current_user.prenom and current_user.nom %}
-                                            {{ current_user.prenom[0] }}{{ current_user.nom[0] }}
-                                        {% elif current_user.prenom %}
-                                            {{ current_user.prenom[0] }}
-                                        {% elif current_user.nom %}
-                                            {{ current_user.nom[0] }}
-                                        {% else %}
-                                            <i class="fas fa-user"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div>
-                                        <div class="fw-semibold text-dark">
-                                            {% if current_user.prenom and current_user.nom %}
-                                                {{ current_user.prenom }} {{ current_user.nom }}
-                                            {% elif current_user.prenom %}
-                                                {{ current_user.prenom }}
-                                            {% elif current_user.nom %}
-                                                {{ current_user.nom }}
+                        <ul class="navbar-nav nav-utility-cluster ms-auto align-items-lg-center gap-lg-2 mt-3 mt-lg-0">
+                            {% if current_user.role in ['eleve', 'admin'] %}
+                                <li
+                                    class="nav-item dropdown nav-notification-wrapper"
+                                    data-notification-center="true"
+                                    data-notification-stream="{{ '1' if notification_stream_enabled else '0' }}"
+                                    data-notification-stream-url="{{ url_for('notifications.stream') }}"
+                                    data-notification-read-all-url="{{ url_for('notifications.read_all') }}"
+                                    data-notification-inbox-url="{{ url_for('notifications.inbox') }}"
+                                >
+                                    <button
+                                        class="btn nav-notification-toggle"
+                                        type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                    >
+                                        <span class="nav-notification-icon">
+                                            <i class="bi bi-bell"></i>
+                                        </span>
+                                        <span class="nav-notification-label">Notifications</span>
+                                        <span class="nav-notification-count {% if not notification_unread %}is-hidden{% endif %}" data-notification-count>{{ notification_unread }}</span>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end nav-notification-menu p-0">
+                                        <div class="nav-notification-menu__header">
+                                            <div>
+                                                <div class="fw-semibold">Notifications</div>
+                                                <div class="small text-muted"><span data-notification-count-label="true">{{ notification_unread }}</span> non lues</div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-link text-decoration-none" data-mark-all-notifications="true">
+                                                Tout lire
+                                            </button>
+                                        </div>
+                                        <div class="nav-notification-list" data-notification-preview-list="true">
+                                            {% if notification_items %}
+                                                {% for notification in notification_items %}
+                                                    {% set icon_class = 'bi-book' if notification.type == 'lesson_published' else 'bi-check-circle' if notification.type == 'exercise_corrected' else 'bi-award' if notification.type == 'badge_unlocked' else 'bi-chat-left-text' if notification.type == 'support_request' else 'bi-alarm' %}
+                                                    <a href="{{ notification.open_url }}" class="nav-notification-item {% if not notification.is_read %}is-unread{% endif %}">
+                                                        <span class="nav-notification-item__icon"><i class="bi {{ icon_class }}"></i></span>
+                                                        <span class="nav-notification-item__body">
+                                                            <span class="nav-notification-item__title">{{ notification.title }}</span>
+                                                            <span class="nav-notification-item__message">{{ notification.message }}</span>
+                                                            <span class="nav-notification-item__time">{{ notification.relative_time }}</span>
+                                                        </span>
+                                                    </a>
+                                                {% endfor %}
                                             {% else %}
-                                                Utilisateur
+                                                <div class="nav-notification-empty" data-notification-empty-state="true">
+                                                    <i class="bi bi-bell-slash"></i>
+                                                    <span>Aucune notification</span>
+                                                </div>
                                             {% endif %}
                                         </div>
-                                        <small class="text-muted">{{ current_user.role | capitalize }}</small>
-                                        {% if session.get('ecole_courante') %}
-                                        <div><small class="text-primary">{{ session.ecole_courante.nom }}</small></div>
-                                        {% endif %}
+                                        <div class="nav-notification-menu__footer">
+                                            <a href="{{ url_for('notifications.inbox') }}" class="btn btn-outline-platform btn-sm w-100">Ouvrir l'inbox</a>
+                                        </div>
                                     </div>
-                                </div>
+                                </li>
+                            {% endif %}
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-sm dropdown-toggle nav-language-toggle" data-bs-toggle="dropdown">
+                                    {{ lang_label }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end nav-utility-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.changer_langue', code='fr') }}">🇫🇷 Français</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.changer_langue', code='en') }}">🇬🇧 English</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.changer_langue', code='es') }}">🇪🇸 Español</a></li>
+                                </ul>
                             </li>
-
-                            <!-- Menu selon le rôle -->
-                            {% if current_user.role in ['admin', 'super_admin'] %}
-                            <li><a class="dropdown-item" href="{{ url_for('main.profile') }}"><i class="fas fa-user me-2"></i>Mon Profil</a></li>
-                            <li><hr class="dropdown-divider"></li>
-
-                            <!-- Menu Admin/Super Admin -->
-                            {% if current_user.role == 'super_admin' %}
-                            <li>
-                                <a class="dropdown-item d-flex justify-content-between align-items-center text-danger" data-bs-toggle="collapse" href="#superAdminMenuCollapse" role="button">
-                                    <span><i class="fas fa-crown me-2"></i>Super Admin</span>
-                                    <i class="fas fa-chevron-down"></i>
-                                </a>
-                                <div class="collapse ps-3" id="superAdminMenuCollapse">
-                                    <ul class="list-unstyled">
-                                        <li><a class="dropdown-item small" href="{{ url_for('admin.dashboard') }}">Dashboard Global</a></li>
-                                        <li><a class="dropdown-item small" href="{{ url_for('admin.view_logs') }}">Logs Système</a></li>
-                                        <li><a class="dropdown-item small" href="{{ url_for('admin.archive_data') }}">Archivage Global</a></li>
-                                        <li><a class="dropdown-item small" href="{{ url_for('admin.optimize') }}">Optimiser DB</a></li>
-                                        <li><a class="dropdown-item small" href="{{ url_for('admin.version_info') }}">Version</a></li>
-                                    </ul>
-                                </div>
-                            </li>
-                           {% else %}
-                            <li>
-                                <a class="dropdown-item d-flex justify-content-between align-items-center text-warning" data-bs-toggle="collapse" href="#adminMenuCollapse" role="button">
-                                    <span><i class="fas fa-cogs me-2"></i>Administration</span>
-                                    <i class="fas fa-chevron-down"></i>
-                                </a>
-                                <div class="collapse ps-3" id="adminMenuCollapse">
-                                    <ul class="list-unstyled">
-                                        {% if current_user.role == 'super_admin' %}
-                                            <li><a class="dropdown-item small" href="{{ url_for('admin.dashboard') }}">Dashboard École</a></li>
-                                            <li><a class="dropdown-item small" href="{{ url_for('admin.archive_data') }}">Archivage</a></li>
-                                            <li><a class="dropdown-item small" href="{{ url_for('main.creer_utilisateur') }}">Créer Utilisateur</a></li>
-                                            <li><a class="dropdown-item small" href="{{ url_for('main.journaux_corrections') }}">Corrections</a></li>
-                                        {% elif current_user.role == 'admin' %}
-                                            <li><a class="dropdown-item small" href="{{ url_for('admin.archive_data') }}">Archivage</a></li>
-                                            <li><a class="dropdown-item small" href="{{ url_for('main.creer_utilisateur') }}">Créer Utilisateur</a></li>
+                            <li class="nav-item">
+                                <a class="nav-link nav-profile-card {% if endpoint == 'main.profile' %}active{% endif %}" href="{{ url_for('main.profile') }}">
+                                    <span class="nav-profile-avatar">
+                                        {% if current_user.prenom %}
+                                            {{ current_user.prenom[0]|upper }}
+                                        {% elif current_user.nom %}
+                                            {{ current_user.nom[0]|upper }}
+                                        {% else %}
+                                            U
                                         {% endif %}
-                                    </ul>
-                                </div>
+                                    </span>
+                                    <span class="nav-profile-copy">
+                                        <span class="nav-profile-name">{{ current_user.prenom or current_user.nom or current_user.email }}</span>
+                                        <span class="nav-role-pill">{{ current_user.role }}</span>
+                                    </span>
+                                    <i class="bi bi-chevron-right nav-profile-chevron"></i>
+                                </a>
                             </li>
-                            {% endif %}
-
-                            <li><hr class="dropdown-divider"></li>
-                            {% endif %}
-
-                           
-
-                            {% if current_user.role == 'eleve' %}
-                            <li><a class="dropdown-item" href="{{ url_for('main.mes_performances') }}"><i class="fas fa-trophy me-2"></i>Mes Performances</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            {% endif %}
-
-                            {% if current_user.role == 'parent' %}
-                            <li><a class="dropdown-item" href="{{ url_for('main.notifications') }}"><i class="fas fa-bell me-2"></i>Notifications</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            {% endif %}
-
-                            <!-- Aide commune à tous -->
-                            <li><a class="dropdown-item" href="{{ url_for('main.aide') }}"><i class="fas fa-question-circle me-2"></i>Centre d'Aide</a></li>
-                            
-                            <!-- Déconnexion -->
-                            <li><hr class="dropdown-divider"></li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center text-danger" href="{{ url_for('main.logout') }}">
-                                    <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                            <li class="nav-item">
+                                <a class="nav-link nav-link-logout" href="{{ url_for('main.logout') }}" data-native-nav="false">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>{{ _('Logout') }}</span>
                                 </a>
                             </li>
                         </ul>
-                    </li>
-
                     {% else %}
-                    <!-- Liens pour non connectés -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('main.login') }}">
-                            <i class="fas fa-sign-in-alt me-1"></i>Connexion
-                        </a>
-                    </li>
-                
+                        <ul class="navbar-nav nav-utility-cluster ms-auto align-items-lg-center gap-lg-2 mt-3 mt-lg-0">
+                            <li class="nav-item dropdown">
+                                <button class="btn btn-sm dropdown-toggle nav-language-toggle" data-bs-toggle="dropdown">
+                                    {{ lang_label }}
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end nav-utility-menu">
+                                    <li><a class="dropdown-item" href="{{ url_for('main.changer_langue', code='fr') }}">🇫🇷 Français</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.changer_langue', code='en') }}">🇬🇧 English</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.changer_langue', code='es') }}">🇪🇸 Español</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if endpoint == 'main.index' %}active{% endif %}" href="{{ url_for('main.index') }}">
+                                    <i class="bi bi-house-door"></i>
+                                    <span>{{ _('Home') }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if endpoint == 'main.login' %}active{% endif %}" href="{{ url_for('main.login') }}">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                    <span>{{ _('Login') }}</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link {% if endpoint == 'main.register' %}active{% endif %}" href="{{ url_for('main.register') }}">
+                                    <i class="bi bi-person-plus"></i>
+                                    <span>Inscription</span>
+                                </a>
+                            </li>
+                        </ul>
                     {% endif %}
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
 
-    <main class="main-content">
-        <div class="container">
-            <!-- Affichage des messages flash -->
-            {% with messages = get_flashed_messages(with_categories=true) %}
-                {% if messages %}
-                    <div class="row">
-                        <div class="col-12">
-                            {% for category, message in messages %}
-                                <div class="alert alert-{{ 'danger' if category == 'error' else (category if category in ['success', 'warning', 'info'] else 'info') }} alert-dismissible fade show animate-pop-in mb-4" role="alert">
-                                    <div class="d-flex align-items-center">
-                                        <i class="fas 
-                                            {% if category == 'success' or category == 'message' %}fa-check-circle 
-                                            {% elif category == 'error' or category == 'danger' %}fa-exclamation-circle 
-                                            {% elif category == 'warning' %}fa-exclamation-triangle 
-                                            {% else %}fa-info-circle{% endif %} 
-                                            me-2 fs-5"></i>
-                                        <div class="fw-medium">{{ message }}</div>
-                                    </div>
-                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                {% endif %}
-            {% endwith %}
-
-            <!-- Contenu spécifique de la page -->
-            {% block content %}{% endblock %}
+    <div class="app-page-loader" aria-hidden="true">
+        <div class="app-page-loader-inner">
+            <div class="app-loader-line app-loader-line-lg"></div>
+            <div class="app-loader-line app-loader-line-md"></div>
+            <div class="app-loader-grid">
+                <div class="app-loader-card"></div>
+                <div class="app-loader-card"></div>
+                <div class="app-loader-card"></div>
+            </div>
+            <div class="app-loader-list">
+                <div class="app-loader-row"></div>
+                <div class="app-loader-row"></div>
+                <div class="app-loader-row"></div>
+            </div>
         </div>
+    </div>
+
+    <div id="app-flash-stack">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="container-fluid px-4 pt-3 flash-stack">
+                    {% for category, message in messages %}
+                        {% set mapped = 'success' if category in ['success'] else 'danger' if category in ['danger', 'error'] else 'warning' if category == 'warning' else 'info' %}
+                        <div class="alert alert-{{ mapped }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('Close') }}"></button>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <main id="app-main" class="container-fluid px-4 py-4" data-app-region="main">
+        {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-4 mb-4 mb-lg-0">
-                    <h5 class="mb-3">EduManage</h5>
-                    <p class="opacity-80">Plateforme de gestion scolaire complète pour les établissements d'enseignement modernes.</p>
-                    <div class="d-flex mt-3">
-                        <a href="#" class="text-white me-3 fs-5"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-white me-3 fs-5"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-white fs-5"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
-                <div class="col-lg-2 col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-3">Navigation</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ url_for('main.index') }}">Accueil</a></li>
-                        {% if current_user.is_authenticated %}
-                            {% if current_user.role in ['admin', 'super_admin'] %}
-                            <li class="mb-2"><a href="{{ url_for('main.dashboard') }}">Tableau de bord</a></li>
-                            {% elif current_user.role == 'professeur' %}
-                            <li class="mb-2"><a href="{{ url_for('main.enseignant_dashboard') }}">Mon Espace</a></li>
-                            {% elif current_user.role == 'eleve' %}
-                            <li class="mb-2"><a href="{{ url_for('main.eleve_dashboard') }}">Mon Espace</a></li>
-                            {% elif current_user.role == 'parent' %}
-                            <li class="mb-2"><a href="{{ url_for('main.parent_dashboard') }}">Mon Espace</a></li>
-                            {% endif %}
-                        {% endif %}
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-4 mb-4 mb-md-0">
-                    <h5 class="mb-3">Support</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="{{ url_for('main.aide') }}">Centre d'Aide</a></li>
-                        <li class="mb-2"><a href="#">FAQ</a></li>
-                        <li class="mb-2"><a href="#">Guide d'utilisation</a></li>
-                        <li class="mb-2"><a href="#">Politique de confidentialité</a></li>
-                    </ul>
-                </div>
-                <div class="col-lg-3 col-md-4">
-                    <h5 class="mb-3">Contact</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><i class="fas fa-envelope me-2 opacity-80"></i> moctargoumarattama@gmail.com</li>
-                        <li class="mb-2"><i class="fas fa-phone me-2 opacity-80"></i> +212 770010264</li>
-                        <li class="mb-2"><i class="fas fa-map-marker-alt me-2 opacity-80"></i> Maroc, Niger</li>
-                        <li class="mb-2"><i class="fas fa-clock me-2 opacity-80"></i> Lun-Ven: 10h-18h</li>
-                    </ul>
-                </div>
-            </div>
-            <hr class="my-4 bg-light opacity-25">
-            <div class="text-center">
-                <p class="mb-0 opacity-80">&copy; {{ moment().year }} EduManage. Tous droits réservés. | Version 2.1.0</p>
-            </div>
-            <meta name="csrf-token" content="{{ csrf_token() }}">
-        </div>
+    <footer class="footer-platform text-center py-3 mt-4">
+        {{ _("LabeeB Arabic | Arabic learning platform") }}
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/page-init.js', v=asset_version) }}"></script>
+    <script id="app-bootstrap-data" type="application/json">
+        {
+            "csrfToken": {{ csrf_token()|tojson }},
+            "vocabUrlTemplate": {% if current_user.is_authenticated and current_user.role in ['admin', 'enseignant', 'eleve'] %}{{ url_for('courses.api_vocabulaire', mot_arabe='__MOT__')|tojson }}{% else %}null{% endif %},
+            "uiStrings": {
+                "translationLabel": {{ _('Translation')|tojson }},
+                "listen": {{ _('Listen')|tojson }},
+                "example": {{ _('Example')|tojson }},
+                "unavailable": {{ _('Unavailable')|tojson }},
+                "pronunciationUnavailable": {{ _('Pronunciation unavailable on this device.')|tojson }}
+            }
+        }
+    </script>
     <script>
-        // Configuration CSRF pour toutes les requêtes fetch
-        function getCSRFToken() {
-            return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        const appBootstrapData = JSON.parse(
+            document.getElementById('app-bootstrap-data')?.textContent || '{}'
+        );
+
+        window.APP_CSRF_TOKEN = appBootstrapData.csrfToken || '';
+        window.APP_VOCAB_URL_TEMPLATE = appBootstrapData.vocabUrlTemplate ?? null;
+        window.APP_UI_STRINGS = appBootstrapData.uiStrings || {};
+        const PREMIUM_BOOT_MIN_MS = 980;
+        const PREMIUM_NAV_MIN_MS = 320;
+        let activeDicoRequestController = null;
+        let activeDicoRequestToken = 0;
+        let removeDicoDragListeners = null;
+        let premiumLoaderMode = 'boot';
+        let premiumLoaderVisible = true;
+        let premiumLoaderShownAt = Date.now();
+        let premiumLoaderHideTimer = null;
+        let premiumBootReady = false;
+        let premiumPageReady = document.readyState === 'complete';
+
+        function getPremiumLoader() {
+            return document.getElementById('app-premium-loader');
         }
 
-        // Intercepteur pour ajouter le token CSRF à toutes les requêtes
-        fetch = (originalFetch => {
-            return (...args) => {
-                if (args[1] && args[1].headers) {
-                    if (!args[1].headers['X-CSRF-TOKEN']) {
-                        args[1].headers['X-CSRF-TOKEN'] = getCSRFToken();
-                    }
-                }
-                return originalFetch(...args);
-            };
-        })(fetch);
-
-        document.addEventListener('DOMContentLoaded', function() {
-            // Animation pour les éléments avec la classe animate-pop-in
-            const animatedElements = document.querySelectorAll('.animate-pop-in');
-            animatedElements.forEach((el, idx) => {
-                el.style.animationDelay = `${idx * 0.1}s`;
-            });
-            
-            // Initialiser les tooltips
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
-            });
-            
-            // Effet de navbar au scroll
-            const navbar = document.querySelector('.navbar');
-            window.addEventListener('scroll', function() {
-                if (window.scrollY > 10) {
-                    navbar.style.padding = '0.5rem 1rem';
-                    navbar.style.backdropFilter = 'blur(12px)';
-                } else {
-                    navbar.style.padding = '0.8rem 1rem';
-                    navbar.style.backdropFilter = 'blur(10px)';
-                }
-            });
-            
-            // Gestion du thème
-            const themeToggle = document.getElementById('themeToggle');
-            const themeIcon = themeToggle.querySelector('i');
-            
-            // Vérifier le thème sauvegardé ou respecter la préférence OS
-            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            document.documentElement.setAttribute('data-bs-theme', savedTheme);
-            updateThemeIcon(savedTheme);
-            
-            themeToggle.addEventListener('click', () => {
-                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
-                const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-                
-                document.documentElement.setAttribute('data-bs-theme', newTheme);
-                localStorage.setItem('theme', newTheme);
-                updateThemeIcon(newTheme);
-            });
-            
-            function updateThemeIcon(theme) {
-                if (theme === 'dark') {
-                    themeIcon.classList.remove('fa-moon');
-                    themeIcon.classList.add('fa-sun');
-                } else {
-                    themeIcon.classList.remove('fa-sun');
-                    themeIcon.classList.add('fa-moon');
-                }
+        function clearPremiumLoaderHideTimer() {
+            if (premiumLoaderHideTimer !== null) {
+                window.clearTimeout(premiumLoaderHideTimer);
+                premiumLoaderHideTimer = null;
             }
-            
-            // Auto-hide alerts après 5 secondes
-            const alerts = document.querySelectorAll('.alert');
-            alerts.forEach(alert => {
-                setTimeout(() => {
-                    const bsAlert = bootstrap.Alert.getInstance(alert);
-                    if (bsAlert) {
-                        bsAlert.close();
-                    }
-                }, 5000);
-            });
+        }
 
-            // Gestion des menus collapibles dans le dropdown
-            const collapseToggles = document.querySelectorAll('[data-bs-toggle="collapse"]');
-            collapseToggles.forEach(toggle => {
-                const target = document.querySelector(toggle.getAttribute('href'));
-                const chevron = toggle.querySelector('.fa-chevron-down');
-                
-                if (target && chevron) {
-                    target.addEventListener('show.bs.collapse', () => {
-                        chevron.style.transform = 'rotate(180deg)';
-                    });
-                    target.addEventListener('hide.bs.collapse', () => {
-                        chevron.style.transform = 'rotate(0deg)';
-                    });
+        function applyPremiumLoaderState() {
+            const loader = getPremiumLoader();
+            if (!loader) {
+                return;
+            }
+
+            loader.classList.toggle('app-premium-loader--visible', premiumLoaderVisible);
+            loader.classList.toggle('app-premium-loader--hidden', !premiumLoaderVisible);
+            loader.classList.toggle('app-premium-loader--boot', premiumLoaderMode === 'boot');
+            loader.classList.toggle('app-premium-loader--nav', premiumLoaderMode === 'nav');
+        }
+
+        function showPremiumLoader(mode) {
+            clearPremiumLoaderHideTimer();
+            premiumLoaderMode = mode;
+            premiumLoaderVisible = true;
+            premiumLoaderShownAt = Date.now();
+            applyPremiumLoaderState();
+        }
+
+        function hidePremiumLoader(force = false) {
+            const minDuration = premiumLoaderMode === 'boot' ? PREMIUM_BOOT_MIN_MS : PREMIUM_NAV_MIN_MS;
+            const elapsed = Date.now() - premiumLoaderShownAt;
+            const remaining = Math.max(minDuration - elapsed, 0);
+            if (!force && remaining > 0) {
+                clearPremiumLoaderHideTimer();
+                premiumLoaderHideTimer = window.setTimeout(() => {
+                    hidePremiumLoader(true);
+                }, remaining);
+                return;
+            }
+
+            clearPremiumLoaderHideTimer();
+            premiumLoaderVisible = false;
+            if (premiumLoaderMode === 'boot') {
+                premiumBootReady = true;
+            }
+            applyPremiumLoaderState();
+        }
+
+        function maybeHideBootPremiumLoader() {
+            if (!premiumPageReady || premiumBootReady === true) {
+                return;
+            }
+            hidePremiumLoader();
+        }
+
+        function jouerAudio(url, onError) {
+            if (!url) {
+                if (typeof onError === 'function') {
+                    onError();
+                }
+                return;
+            }
+
+            const audio = new Audio(url);
+            audio.preload = 'auto';
+
+            let settled = false;
+            let fallbackTimer = null;
+
+            const cleanup = () => {
+                if (fallbackTimer !== null) {
+                    window.clearTimeout(fallbackTimer);
+                    fallbackTimer = null;
+                }
+
+                audio.removeEventListener('error', triggerFallback);
+                audio.removeEventListener('stalled', triggerFallback);
+                audio.removeEventListener('abort', triggerFallback);
+                audio.removeEventListener('playing', markStarted);
+            };
+
+            const triggerFallback = () => {
+                if (settled) {
+                    return;
+                }
+
+                settled = true;
+                cleanup();
+
+                try {
+                    audio.pause();
+                    audio.removeAttribute('src');
+                } catch (_) {
+                    // Ignore cleanup failures and continue with the TTS fallback.
+                }
+
+                if (typeof onError === 'function') {
+                    onError();
+                }
+            };
+
+            const markStarted = () => {
+                if (settled) {
+                    return;
+                }
+                settled = true;
+                cleanup();
+            };
+
+            audio.addEventListener('error', triggerFallback, { once: true });
+            audio.addEventListener('stalled', triggerFallback, { once: true });
+            audio.addEventListener('abort', triggerFallback, { once: true });
+            audio.addEventListener('playing', markStarted, { once: true });
+
+            fallbackTimer = window.setTimeout(triggerFallback, 1800);
+
+            const playPromise = audio.play();
+            if (playPromise && typeof playPromise.catch === 'function') {
+                playPromise.catch(triggerFallback);
+            }
+        }
+
+        function choisirVoixArabe() {
+            if (!('speechSynthesis' in window) || typeof window.speechSynthesis.getVoices !== 'function') {
+                return null;
+            }
+
+            const voices = window.speechSynthesis.getVoices() || [];
+            return voices.find(voice => /^ar([_-]|$)/i.test(voice.lang || ''))
+                || voices.find(voice => /arab/i.test(`${voice.name || ''} ${voice.lang || ''}`))
+                || null;
+        }
+
+        function prononcerTexte(texte, langue, ui) {
+            const content = String(texte || '').trim();
+            if (!content) {
+                return false;
+            }
+
+            if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+                window.alert((ui && ui.pronunciationUnavailable) || (ui && ui.unavailable) || 'Pronunciation unavailable.');
+                return false;
+            }
+
+            try {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(content);
+                utterance.lang = langue || 'ar';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                const voice = choisirVoixArabe();
+                if (voice) {
+                    utterance.voice = voice;
+                }
+                window.speechSynthesis.speak(utterance);
+                return true;
+            } catch (_) {
+                window.alert((ui && ui.pronunciationUnavailable) || (ui && ui.unavailable) || 'Pronunciation unavailable.');
+                return false;
+            }
+        }
+
+        function peutPrononcerDico(data) {
+            return Boolean(data && (data.audio_url || data.pronunciation_text || data.mot));
+        }
+
+        function jouerPrononciationDico(data, ui) {
+            if (!data) {
+                return;
+            }
+
+            const fallbackText = data.pronunciation_text || data.mot || '';
+            const fallbackLang = data.pronunciation_lang || 'ar';
+            const lancerFallback = () => prononcerTexte(fallbackText, fallbackLang, ui);
+
+            if (data.audio_url) {
+                jouerAudio(data.audio_url, lancerFallback);
+                return;
+            }
+
+            lancerFallback();
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function buildArabicWordSpan(word) {
+            const span = document.createElement('span');
+            span.className = 'mot-arabe-cliquable';
+            span.textContent = word;
+            span.dataset.motArabe = word;
+            return span;
+        }
+
+        function wrapArabicWords(container) {
+            const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+                acceptNode(node) {
+                    if (!node.nodeValue || !/[\u0600-\u06FF]+/.test(node.nodeValue)) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+                    if (!node.parentElement || node.parentElement.closest('.mot-arabe-cliquable, #dico-popup')) {
+                        return NodeFilter.FILTER_REJECT;
+                    }
+                    return NodeFilter.FILTER_ACCEPT;
                 }
             });
 
-            // Fermer le dropdown quand on clique sur un lien
-            const dropdownLinks = document.querySelectorAll('.dropdown-menu a:not([data-bs-toggle])');
-            dropdownLinks.forEach(link => {
-                link.addEventListener('click', () => {
-                    const dropdown = bootstrap.Dropdown.getInstance(document.querySelector('#userDropdown'));
-                    if (dropdown) {
-                        dropdown.hide();
+            const textNodes = [];
+            while (walker.nextNode()) {
+                textNodes.push(walker.currentNode);
+            }
+
+            textNodes.forEach(node => {
+                const fragment = document.createDocumentFragment();
+                const parts = node.nodeValue.split(/([\u0600-\u06FF]+)/g);
+                parts.forEach(part => {
+                    if (!part) {
+                        return;
+                    }
+                    if (/^[\u0600-\u06FF]+$/.test(part)) {
+                        fragment.appendChild(buildArabicWordSpan(part));
+                    } else {
+                        fragment.appendChild(document.createTextNode(part));
                     }
                 });
+                node.parentNode.replaceChild(fragment, node);
             });
+        }
+
+        function initDictionnaire() {
+            if (!window.APP_VOCAB_URL_TEMPLATE) {
+                return;
+            }
+            document.querySelectorAll('.arabic-text, .arabic-content, [lang="ar"]').forEach(container => {
+                if (container.dataset.dicoReady === 'true') {
+                    return;
+                }
+                wrapArabicWords(container);
+                container.dataset.dicoReady = 'true';
+            });
+        }
+
+        function cleanupDicoRuntime(options = {}) {
+            const { abortRequest = false, restoreScroll = true } = options;
+
+            if (abortRequest && activeDicoRequestController) {
+                activeDicoRequestController.abort();
+            }
+            activeDicoRequestController = null;
+
+            if (typeof removeDicoDragListeners === 'function') {
+                removeDicoDragListeners();
+                removeDicoDragListeners = null;
+            }
+
+            document.getElementById('dico-popup')?.remove();
+            if (restoreScroll) {
+                document.body.style.overflow = '';
+            }
+        }
+
+        function renderDicoPopup(content) {
+            cleanupDicoRuntime({ restoreScroll: false });
+
+            const popup = document.createElement('div');
+            popup.id = 'dico-popup';
+            popup.innerHTML = content;
+            document.body.appendChild(popup);
+            document.body.style.overflow = 'hidden';
+
+            popup.querySelector('.dico-overlay')?.addEventListener('click', () => {
+                cleanupDicoRuntime();
+            });
+            popup.querySelector('.dico-close')?.addEventListener('click', () => {
+                cleanupDicoRuntime();
+            });
+
+            const card = popup.querySelector('.dico-card');
+            removeDicoDragListeners = enableDicoDrag(card);
+            return popup;
+        }
+
+        function renderDicoError(mot, ui) {
+            renderDicoPopup(`
+                <div class="dico-overlay"></div>
+                <div class="dico-card">
+                    <div class="dico-drag-handle" aria-hidden="true">
+                        <span class="dico-drag-bar"></span>
+                    </div>
+                    <button class="dico-close" type="button" aria-label="Close">x</button>
+                    <div class="dico-mot arabic-text">${escapeHtml(mot)}</div>
+                    <div class="dico-section-label">${escapeHtml(ui.translationLabel || 'Translation')}</div>
+                    <div class="dico-traduction">${escapeHtml(ui.unavailable || 'Unavailable')}</div>
+                </div>
+            `);
+        }
+
+        async function ouvrirDico(mot) {
+            if (!window.APP_VOCAB_URL_TEMPLATE) {
+                return;
+            }
+
+            activeDicoRequestToken += 1;
+            const requestToken = activeDicoRequestToken;
+            if (activeDicoRequestController) {
+                activeDicoRequestController.abort();
+            }
+            activeDicoRequestController = new AbortController();
+
+            const endpoint = window.APP_VOCAB_URL_TEMPLATE.replace('__MOT__', encodeURIComponent(mot));
+            const ui = window.APP_UI_STRINGS || {};
+
+            try {
+                const resp = await fetch(endpoint, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    credentials: 'same-origin',
+                    signal: activeDicoRequestController.signal
+                });
+
+                const contentType = resp.headers.get('content-type') || '';
+                if (!resp.ok || !contentType.includes('application/json')) {
+                    throw new Error(`Unexpected dictionary response: ${resp.status}`);
+                }
+
+                const data = await resp.json();
+                if (requestToken !== activeDicoRequestToken) {
+                    return;
+                }
+
+                const popup = renderDicoPopup(`
+                    <div class="dico-overlay"></div>
+                    <div class="dico-card">
+                        <div class="dico-drag-handle" aria-hidden="true">
+                            <span class="dico-drag-bar"></span>
+                        </div>
+                        <button class="dico-close" type="button" aria-label="Close">x</button>
+                        <div class="dico-mot arabic-text">${escapeHtml(data.mot || mot)}</div>
+                        ${data.translitteration ? `<div class="dico-translit">${escapeHtml(data.translitteration)}</div>` : ''}
+                        <div class="dico-section-label">${escapeHtml(ui.translationLabel || 'Translation')}</div>
+                        <div class="dico-traduction">${escapeHtml(data.traduction || ui.unavailable || 'Unavailable')}</div>
+                        ${peutPrononcerDico(data) ? `<button class="dico-audio" type="button">${escapeHtml(ui.listen || 'Listen')}</button>` : ''}
+                        ${data.exemple ? `<div class="dico-section-label">${escapeHtml(ui.example || 'Example')}</div><div class="dico-exemple arabic-text">${escapeHtml(data.exemple)}</div>` : ''}
+                    </div>
+                `);
+                if (peutPrononcerDico(data)) {
+                    popup.querySelector('.dico-audio')?.addEventListener('click', () => jouerPrononciationDico(data, ui));
+                }
+                initDictionnaire();
+            } catch (error) {
+                if (error.name === 'AbortError' || requestToken !== activeDicoRequestToken) {
+                    return;
+                }
+                renderDicoError(mot, ui);
+            }
+        }
+
+        function enableDicoDrag(card) {
+            if (!card) {
+                return null;
+            }
+
+            const handle = card.querySelector('.dico-drag-handle');
+            if (!handle) {
+                return null;
+            }
+
+            let dragging = false;
+            let startX = 0;
+            let startY = 0;
+            let currentX = 0;
+            let currentY = 0;
+
+            const updateTransform = () => {
+                if (window.innerWidth >= 769) {
+                    card.style.transform = `translate(calc(-50% + ${currentX}px), calc(-50% + ${currentY}px))`;
+                } else {
+                    card.style.transform = `translate(${currentX}px, ${currentY}px)`;
+                }
+            };
+
+            const startDrag = (clientX, clientY) => {
+                dragging = true;
+                startX = clientX - currentX;
+                startY = clientY - currentY;
+                card.classList.add('is-dragging');
+            };
+
+            const moveDrag = (clientX, clientY) => {
+                if (!dragging) {
+                    return;
+                }
+
+                currentX = clientX - startX;
+                currentY = clientY - startY;
+                updateTransform();
+            };
+
+            const endDrag = () => {
+                dragging = false;
+                card.classList.remove('is-dragging');
+            };
+
+            const onMouseDown = event => {
+                event.preventDefault();
+                startDrag(event.clientX, event.clientY);
+            };
+
+            const onMouseMove = event => {
+                moveDrag(event.clientX, event.clientY);
+            };
+
+            const onTouchStart = event => {
+                const touch = event.touches[0];
+                if (!touch) {
+                    return;
+                }
+                startDrag(touch.clientX, touch.clientY);
+            };
+
+            const onTouchMove = event => {
+                if (!dragging) {
+                    return;
+                }
+                if (event.cancelable) {
+                    event.preventDefault();
+                }
+                const touch = event.touches[0];
+                if (!touch) {
+                    return;
+                }
+                moveDrag(touch.clientX, touch.clientY);
+            };
+
+            handle.addEventListener('mousedown', onMouseDown);
+            window.addEventListener('mousemove', onMouseMove);
+            window.addEventListener('mouseup', endDrag);
+            handle.addEventListener('touchstart', onTouchStart, { passive: true });
+            window.addEventListener('touchmove', onTouchMove, { passive: false });
+            window.addEventListener('touchend', endDrag);
+            window.addEventListener('resize', updateTransform);
+
+            return () => {
+                handle.removeEventListener('mousedown', onMouseDown);
+                window.removeEventListener('mousemove', onMouseMove);
+                window.removeEventListener('mouseup', endDrag);
+                handle.removeEventListener('touchstart', onTouchStart);
+                window.removeEventListener('touchmove', onTouchMove);
+                window.removeEventListener('touchend', endDrag);
+                window.removeEventListener('resize', updateTransform);
+            };
+        }
+
+        let navProgressTimer = null;
+
+        function setNavProgress(value) {
+            document.documentElement.style.setProperty('--app-nav-progress', `${value}%`);
+        }
+
+        function startNavProgress() {
+            clearInterval(navProgressTimer);
+            let progress = 12;
+            setNavProgress(progress);
+            navProgressTimer = window.setInterval(() => {
+                progress = Math.min(progress + 7, 82);
+                setNavProgress(progress);
+            }, 120);
+        }
+
+        function stopNavProgress() {
+            clearInterval(navProgressTimer);
+            setNavProgress(100);
+            window.setTimeout(() => {
+                setNavProgress(0);
+            }, 180);
+        }
+
+        function markNavigating() {
+            document.body.classList.add('app-is-navigating');
+            startNavProgress();
+        }
+
+        window.addEventListener('pageshow', () => {
+            document.body.classList.remove('app-is-navigating');
+            stopNavProgress();
+            premiumPageReady = true;
+            if (!premiumBootReady) {
+                maybeHideBootPremiumLoader();
+            }
+        });
+
+        window.addEventListener('app:navigation-start', () => {
+            showPremiumLoader('nav');
+            markNavigating();
+        });
+
+        window.addEventListener('app:navigation-stop', () => {
+            document.body.classList.remove('app-is-navigating');
+            stopNavProgress();
+            hidePremiumLoader();
+        });
+
+        document.addEventListener('click', event => {
+            const trigger = event.target instanceof Element ? event.target.closest('.mot-arabe-cliquable') : null;
+            if (!trigger) {
+                return;
+            }
+            const mot = trigger.dataset.motArabe;
+            if (!mot) {
+                return;
+            }
+            ouvrirDico(mot);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.__APP_DICO_CLEANUP_REGISTERED__) {
+                window.__APP_DICO_CLEANUP_REGISTERED__ = true;
+                window.appRegisterCleanup?.(() => {
+                    cleanupDicoRuntime({ abortRequest: true, restoreScroll: true });
+                });
+            }
+            showPremiumLoader('boot');
+            if ('speechSynthesis' in window && typeof window.speechSynthesis.getVoices === 'function') {
+                window.speechSynthesis.getVoices();
+                if (typeof window.speechSynthesis.addEventListener === 'function') {
+                    window.speechSynthesis.addEventListener('voiceschanged', () => {
+                        window.speechSynthesis.getVoices();
+                    }, { once: true });
+                }
+            }
+            initDictionnaire();
+            window.appRunPageInitializers?.(document);
+            premiumPageReady = true;
+            maybeHideBootPremiumLoader();
         });
     </script>
-    
-    <!-- Scripts spécifiques aux pages -->
-    {% block scripts %}{% endblock %}
-    <!-- ... autres scripts ... -->
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-
-
-{% block extra_js %}{% endblock %}  <!-- ⚠️ IMPORTANT -->
-
+    <script src="{{ url_for('static', filename='js/native-nav.js', v=asset_version) }}"></script>
+    <script src="{{ url_for('static', filename='js/pwa.js', v=asset_version) }}"></script>
+    <div id="app-page-scripts" hidden>
+        {% block extra_js %}{% endblock %}
+    </div>
 </body>
 </html>

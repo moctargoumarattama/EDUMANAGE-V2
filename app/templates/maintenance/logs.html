@@ -1,0 +1,72 @@
+{% extends "maintenance/base_maintenance.html" %}
+
+{% block title %}Logs | Maintenance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Logs applicatifs</h1>
+        <p class="text-secondary mb-0">Filtres par niveau, module, utilisateur, IP et date.</p>
+    </div>
+    <a class="btn btn-outline-light" href="{{ url_for('maintenance.dashboard') }}">
+        <i class="bi bi-arrow-left me-2"></i>Retour
+    </a>
+</div>
+
+{% if latest_critical_error %}
+<div class="alert-banner alert-banner--danger">
+    <strong>Derniere erreur critique :</strong> {{ latest_critical_error.timestamp }} · {{ latest_critical_error.action }}
+    {% if latest_critical_error.details %}<div class="mt-2">{{ latest_critical_error.details }}</div>{% endif %}
+</div>
+{% endif %}
+
+<div class="tech-card mb-4">
+    <form method="GET" class="tech-grid tech-grid--filters">
+        <input class="tech-input" type="text" name="level" value="{{ filters.level }}" placeholder="Level">
+        <input class="tech-input" type="text" name="module" value="{{ filters.module }}" placeholder="Module">
+        <input class="tech-input" type="text" name="user_id" value="{{ filters.user_id }}" placeholder="User ID">
+        <input class="tech-input" type="text" name="ip" value="{{ filters.ip }}" placeholder="IP">
+        <input class="tech-input" type="date" name="start_date" value="{{ filters.start_date }}">
+        <input class="tech-input" type="date" name="end_date" value="{{ filters.end_date }}">
+        <div class="d-flex gap-2">
+            <button class="btn btn-outline-light" type="submit">Filtrer</button>
+            <a class="btn btn-outline-secondary" href="{{ url_for('maintenance.logs') }}">Reinitialiser</a>
+        </div>
+    </form>
+</div>
+
+<div class="tech-card">
+    {% if logs %}
+    <div class="table-responsive">
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Level</th>
+                    <th>Module</th>
+                    <th>Action</th>
+                    <th>User</th>
+                    <th>IP</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in logs %}
+                <tr>
+                    <td>{{ item.timestamp.strftime('%Y-%m-%d %H:%M:%S') if item.timestamp else '-' }}</td>
+                    <td>{{ item.level }}</td>
+                    <td>{{ item.module }}</td>
+                    <td>{{ item.action }}</td>
+                    <td>{{ item.utilisateur_id or '-' }}</td>
+                    <td>{{ item.ip_address or '-' }}</td>
+                    <td>{{ item.details or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-secondary">Aucun log pour ces filtres.</div>
+    {% endif %}
+</div>
+{% endblock %}

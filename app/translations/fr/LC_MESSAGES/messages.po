@@ -1,0 +1,1078 @@
+# French translations for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-04-11 19:47+0100\n"
+"PO-Revision-Date: 2026-04-11 19:48+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: fr\n"
+"Language-Team: fr <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: app/routes.py:114 app/routes.py:176
+msgid "Connexion reussie."
+msgstr "Connexion reussie."
+
+#: app/routes.py:118
+msgid "Identifiant ou mot de passe incorrect."
+msgstr "Identifiant ou mot de passe incorrect."
+
+#: app/routes.py:126 app/routes.py:134
+msgid "La connexion Google n'est pas encore configuree."
+msgstr "La connexion Google n'est pas encore configuree."
+
+#: app/routes.py:138
+msgid "La connexion Google a ete annulee ou a echoue."
+msgstr "La connexion Google a ete annulee ou a echoue."
+
+#: app/routes.py:143
+msgid "Impossible de recuperer votre profil Google."
+msgstr "Impossible de recuperer votre profil Google."
+
+#: app/routes.py:149
+msgid "Le compte Google ne fournit pas d'adresse email exploitable."
+msgstr "Le compte Google ne fournit pas d'adresse email exploitable."
+
+#: app/routes.py:188
+msgid "Vous etes maintenant deconnecte."
+msgstr "Vous etes maintenant deconnecte."
+
+#: app/routes.py:220
+msgid "Cet email existe deja."
+msgstr "Cet email existe deja."
+
+#: app/routes.py:233
+msgid "Utilisateur cree avec succes."
+msgstr "Utilisateur cree avec succes."
+
+#: app/routes.py:257
+msgid "Le fichier CSV n'a pas pu etre lu."
+msgstr "Le fichier CSV n'a pas pu etre lu."
+
+#: app/routes.py:284
+#, python-format
+msgid "Import CSV termine: %(added)s ajoute(s), %(updated)s mis a jour."
+msgstr "Import CSV termine: %(added)s ajoute(s), %(updated)s mis a jour."
+
+#: app/routes.py:291
+msgid "Le mot arabe est obligatoire."
+msgstr "Le mot arabe est obligatoire."
+
+#: app/routes.py:310
+msgid "Entree de vocabulaire ajoutee."
+msgstr "Entree de vocabulaire ajoutee."
+
+#: app/routes.py:310
+msgid "Entree de vocabulaire mise a jour."
+msgstr "Entree de vocabulaire mise a jour."
+
+#: app/routes.py:323
+msgid "Entree de vocabulaire supprimee."
+msgstr "Entree de vocabulaire supprimee."
+
+#: app/routes.py:348
+msgid "Si un compte existe pour cet email, un lien a ete envoye."
+msgstr "Si un compte existe pour cet email, un lien a ete envoye."
+
+#: app/routes.py:365
+msgid "Le lien de reinitialisation est invalide ou expire."
+msgstr "Le lien de reinitialisation est invalide ou expire."
+
+#: app/routes.py:372
+msgid "Utilisateur introuvable."
+msgstr "Utilisateur introuvable."
+
+#: app/routes.py:377
+msgid "Mot de passe mis a jour. Vous pouvez vous reconnecter."
+msgstr "Mot de passe mis a jour. Vous pouvez vous reconnecter."
+
+#: app/blueprints/courses.py:171
+msgid "Cours cree avec succes. Il reste en brouillon jusqu'a publication."
+msgstr "Cours cree avec succes. Il reste en brouillon jusqu'a publication."
+
+#: app/blueprints/courses.py:209
+msgid "Cours mis a jour avec succes."
+msgstr "Cours mis a jour avec succes."
+
+#: app/blueprints/courses.py:226
+msgid "Cours supprime avec succes."
+msgstr "Cours supprime avec succes."
+
+#: app/blueprints/courses.py:246
+msgid "Vous etes deja inscrit a ce cours."
+msgstr "Vous etes deja inscrit a ce cours."
+
+#: app/blueprints/courses.py:256
+msgid "Inscription au cours enregistree avec succes."
+msgstr "Inscription au cours enregistree avec succes."
+
+#: app/blueprints/courses.py:271 app/blueprints/courses.py:281
+msgid "Non disponible"
+msgstr "Non disponible"
+
+#: app/blueprints/lessons.py:91
+msgid "Vous devez etre inscrit a ce cours pour ouvrir cette lecon."
+msgstr "Vous devez etre inscrit a ce cours pour ouvrir cette lecon."
+
+#: app/blueprints/lessons.py:202
+msgid "Une question est manquante dans la reponse."
+msgstr "Une question est manquante dans la reponse."
+
+#: app/blueprints/lessons.py:212
+msgid "La dictee n'est pas configuree correctement."
+msgstr "La dictee n'est pas configuree correctement."
+
+#: app/blueprints/lessons.py:214
+msgid "Toutes les questions doivent etre completees."
+msgstr "Toutes les questions doivent etre completees."
+
+#: app/blueprints/lessons.py:220
+msgid "Un choix selectionne est invalide."
+msgstr "Un choix selectionne est invalide."
+
+#: app/blueprints/lessons.py:224 app/blueprints/quiz.py:133
+msgid "Le choix selectionne ne correspond pas a la question."
+msgstr "Le choix selectionne ne correspond pas a la question."
+
+#: app/blueprints/lessons.py:308
+msgid "Lecon creee avec succes."
+msgstr "Lecon creee avec succes."
+
+#: app/blueprints/lessons.py:358
+msgid "Lecon mise a jour avec succes."
+msgstr "Lecon mise a jour avec succes."
+
+#: app/blueprints/lessons.py:377
+msgid "Lecon supprimee avec succes."
+msgstr "Lecon supprimee avec succes."
+
+#: app/blueprints/placement.py:45 app/blueprints/placement.py:64
+msgid "Vous avez deja passe le test de niveau."
+msgstr "Vous avez deja passe le test de niveau."
+
+#: app/blueprints/placement.py:53 app/blueprints/placement.py:72
+msgid "Test non disponible pour le moment."
+msgstr "Test non disponible pour le moment."
+
+#: app/blueprints/placement.py:130
+msgid "Excellent ! Vous commencez au niveau A2."
+msgstr "Excellent ! Vous commencez au niveau A2."
+
+#: app/blueprints/placement.py:132
+msgid "Vous commencez au niveau A1 pour consolider les bases."
+msgstr "Vous commencez au niveau A1 pour consolider les bases."
+
+#: app/blueprints/placement.py:174 app/blueprints/quiz.py:42
+msgid "Le texte de la question est obligatoire."
+msgstr "Le texte de la question est obligatoire."
+
+#: app/blueprints/placement.py:178
+msgid "Vous devez designer exactement une bonne reponse."
+msgstr "Vous devez designer exactement une bonne reponse."
+
+#: app/blueprints/placement.py:182
+msgid "Ajoutez au moins deux choix pour la question."
+msgstr "Ajoutez au moins deux choix pour la question."
+
+#: app/blueprints/placement.py:209
+msgid "Question de placement ajoutee avec succes."
+msgstr "Question de placement ajoutee avec succes."
+
+#: app/blueprints/placement.py:220
+msgid "Question supprimee."
+msgstr "Question supprimee."
+
+#: app/blueprints/quiz.py:44
+msgid "L'URL audio est obligatoire pour une dictee."
+msgstr "L'URL audio est obligatoire pour une dictee."
+
+#: app/blueprints/quiz.py:46
+msgid "La bonne reponse est obligatoire pour une dictee."
+msgstr "La bonne reponse est obligatoire pour une dictee."
+
+#: app/blueprints/quiz.py:48
+msgid "Les quatre choix doivent etre renseignes."
+msgstr "Les quatre choix doivent etre renseignes."
+
+#: app/blueprints/quiz.py:50
+msgid "Vous devez marquer exactement une bonne reponse."
+msgstr "Vous devez marquer exactement une bonne reponse."
+
+#: app/blueprints/quiz.py:74
+msgid "Question ajoutee avec succes."
+msgstr "Question ajoutee avec succes."
+
+#: app/blueprints/quiz.py:118 app/blueprints/quiz.py:124
+msgid "Veuillez repondre a toutes les questions."
+msgstr "Veuillez repondre a toutes les questions."
+
+#: app/blueprints/quiz.py:129
+msgid "Une reponse du quiz est invalide."
+msgstr "Une reponse du quiz est invalide."
+
+#: app/templates/base.html:33
+msgid "Open menu"
+msgstr "Ouvrir le menu"
+
+#: app/templates/base.html:42
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: app/templates/base.html:49
+msgid "Courses"
+msgstr "Cours"
+
+#: app/templates/base.html:57
+msgid "My progress"
+msgstr "Ma progression"
+
+#: app/templates/base.html:70
+msgid "My students"
+msgstr "Mes eleves"
+
+#: app/templates/base.html:78
+msgid "Users"
+msgstr "Utilisateurs"
+
+#: app/templates/base.html:83
+msgid "Placement"
+msgstr "Placement"
+
+#: app/templates/base.html:88
+msgid "Dictionary"
+msgstr "Dictionnaire"
+
+#: app/templates/base.html:93
+msgid "Admin"
+msgstr "Admin"
+
+#: app/templates/base.html:101
+msgid "Maintenance"
+msgstr "Maintenance"
+
+#: app/templates/base.html:129
+msgid "Logout"
+msgstr "Deconnexion"
+
+#: app/templates/base.html:147
+msgid "Home"
+msgstr "Accueil"
+
+#: app/templates/base.html:152
+msgid "Login"
+msgstr "Connexion"
+
+#: app/templates/base.html:169
+msgid "Close"
+msgstr "Fermer"
+
+#: app/templates/base.html:182
+msgid "LabeeB Arabic | Arabic learning platform"
+msgstr "LabeeB Arabic | Plateforme d'apprentissage de l'arabe"
+
+#: app/templates/base.html:190
+msgid "Translation"
+msgstr "Traduction"
+
+#: app/templates/base.html:191
+msgid "Listen"
+msgstr "Ecouter"
+
+#: app/templates/base.html:192
+msgid "Example"
+msgstr "Exemple"
+
+#: app/templates/base.html:193
+msgid "Unavailable"
+msgstr "Indisponible"
+
+#: app/templates/choix_langue.html:3
+msgid "Choix de la langue"
+msgstr "Choix de la langue"
+
+#: app/templates/choix_langue.html:9
+msgid "Choisissez votre langue"
+msgstr "Choisissez votre langue"
+
+#: app/templates/choix_langue.html:10
+msgid "Choose your language / Elige tu idioma"
+msgstr "Choose your language / Elige tu idioma"
+
+#: app/templates/choix_langue.html:19
+msgid "Continuer en français"
+msgstr "Continuer en français"
+
+#: app/templates/choix_langue.html:27
+msgid "Continue in English"
+msgstr "Continuer en anglais"
+
+#: app/templates/choix_langue.html:35
+msgid "Continuar en español"
+msgstr "Continuar en español"
+
+#: app/templates/index.html:3
+msgid "Apprendre l'arabe"
+msgstr "Apprendre l'arabe"
+
+#: app/templates/index.html:10 app/templates/login.html:11
+msgid "Plateforme e-learning arabe"
+msgstr "Plateforme e-learning arabe"
+
+#: app/templates/courses/liste.html:9 app/templates/index.html:12
+msgid "Apprenez l'arabe à votre rythme"
+msgstr "Apprenez l'arabe à votre rythme"
+
+#: app/templates/index.html:14
+msgid ""
+"Cours structurés du niveau A1 au niveau A2, leçons progressives, quiz interactifs et suivi de progression personnalisé dans "
+"une interface pensée pour l'apprentissage."
+msgstr ""
+"Cours structurés du niveau A1 au niveau A2, leçons progressives, quiz interactifs et suivi de progression personnalisé dans "
+"une interface pensée pour l'apprentissage."
+
+#: app/templates/index.html:21
+msgid "Commencer maintenant"
+msgstr "Commencer maintenant"
+
+#: app/templates/index.html:24
+msgid "Voir les niveaux"
+msgstr "Voir les niveaux"
+
+#: app/templates/index.html:32
+msgid "Parcours"
+msgstr "Parcours"
+
+#: app/templates/index.html:33
+msgid "Du niveau A1 au niveau A2"
+msgstr "Du niveau A1 au niveau A2"
+
+#: app/templates/index.html:36
+msgid "Pédagogie"
+msgstr "Pédagogie"
+
+#: app/templates/index.html:37
+msgid "Leçons, vidéos, PDF et quiz"
+msgstr "Leçons, vidéos, PDF et quiz"
+
+#: app/templates/index.html:40
+msgid "Suivi"
+msgstr "Suivi"
+
+#: app/templates/index.html:41
+msgid "Progression claire pour chaque apprenant"
+msgstr "Progression claire pour chaque apprenant"
+
+#: app/templates/index.html:52
+msgid "Niveaux disponibles"
+msgstr "Niveaux disponibles"
+
+#: app/templates/index.html:53
+msgid "Une progression claire centrée sur les niveaux A1 et A2."
+msgstr "Une progression claire centrée sur les niveaux A1 et A2."
+
+#: app/templates/index.html:58
+msgid "Débutant"
+msgstr "Débutant"
+
+#: app/templates/index.html:58
+msgid "Les bases : alphabet, salutations, chiffres"
+msgstr "Les bases : alphabet, salutations, chiffres"
+
+#: app/templates/index.html:59
+msgid "Élémentaire"
+msgstr "Élémentaire"
+
+#: app/templates/index.html:59
+msgid "Conversations simples du quotidien"
+msgstr "Conversations simples du quotidien"
+
+#: app/templates/index.html:79
+msgid "Apprendre"
+msgstr "Apprendre"
+
+#: app/templates/index.html:81
+msgid "Leçons immersives"
+msgstr "Leçons immersives"
+
+#: app/templates/index.html:82
+msgid "Chaque cours peut combiner texte, vidéo et support PDF pour une progression souple et efficace."
+msgstr "Chaque cours peut combiner texte, vidéo et support PDF pour une progression souple et efficace."
+
+#: app/templates/index.html:88
+msgid "S'évaluer"
+msgstr "S'évaluer"
+
+#: app/templates/index.html:90
+msgid "Quiz interactifs"
+msgstr "Quiz interactifs"
+
+#: app/templates/index.html:91
+msgid "Des QCM rapides pour valider la compréhension et donner un retour immédiat à l'apprenant."
+msgstr "Des QCM rapides pour valider la compréhension et donner un retour immédiat à l'apprenant."
+
+#: app/templates/index.html:97
+msgid "Progresser"
+msgstr "Progresser"
+
+#: app/templates/index.html:99
+msgid "Suivi visuel"
+msgstr "Suivi visuel"
+
+#: app/templates/index.html:100
+msgid "Des tableaux de bord simples pour voir les leçons vues, les scores et la dynamique d’apprentissage."
+msgstr "Des tableaux de bord simples pour voir les leçons vues, les scores et la dynamique d’apprentissage."
+
+#: app/templates/login.html:3
+msgid "Connexion"
+msgstr "Connexion"
+
+#: app/templates/login.html:13
+msgid "Connexion à l'espace LabeeB Arabic"
+msgstr "Connexion à l'espace LabeeB Arabic"
+
+#: app/templates/login.html:15
+msgid ""
+"Accédez à vos cours, vos leçons, vos quiz et votre progression dans une interface conçue pour l'apprentissage de "
+"l'arabe."
+msgstr ""
+"Accédez à vos cours, vos leçons, vos quiz et votre progression dans une interface conçue pour l'apprentissage de "
+"l'arabe."
+
+#: app/templates/login.html:24
+msgid "Se connecter"
+msgstr "Se connecter"
+
+#: app/templates/login.html:30
+msgid "Email ou téléphone"
+msgstr "Email ou téléphone"
+
+#: app/templates/login.html:35
+msgid "Mot de passe"
+msgstr "Mot de passe"
+
+#: app/templates/login.html:46
+msgid "Mot de passe oublié"
+msgstr "Mot de passe oublié"
+
+#: app/templates/login.html:52
+msgid "ou"
+msgstr "ou"
+
+#: app/templates/login.html:59
+msgid "Continuer avec Google"
+msgstr "Continuer avec Google"
+
+#: app/templates/profile.html:3
+msgid "Profil"
+msgstr "Profil"
+
+#: app/templates/profile.html:9
+msgid "Mon profil"
+msgstr "Mon profil"
+
+#: app/templates/profile.html:12
+msgid "Nom"
+msgstr "Nom"
+
+#: app/templates/profile.html:16
+msgid "Prénom"
+msgstr "Prénom"
+
+#: app/templates/profile.html:20
+msgid "Email"
+msgstr "Email"
+
+#: app/templates/profile.html:24
+msgid "Rôle"
+msgstr "Rôle"
+
+#: app/templates/profile.html:28
+msgid "Téléphone"
+msgstr "Téléphone"
+
+#: app/templates/profile.html:32
+msgid "Dernière connexion"
+msgstr "Dernière connexion"
+
+#: app/templates/request_reset_password.html:3
+msgid "Réinitialisation"
+msgstr "Réinitialisation"
+
+#: app/templates/request_reset_password.html:9
+msgid "Réinitialiser le mot de passe"
+msgstr "Réinitialiser le mot de passe"
+
+#: app/templates/request_reset_password.html:10
+msgid "Entrez votre email pour recevoir un lien de réinitialisation."
+msgstr "Entrez votre email pour recevoir un lien de réinitialisation."
+
+#: app/templates/reset_password.html:3
+msgid "Nouveau mot de passe"
+msgstr "Nouveau mot de passe"
+
+#: app/templates/reset_password.html:9
+msgid "Définir un nouveau mot de passe"
+msgstr "Définir un nouveau mot de passe"
+
+#: app/templates/courses/detail.html:12
+msgid "Publié"
+msgstr "Publié"
+
+#: app/templates/courses/detail.html:14 app/templates/courses/liste.html:49
+msgid "Brouillon"
+msgstr "Brouillon"
+
+#: app/templates/courses/detail.html:18
+msgid "Ce cours sera enrichi avec des leçons, des supports et des quiz."
+msgstr "Ce cours sera enrichi avec des leçons, des supports et des quiz."
+
+#: app/templates/courses/detail.html:21 app/templates/courses/liste.html:65
+#, python-format
+msgid "%(count)s leçon"
+msgid_plural "%(count)s leçons"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/templates/courses/detail.html:45
+msgid "Leçons du cours"
+msgstr "Leçons du cours"
+
+#: app/templates/courses/detail.html:46
+msgid "Suivez les étapes dans l'ordre et revenez où vous voulez."
+msgstr "Suivez les étapes dans l'ordre et revenez où vous voulez."
+
+#: app/templates/courses/detail.html:50
+msgid "Ajouter une leçon"
+msgstr "Ajouter une leçon"
+
+#: app/templates/courses/detail.html:70
+#, python-format
+msgid "%(minutes)s min"
+msgstr "%(minutes)s min"
+
+#: app/templates/courses/detail.html:72 app/templates/progression/dashboard_eleve.html:235
+msgid "Durée libre"
+msgstr "Durée libre"
+
+#: app/templates/courses/detail.html:78
+msgid "Ouvrir"
+msgstr "Ouvrir"
+
+#: app/templates/courses/detail.html:80
+msgid "Inscription requise"
+msgstr "Inscription requise"
+
+#: app/templates/courses/detail.html:88
+msgid "Ce cours ne contient pas encore de leçons."
+msgstr "Ce cours ne contient pas encore de leçons."
+
+#: app/templates/courses/detail.html:96
+msgid "Votre progression"
+msgstr "Votre progression"
+
+#: app/templates/courses/detail.html:99
+msgid "Avancement"
+msgstr "Avancement"
+
+#: app/templates/courses/detail.html:106
+msgid "La progression s'affiche pour les apprenants inscrits."
+msgstr "La progression s'affiche pour les apprenants inscrits."
+
+#: app/templates/courses/detail.html:111
+msgid "Niveau"
+msgstr "Niveau"
+
+#: app/templates/courses/detail.html:115
+msgid "Enseignant"
+msgstr "Enseignant"
+
+#: app/templates/courses/detail.html:119
+msgid "Leçons"
+msgstr "Leçons"
+
+#: app/templates/courses/detail.html:128
+msgid "S'inscrire au cours"
+msgstr "S'inscrire au cours"
+
+#: app/templates/courses/detail.html:133
+msgid "Vous êtes inscrit à ce cours."
+msgstr "Vous êtes inscrit à ce cours."
+
+#: app/templates/courses/detail.html:140
+msgid "Gestion du cours"
+msgstr "Gestion du cours"
+
+#: app/templates/courses/detail.html:143
+msgid "Modifier"
+msgstr "Modifier"
+
+#: app/templates/courses/detail.html:148
+msgid "Supprimer le cours"
+msgstr "Supprimer le cours"
+
+#: app/templates/courses/form.html:3 app/templates/courses/form.html:12
+msgid "Modifier le cours"
+msgstr "Modifier le cours"
+
+#: app/templates/courses/form.html:3 app/templates/courses/liste.html:13
+msgid "Nouveau cours"
+msgstr "Nouveau cours"
+
+#: app/templates/courses/form.html:12
+msgid "Créer un nouveau cours"
+msgstr "Créer un nouveau cours"
+
+#: app/templates/courses/form.html:14
+msgid "Définissez le cadre pédagogique du parcours avant d'ajouter les leçons."
+msgstr "Définissez le cadre pédagogique du parcours avant d'ajouter les leçons."
+
+#: app/templates/courses/form.html:17 app/templates/lecons/form.html:17
+msgid "Retour"
+msgstr "Retour"
+
+#: app/templates/courses/form.html:26
+msgid "Ex. Alphabet arabe pour débutants"
+msgstr "Ex. Alphabet arabe pour débutants"
+
+#: app/templates/courses/form.html:36
+msgid "Image actuelle"
+msgstr "Image actuelle"
+
+#: app/templates/courses/form.html:41
+msgid "Présentez les objectifs et le contenu du cours."
+msgstr "Présentez les objectifs et le contenu du cours."
+
+#: app/templates/courses/form.html:54 app/templates/lecons/form.html:61
+msgid "Annuler"
+msgstr "Annuler"
+
+#: app/templates/courses/liste.html:3
+msgid "Cours"
+msgstr "Cours"
+
+#: app/templates/courses/liste.html:8
+msgid "Catalogue des cours"
+msgstr "Catalogue des cours"
+
+#: app/templates/courses/liste.html:20
+msgid "Tous"
+msgstr "Tous"
+
+#: app/templates/courses/liste.html:55
+msgid "Aucune description pour le moment."
+msgstr "Aucune description pour le moment."
+
+#: app/templates/courses/liste.html:70 app/templates/lecons/lesson_flow.html:61
+msgid "Voir le cours"
+msgstr "Voir le cours"
+
+#: app/templates/courses/liste.html:78
+msgid "Aucun cours disponible pour le moment."
+msgstr "Aucun cours disponible pour le moment."
+
+#: app/templates/lecons/form.html:3 app/templates/lecons/form.html:12
+msgid "Modifier la leçon"
+msgstr "Modifier la leçon"
+
+#: app/templates/lecons/form.html:3
+msgid "Nouvelle leçon"
+msgstr "Nouvelle leçon"
+
+#: app/templates/lecons/form.html:12
+msgid "Créer une nouvelle leçon"
+msgstr "Créer une nouvelle leçon"
+
+#: app/templates/lecons/form.html:14
+msgid "Cours source"
+msgstr "Cours source"
+
+#: app/templates/lecons/form.html:26
+msgid "Ex. Les salutations en arabe"
+msgstr "Ex. Les salutations en arabe"
+
+#: app/templates/lecons/form.html:34
+msgid "Ajoutez le contenu de la leçon. Les blocs en arabe seront affichés en RTL."
+msgstr "Ajoutez le contenu de la leçon. Les blocs en arabe seront affichés en RTL."
+
+#: app/templates/lecons/form.html:38
+msgid "Lien YouTube ou vidéo MP4"
+msgstr "Lien YouTube ou vidéo MP4"
+
+#: app/templates/lecons/form.html:48
+msgid "Un PDF est déjà disponible pour cette leçon."
+msgstr "Un PDF est déjà disponible pour cette leçon."
+
+#: app/templates/lecons/form.html:55
+msgid "Un audio est déjà disponible pour cette leçon."
+msgstr "Un audio est déjà disponible pour cette leçon."
+
+#: app/templates/lecons/lesson_flow.html:30 app/templates/placement/test_flow.html:30
+msgid "Continuer"
+msgstr "Continuer"
+
+#: app/templates/lecons/lesson_flow.html:42 app/templates/placement/test_flow.html:39
+msgid "Choisissez la bonne réponse"
+msgstr "Choisissez la bonne réponse"
+
+#: app/templates/lecons/lesson_flow.html:43
+msgid "Écoutez et choisissez"
+msgstr "Écoutez et choisissez"
+
+#: app/templates/lecons/lesson_flow.html:44 app/templates/placement/test_flow.html:41
+msgid "Remettez les mots dans l'ordre"
+msgstr "Remettez les mots dans l'ordre"
+
+#: app/templates/lecons/lesson_flow.html:45
+msgid "Écoutez et écrivez ce que vous entendez"
+msgstr "Écoutez et écrivez ce que vous entendez"
+
+#: app/templates/lecons/lesson_flow.html:46
+msgid "Écouter le mot"
+msgstr "Écouter le mot"
+
+#: app/templates/lecons/lesson_flow.html:47
+msgid "Répéter"
+msgstr "Répéter"
+
+#: app/templates/lecons/lesson_flow.html:48
+msgid "Écrivez ici..."
+msgstr "Écrivez ici..."
+
+#: app/templates/lecons/lesson_flow.html:49
+msgid "Valider"
+msgstr "Valider"
+
+#: app/templates/lecons/lesson_flow.html:50
+msgid "Correct !"
+msgstr "Correct !"
+
+#: app/templates/lecons/lesson_flow.html:51
+msgid "Pas tout à fait."
+msgstr "Pas tout à fait."
+
+#: app/templates/lecons/lesson_flow.html:52
+msgid "Leçon terminée !"
+msgstr "Leçon terminée !"
+
+#: app/templates/lecons/lesson_flow.html:53
+msgid "Continue comme ça !"
+msgstr "Continue comme ça !"
+
+#: app/templates/lecons/lesson_flow.html:54 app/templates/placement/test_flow.html:52
+msgid "Correctes"
+msgstr "Correctes"
+
+#: app/templates/lecons/lesson_flow.html:55 app/templates/placement/test_flow.html:53
+msgid "Erreurs"
+msgstr "Erreurs"
+
+#: app/templates/lecons/lesson_flow.html:56 app/templates/placement/test_flow.html:54
+#: app/templates/progression/dashboard_eleve.html:237
+msgid "Score"
+msgstr "Score"
+
+#: app/templates/lecons/lesson_flow.html:57
+msgid "XP total"
+msgstr "XP total"
+
+#: app/templates/lecons/lesson_flow.html:58
+msgid "Streak"
+msgstr "Streak"
+
+#: app/templates/lecons/lesson_flow.html:59
+msgid "Leçon suivante"
+msgstr "Leçon suivante"
+
+#: app/templates/lecons/lesson_flow.html:60 app/templates/placement/test_flow.html:57
+msgid "Retour aux cours"
+msgstr "Retour aux cours"
+
+#: app/templates/lecons/lesson_flow.html:62
+msgid "Quitter la leçon ? Ta progression sera perdue."
+msgstr "Quitter la leçon ? Ta progression sera perdue."
+
+#: app/templates/lecons/lesson_flow.html:63
+msgid "Bonne réponse :"
+msgstr "Bonne réponse :"
+
+#: app/templates/placement/intro.html:3 app/templates/placement/intro.html:9 app/templates/placement/test_flow.html:6
+msgid "Test de niveau"
+msgstr "Test de niveau"
+
+#: app/templates/placement/intro.html:8
+msgid "Placement Test"
+msgstr "Test de niveau"
+
+#: app/templates/placement/intro.html:11
+msgid "10 à 15 questions rapides pour vous orienter vers le bon point de départ."
+msgstr "10 à 15 questions rapides pour vous orienter vers le bon point de départ."
+
+#: app/templates/placement/intro.html:21
+msgid "Comment cela fonctionne"
+msgstr "Comment cela fonctionne"
+
+#: app/templates/placement/intro.html:25
+msgid "Questions variées"
+msgstr "Questions variées"
+
+#: app/templates/placement/intro.html:26
+msgid "QCM, images et remise en ordre de mots."
+msgstr "QCM, images et remise en ordre de mots."
+
+#: app/templates/placement/intro.html:32
+msgid "Résultat immédiat"
+msgstr "Résultat immédiat"
+
+#: app/templates/placement/intro.html:33
+msgid "Vous obtenez un niveau A1 ou A2 à la fin du test."
+msgstr "Vous obtenez un niveau A1 ou A2 à la fin du test."
+
+#: app/templates/placement/intro.html:35
+msgid "Immédiat"
+msgstr "Immédiat"
+
+#: app/templates/placement/intro.html:39
+msgid "Parcours personnalisé"
+msgstr "Parcours personnalisé"
+
+#: app/templates/placement/intro.html:40
+msgid "Votre progression commence directement sur le bon niveau."
+msgstr "Votre progression commence directement sur le bon niveau."
+
+#: app/templates/placement/intro.html:42
+msgid "Guidé"
+msgstr "Guidé"
+
+#: app/templates/placement/intro.html:51
+msgid "Avant de commencer"
+msgstr "Avant de commencer"
+
+#: app/templates/placement/intro.html:54
+msgid "Choisissez l'environnement le plus calme possible."
+msgstr "Choisissez l'environnement le plus calme possible."
+
+#: app/templates/placement/intro.html:57
+msgid "Lisez chaque question jusqu’au bout avant de répondre."
+msgstr "Lisez chaque question jusqu’au bout avant de répondre."
+
+#: app/templates/placement/intro.html:60
+msgid "Le résultat est enregistré automatiquement à la fin."
+msgstr "Le résultat est enregistré automatiquement à la fin."
+
+#: app/templates/placement/intro.html:65
+msgid "Commencer le test"
+msgstr "Commencer le test"
+
+#: app/templates/placement/test_flow.html:19
+msgid "Test"
+msgstr "Test"
+
+#: app/templates/placement/test_flow.html:40
+msgid "Choisissez la bonne image"
+msgstr "Choisissez la bonne image"
+
+#: app/templates/placement/test_flow.html:42
+msgid "Écouter"
+msgstr "Écouter"
+
+#: app/templates/placement/test_flow.html:43
+msgid "Correct."
+msgstr "Correct."
+
+#: app/templates/placement/test_flow.html:44
+msgid "Continue."
+msgstr "Continue."
+
+#: app/templates/placement/test_flow.html:45
+msgid "Bonne structure."
+msgstr "Bonne structure."
+
+#: app/templates/placement/test_flow.html:46
+msgid "Bonne image."
+msgstr "Bonne image."
+
+#: app/templates/placement/test_flow.html:47
+msgid "Pas tout à fait, essayez de retenir cette forme."
+msgstr "Pas tout à fait, essayez de retenir cette forme."
+
+#: app/templates/placement/test_flow.html:48
+msgid "La bonne image est maintenant surlignée."
+msgstr "La bonne image est maintenant surlignée."
+
+#: app/templates/placement/test_flow.html:49
+msgid "Analyse du niveau en cours..."
+msgstr "Analyse du niveau en cours..."
+
+#: app/templates/placement/test_flow.html:50
+msgid "Score provisoire"
+msgstr "Score provisoire"
+
+#: app/templates/placement/test_flow.html:51
+msgid "Niveau assigné"
+msgstr "Niveau assigné"
+
+#: app/templates/placement/test_flow.html:55
+msgid "Commencer l'apprentissage"
+msgstr "Commencer l'apprentissage"
+
+#: app/templates/placement/test_flow.html:56
+msgid "Le test n'a pas pu être enregistré"
+msgstr "Le test n'a pas pu être enregistré"
+
+#: app/templates/placement/test_flow.html:58
+msgid "Quitter le test de niveau ? Vos réponses ne seront pas conservées."
+msgstr "Quitter le test de niveau ? Vos réponses ne seront pas conservées."
+
+#: app/templates/progression/dashboard_eleve.html:3
+msgid "Ma progression"
+msgstr "Ma progression"
+
+#: app/templates/progression/dashboard_eleve.html:128
+msgid "Mon parcours d'apprentissage"
+msgstr "Mon parcours d'apprentissage"
+
+#: app/templates/progression/dashboard_eleve.html:130
+msgid "Continue tes leçons, garde ta série active et débloque les étapes suivantes."
+msgstr "Continue tes leçons, garde ta série active et débloque les étapes suivantes."
+
+#: app/templates/progression/dashboard_eleve.html:137
+msgid "Points XP"
+msgstr "Points XP"
+
+#: app/templates/progression/dashboard_eleve.html:143
+msgid "Jours consécutifs"
+msgstr "Jours consécutifs"
+
+#: app/templates/progression/dashboard_eleve.html:149
+msgid "Leçons terminées"
+msgstr "Leçons terminées"
+
+#: app/templates/progression/dashboard_eleve.html:160
+msgid "Mes cours inscrits"
+msgstr "Mes cours inscrits"
+
+#: app/templates/progression/dashboard_eleve.html:161
+msgid "Chaque chemin avance de leçon en leçon, comme une carte de progression."
+msgstr "Chaque chemin avance de leçon en leçon, comme une carte de progression."
+
+#: app/templates/progression/dashboard_eleve.html:164
+msgid "Voir les cours"
+msgstr "Voir les cours"
+
+#: app/templates/progression/dashboard_eleve.html:182
+#, python-format
+msgid "%(seen)s/%(total)s leçons vues"
+msgstr "%(seen)s/%(total)s leçons vues"
+
+#: app/templates/progression/dashboard_eleve.html:184
+msgid "Score moyen"
+msgstr "Score moyen"
+
+#: app/templates/progression/dashboard_eleve.html:198
+msgid "Leçon terminée"
+msgstr "Leçon terminée"
+
+#: app/templates/progression/dashboard_eleve.html:198
+msgid "Leçon en cours"
+msgstr "Leçon en cours"
+
+#: app/templates/progression/dashboard_eleve.html:198
+msgid "Leçon débloquée"
+msgstr "Leçon débloquée"
+
+#: app/templates/progression/dashboard_eleve.html:211
+msgid "Termine d’abord la leçon précédente"
+msgstr "Termine d’abord la leçon précédente"
+
+#: app/templates/progression/dashboard_eleve.html:225
+msgid "Terminé"
+msgstr "Terminé"
+
+#: app/templates/progression/dashboard_eleve.html:227
+msgid "En cours"
+msgstr "En cours"
+
+#: app/templates/progression/dashboard_eleve.html:229
+msgid "Débloqué"
+msgstr "Débloqué"
+
+#: app/templates/progression/dashboard_eleve.html:231
+msgid "Verrouillé"
+msgstr "Verrouillé"
+
+#: app/templates/progression/dashboard_eleve.html:247
+msgid "Ce cours n'a pas encore de leçons."
+msgstr "Ce cours n'a pas encore de leçons."
+
+#: app/templates/progression/dashboard_eleve.html:256
+msgid "Vous n'êtes inscrit à aucun cours pour le moment."
+msgstr "Vous n'êtes inscrit à aucun cours pour le moment."
+
+#: app/templates/quiz/form_question.html:3
+msgid "Nouvelle question"
+msgstr "Nouvelle question"
+
+#: app/templates/quiz/form_question.html:11
+msgid "Ajouter une question"
+msgstr "Ajouter une question"
+
+#: app/templates/quiz/form_question.html:12
+msgid "Leçon"
+msgstr "Leçon"
+
+#: app/templates/quiz/form_question.html:15
+msgid "Retour à la leçon"
+msgstr "Retour à la leçon"
+
+#: app/templates/quiz/form_question.html:23
+msgid "Type d'exercice"
+msgstr "Type d'exercice"
+
+#: app/templates/quiz/form_question.html:26
+msgid "Remettre les mots dans l'ordre"
+msgstr "Remettre les mots dans l'ordre"
+
+#: app/templates/quiz/form_question.html:27
+msgid "Écoute"
+msgstr "Écoute"
+
+#: app/templates/quiz/form_question.html:28
+msgid "Dictée"
+msgstr "Dictée"
+
+#: app/templates/quiz/form_question.html:31
+msgid "Pour ordre_mots, saisis la phrase correcte ou la structure attendue."
+msgstr "Pour ordre_mots, saisis la phrase correcte ou la structure attendue."
+
+#: app/templates/quiz/form_question.html:36
+msgid "Texte de la question"
+msgstr "Texte de la question"
+
+#: app/templates/quiz/form_question.html:42
+msgid "URL audio"
+msgstr "URL audio"
+
+#: app/templates/quiz/form_question.html:46
+msgid "Bonne réponse texte"
+msgstr "Bonne réponse texte"
+
+#: app/templates/quiz/form_question.html:56
+msgid "Choix"
+msgstr "Choix"
+
+#: app/templates/quiz/form_question.html:60
+msgid "Bonne réponse"
+msgstr "Bonne réponse"
+
+#: app/templates/quiz/form_question.html:70
+msgid "Ajouter la question"
+msgstr "Ajouter la question"

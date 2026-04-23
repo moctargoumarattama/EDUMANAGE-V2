@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Cours') }} | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="hero-panel card-platform courses-hero-panel mb-4">
+    <div class="d-flex flex-column flex-lg-row justify-content-between align-items-start gap-3">
+        <div class="courses-hero-copy">
+            <div class="eyebrow mb-3">
+                <i class="bi bi-book-half"></i>{{ _('Plateforme e-learning arabe') }}
+            </div>
+            <h1 class="h2 fw-bold mb-2">{{ _('Cours') }}</h1>
+            <p class="mb-0 courses-hero-copy-text">{{ _('Tous les cours, en un clic.') }}</p>
+        </div>
+        <div class="d-flex gap-3 flex-wrap courses-hero-stats">
+            <div class="surface-card px-3 py-2 rounded-4 border border-white border-opacity-25">
+                <div class="small courses-hero-stat-label">{{ _('Cours') }}</div>
+                <div class="h4 mb-0 fw-bold">{{ summary.courses }}</div>
+            </div>
+            <div class="surface-card px-3 py-2 rounded-4 border border-white border-opacity-25">
+                <div class="small courses-hero-stat-label">{{ _('Lecons') }}</div>
+                <div class="h4 mb-0 fw-bold">{{ summary.lessons }}</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="page-header">
+    <div>
+        <h2 class="h4 fw-bold mb-1">{{ _('Catalogue') }}</h2>
+        <p class="text-muted mb-0">{{ _('Choisissez un cours et ouvrez-le en un clic.') }}</p>
+    </div>
+    {% if current_user.role in ['enseignant', 'admin'] %}
+    <a href="{{ url_for('courses.nouveau') }}" class="btn btn-primary-platform">
+        <i class="bi bi-plus-lg me-2"></i>{{ _('Nouveau cours') }}
+    </a>
+    {% endif %}
+</div>
+
+<div class="course-filter-bar mb-4">
+    <button class="btn btn-sm btn-outline-secondary active" data-filter="all">
+        {{ _('Tous') }}
+    </button>
+    {% for niveau in niveaux %}
+    <button class="btn btn-sm btn-outline-secondary" data-filter="{{ niveau }}">
+        <span class="badge-niveau badge-{{ niveau }}">{{ niveau }}</span>
+    </button>
+    {% endfor %}
+</div>
+
+<div class="row g-4" id="cours-grid">
+    {% for item in course_cards %}
+    {% set cours = item.cours %}
+    <div class="col-12 col-sm-6 col-xl-4 cours-card" data-niveau="{{ cours.niveau }}">
+        <article class="card-platform h-100 d-flex flex-column">
+            <div class="position-relative">
+                {% if cours.image_url %}
+                    {% if cours.image_url.startswith('http') %}
+                    <img src="{{ cours.image_url }}" class="w-100 rounded-top-4" style="height: 220px; object-fit: cover;" alt="{{ cours.nom }}">
+                    {% else %}
+                    <img src="{{ asset_url(cours.image_url) }}" class="w-100 rounded-top-4" style="height: 220px; object-fit: cover;" alt="{{ cours.nom }}">
+                    {% endif %}
+                {% else %}
+                <div class="rounded-top-4 d-flex align-items-center justify-content-center text-white fw-bold" style="height: 220px; background: linear-gradient(135deg, var(--primary-dark), var(--secondary));">
+                    AR
+                </div>
+                {% endif %}
+
+                <div class="position-absolute top-0 start-0 end-0 d-flex justify-content-between align-items-start p-3">
+                    <span class="badge-niveau badge-{{ cours.niveau }}">{{ cours.niveau }}</span>
+                    <div class="d-flex flex-wrap gap-2 justify-content-end">
+                        {% if item.is_enrolled %}
+                        <span class="badge text-bg-success">{{ _('Inscrit') }}</span>
+                        {% endif %}
+                        {% if item.can_manage %}
+                        <span class="badge text-bg-light">{{ _('Gestion') }}</span>
+                        {% endif %}
+                        {% if not cours.est_publie %}
+                        <span class="badge bg-warning text-dark">{{ _('Brouillon') }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-4 d-flex flex-column flex-grow-1">
+                <h3 class="h5 fw-bold mb-2">{{ cours.nom }}</h3>
+                <p class="text-muted small mb-3">
+                    {{ cours.description[:100] ~ '...' if cours.description and cours.description|length > 100 else cours.description or _('Aucune description pour le moment.') }}
+                </p>
+
+                {% if item.is_enrolled and item.progression is not none %}
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between align-items-center small mb-2">
+                        <span>{{ _('Progression') }}</span>
+                        <strong>{{ item.progression }}%</strong>
+                    </div>
+                    <div class="progress-platform">
+                        <div class="progress-fill" style="width: {{ item.progression }}%;"></div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="d-flex flex-wrap gap-2 text-muted small mb-3">
+                    <span class="px-3 py-2 rounded-pill border bg-light-subtle">
+                        <i class="bi bi-collection me-1"></i>
+                        {{ ngettext('%(count)s leçon', '%(count)s leçons', item.lesson_count, count=item.lesson_count) }}
+                    </span>
+                    {% if current_user.role != 'enseignant' %}
+                    <span class="px-3 py-2 rounded-pill border bg-light-subtle">
+                        <i class="bi bi-person me-1"></i>
+                        {{ cours.enseignant_nom }}
+                    </span>
+                    {% endif %}
+                    {% if item.can_manage %}
+                    <span class="px-3 py-2 rounded-pill border bg-light-subtle">
+                        <i class="bi bi-people me-1"></i>
+                        {{ ngettext('%(count)s inscrit', '%(count)s inscrits', item.inscriptions_count, count=item.inscriptions_count) }}
+                    </span>
+                    {% endif %}
+                </div>
+
+                <a href="{{ url_for('courses.detail', cours_id=cours.id) }}" class="btn {% if item.can_manage or item.is_enrolled %}btn-primary-platform{% else %}btn-outline-platform{% endif %} w-100 mt-auto">
+                    {% if item.can_manage %}
+                    {{ _('Gerer le cours') }}
+                    {% elif item.is_enrolled %}
+                    {{ _('Continuer') }}
+                    {% else %}
+                    {{ _('Voir le cours') }}
+                    {% endif %}
+                    <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </article>
+    </div>
+    {% else %}
+    <div class="col-12 text-center py-5 text-muted">
+        <i class="bi bi-book fs-1 d-block mb-3 opacity-25"></i>
+        {{ _('Aucun cours disponible pour le moment.') }}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

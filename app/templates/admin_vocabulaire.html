@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Vocabulaire | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="form-shell vocab-admin-page">
+    <div class="page-header">
+        <div>
+            <h1 class="h3 fw-bold mb-1">Dictionnaire pedagogique</h1>
+            <p class="text-muted mb-0">Alimentez les traductions utilisees dans le popup dictionnaire.</p>
+        </div>
+        <a href="{{ url_for('placement.admin_questions') }}" class="btn btn-outline-platform">
+            <i class="bi bi-sliders me-2"></i>Questions de placement
+        </a>
+    </div>
+
+    <div class="content-shell with-sidebar vocab-admin-shell">
+        <div class="vocab-admin-sidebar">
+            <div class="form-panel mb-4">
+                <h2 class="form-panel-title">Ajouter un mot</h2>
+                <form method="post" action="{{ url_for('main.ajouter_vocabulaire') }}" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                    <div class="col-12">
+                        <label class="form-label">Mot arabe</label>
+                        <input class="form-control arabic-text" name="mot_arabe" required>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Translitteration</label>
+                        <input class="form-control" name="translitteration">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">FR</label>
+                        <input class="form-control" name="traduction_fr">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">EN</label>
+                        <input class="form-control" name="traduction_en">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label">ES</label>
+                        <input class="form-control" name="traduction_es">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Audio (URL)</label>
+                        <input class="form-control" name="audio_url" type="url">
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label">Exemple</label>
+                        <textarea class="form-control arabic-text" rows="3" name="exemple_phrase"></textarea>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-primary-platform w-100" type="submit">
+                            <i class="bi bi-plus-circle me-2"></i>Enregistrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="form-panel">
+                <h2 class="form-panel-title">Import CSV</h2>
+                <p class="text-muted mb-3">Colonnes attendues : mot_arabe, translitteration, traduction_fr, traduction_en, traduction_es, audio_url, exemple_phrase</p>
+                <form method="post" action="{{ url_for('main.ajouter_vocabulaire') }}" enctype="multipart/form-data" class="row g-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="col-12">
+                        <input class="form-control" type="file" name="csv_file" accept=".csv" required>
+                    </div>
+                    <div class="col-12">
+                        <button class="btn btn-outline-platform w-100" type="submit">
+                            <i class="bi bi-upload me-2"></i>Importer le CSV
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="vocab-admin-main">
+            <div class="card-platform p-4 vocab-admin-panel">
+                <form id="vocab-filter-form" method="get" action="{{ url_for('main.vocabulaire_admin') }}#vocab-results" class="row g-2 mb-4 vocab-filter-form instant-nav-zone" data-auto-submit="true" data-auto-submit-delay="260" data-instant-nav="true">
+                    <div class="col-12 col-lg-4">
+                        <input class="form-control" type="search" name="q" value="{{ q or '' }}" placeholder="Rechercher un mot arabe, une translitteration ou une traduction" autocomplete="off" data-auto-submit-input="true">
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <select class="form-select" name="niveau" data-auto-submit-select="true">
+                            <option value="">Tous</option>
+                            <option value="A1" {% if niveau == 'A1' %}selected{% endif %}>A1</option>
+                            <option value="A2" {% if niveau == 'A2' %}selected{% endif %}>A2</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <select class="form-select" name="pedagogique" data-auto-submit-select="true">
+                            <option value="">Tous</option>
+                            <option value="1" {% if pedagogique == '1' %}selected{% endif %}>Pedago</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-2">
+                        <select class="form-select" name="traduits" data-auto-submit-select="true">
+                            <option value="">Tous</option>
+                            <option value="1" {% if traduits == '1' %}selected{% endif %}>Traduits</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-lg-1">
+                        <button class="btn btn-primary-platform w-100" type="submit" data-submit-button="true">
+                            <i class="bi bi-search me-2" data-submit-icon="true"></i><span data-submit-label="true">Rechercher</span>
+                        </button>
+                    </div>
+                    <div class="col-6 col-lg-1">
+                        <a class="btn btn-outline-platform w-100" href="{{ url_for('main.vocabulaire_admin') }}" data-vocab-reset-link="true">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Reset
+                        </a>
+                    </div>
+                </form>
+                {% include "partials/_vocab_results_region.html" %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

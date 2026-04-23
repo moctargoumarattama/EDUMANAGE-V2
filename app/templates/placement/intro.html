@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}{{ _('Test de niveau') }} | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<section class="form-shell">
+    <div class="card-platform hero-panel mb-4">
+        <span class="eyebrow"><i class="bi bi-stars"></i> {{ _('Placement Test') }}</span>
+        <h1 class="display-6 fw-bold mt-3 mb-2">{{ _('Test de niveau') }}</h1>
+        <p class="text-white-50 mb-2">
+            {{ _('%(count)s questions rapides pour vous orienter vers le bon point de depart.', count=question_count) }}
+        </p>
+        <p class="arabic-text mb-0" style="color:#fff;font-size:1.6rem;text-align:center;">
+            اختبار تحديد المستوى
+        </p>
+    </div>
+
+    <div class="row g-4 align-items-stretch">
+        <div class="col-12 col-lg-7">
+            <div class="card-platform p-4 h-100">
+                <h2 class="h5 fw-bold mb-3">{{ _('Comment cela fonctionne') }}</h2>
+                <div class="info-list">
+                    <div class="info-item">
+                        <div>
+                            <div class="fw-semibold">{{ _('Questions variees') }}</div>
+                            <div class="text-muted small">{{ _('QCM, images et remise en ordre de mots.') }}</div>
+                        </div>
+                        <span class="badge-niveau badge-A1">10 min</span>
+                    </div>
+                    <div class="info-item">
+                        <div>
+                            <div class="fw-semibold">{{ _('Resultat immediat') }}</div>
+                            <div class="text-muted small">{{ _("Vous obtenez un niveau A1 ou A2 a la fin du test.") }}</div>
+                        </div>
+                        <span class="badge-niveau badge-A2">{{ _('Immediat') }}</span>
+                    </div>
+                    <div class="info-item">
+                        <div>
+                            <div class="fw-semibold">{{ _('Parcours personnalise') }}</div>
+                            <div class="text-muted small">{{ _('Votre progression commence directement sur le bon niveau.') }}</div>
+                        </div>
+                        <span class="badge-niveau badge-A2">{{ _('Guide') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-lg-5">
+            <div class="card-platform p-4 h-100 d-flex flex-column justify-content-between">
+                <div>
+                    <h2 class="h5 fw-bold mb-3">{{ _('Avant de commencer') }}</h2>
+                    <ul class="soft-list">
+                        <li class="soft-list-item">
+                            <span>{{ _("Choisissez l'environnement le plus calme possible.") }}</span>
+                        </li>
+                        <li class="soft-list-item">
+                            <span>{{ _('Lisez chaque question jusqu au bout avant de repondre.') }}</span>
+                        </li>
+                        <li class="soft-list-item">
+                            <span>{{ _('Le resultat est enregistre automatiquement a la fin.') }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <a href="{{ url_for('placement.start') }}" class="btn btn-primary-platform btn-lg mt-4">
+                    {{ _('Commencer le test') }} <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

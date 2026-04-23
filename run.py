@@ -1,21 +1,14 @@
-
-import sys
-from pathlib import Path
-
-# Ajouter le dossier racine au PYTHONPATH pour que "app.service" soit trouvé
-sys.path.append(str(Path(__file__).parent.resolve()))
+import os
 
 from app import create_app
-from app.extensions import db  # ← Modifier l'import
+
 
 app = create_app()
 
-if __name__ == '__main__':
-    # Crée la base et les tables si elles n'existent pas
-    with app.app_context():
-        
-        db.create_all()
-        print("Base de données et tables créées avec succès !")
 
-    # Lancement de l'application
-    app.run(debug=True, host='0.0.0.0', port=5000)
+if __name__ == "__main__":
+    app.run(
+        debug=os.environ.get("FLASK_DEBUG", "0").strip().lower() in {"1", "true", "yes", "on"},
+        host=os.environ.get("FLASK_RUN_HOST", "0.0.0.0"),
+        port=int(os.environ.get("FLASK_RUN_PORT", "5000")),
+    )

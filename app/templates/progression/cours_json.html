@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Donnees du cours | LabeeB Arabic{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a href="{{ url_for('progress.api_cours', cours_id=cours.id) }}" class="text-decoration-none small text-muted">
+            <i class="bi bi-arrow-left me-1"></i>Retour aux statistiques
+        </a>
+        <h1 class="h3 fw-bold mt-2 mb-1">Vue detaillee du cours</h1>
+        <p class="text-muted mb-0">
+            {{ cours.nom }} · {{ cours.lecons|selectattr('est_publie')|list|length }} lecon(s)
+        </p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <a href="{{ url_for('progress.api_cours', cours_id=cours.id) }}" class="btn btn-outline-platform">
+            Vue graphique
+        </a>
+        <a href="{{ url_for('progress.api_cours_json', cours_id=cours.id, raw=1, download=1) }}" class="btn btn-outline-platform">
+            JSON brut
+        </a>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_eleves }}</div>
+            <div class="stat-label">Eleves inscrits</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card" style="border-left-color:var(--secondary)">
+            <div class="stat-number" style="color:var(--secondary)">{{ moyenne_progression }}%</div>
+            <div class="stat-label">Progression moyenne</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card" style="border-left-color:var(--success)">
+            <div class="stat-number" style="color:var(--success)">
+                {% if moyenne_score is not none %}{{ moyenne_score }}%{% else %}0%{% endif %}
+            </div>
+            <div class="stat-label">Score moyen</div>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="stat-card" style="border-left-color:var(--primary-dark)">
+            <div class="stat-number" style="color:var(--primary-dark)">{{ eleves_actifs }}</div>
+            <div class="stat-label">Eleves actifs</div>
+        </div>
+    </div>
+</div>
+
+{% if eleves_data %}
+<div class="card-platform p-4 mb-4">
+    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
+        <div>
+            <h2 class="h5 fw-bold mb-1">Resume numerique</h2>
+            <p class="text-muted small mb-0">Lecture simple de la progression par eleve.</p>
+        </div>
+        <span class="badge-role badge-role-maintenance">Vue lisible</span>
+    </div>
+
+    <div class="d-grid gap-3">
+        {% for item in eleves_data %}
+        <div class="card-platform p-3">
+            <div class="d-flex flex-column flex-xl-row justify-content-between gap-3">
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-3 mb-3">
+                        <span class="avatar-chip">{{ loop.index }}</span>
+                        <div>
+                            <div class="fw-semibold">{{ ((item.prenom or '') ~ ' ' ~ (item.nom or '')).strip() or 'Eleve sans nom' }}</div>
+                            <div class="small text-muted">{{ item.email }}</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-platform mb-2">
+                        <div class="progress-fill" style="width: {{ item.pourcentage }}%;"></div>
+                    </div>
+                    <div class="small text-muted">
+                        {% if item.derniere_activite %}
+                            Derniere activite : {{ item.derniere_activite.strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                            Aucune activite pour le moment
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row g-2 flex-grow-1">
+                    <div class="col-6 col-md-3">
+                        <div class="card-platform p-3 h-100 text-center">
+                            <div class="small text-muted mb-1">Progression</div>
+                            <div class="fw-bold fs-4" style="color:var(--primary)">{{ item.pourcentage }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card-platform p-3 h-100 text-center">
+                            <div class="small text-muted mb-1">Lecons vues</div>
+                            <div class="fw-bold fs-4" style="color:var(--secondary)">{{ item.lecons_vues }}/{{ item.total_lecons }}</div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card-platform p-3 h-100 text-center">
+                            <div class="small text-muted mb-1">Score quiz</div>
+                            <div class="fw-bold fs-4" style="color:{% if item.score_moyen is not none and item.score_moyen >= 70 %}var(--success){% elif item.score_moyen is not none and item.score_moyen >= 40 %}var(--secondary){% else %}var(--text-muted){% endif %}">
+                                {% if item.score_moyen is not none %}{{ item.score_moyen }}%{% else %}0%{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="card-platform p-3 h-100 text-center">
+                            <div class="small text-muted mb-1">Etat</div>
+                            <div class="fw-bold fs-6 {% if item.pourcentage >= 80 %}text-success{% elif item.pourcentage >= 40 %}text-primary{% else %}text-muted{% endif %}">
+                                {% if item.pourcentage >= 80 %}Avance{% elif item.pourcentage >= 40 %}En cours{% else %}Debut{% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="card-platform p-4">
+    <div class="d-flex justify-content-between align-items-center gap-3 flex-wrap mb-3">
+        <div>
+            <h2 class="h5 fw-bold mb-1">Bloc JSON technique</h2>
+            <p class="text-muted small mb-0">Utile pour debug ou export, pas pour la lecture principale.</p>
+        </div>
+    </div>
+    <pre class="json-viewer mb-0"><code>{{ pretty_json }}</code></pre>
+</div>
+{% else %}
+<div class="card-platform empty-state">
+    <i class="bi bi-people fs-1 d-block mb-2 opacity-25"></i>
+    Aucun eleve n'est encore inscrit a ce cours.
+</div>
+{% endif %}
+{% endblock %}

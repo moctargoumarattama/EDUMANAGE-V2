@@ -1,0 +1,69 @@
+{% extends "maintenance/base_maintenance.html" %}
+
+{% block title %}Sessions actives | Maintenance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+    <div>
+        <div class="page-kicker">Suivi des acces</div>
+        <h1 class="page-title fs-2">Connexions en cours</h1>
+        <p class="page-subtitle">{{ active_sessions_count }} session(s) en cours de connexion sur la plateforme.</p>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-warning" data-url="{{ url_for('maintenance.revoke_all_sessions') }}" data-result-id="sessions-result" data-payload='{{ {}|tojson }}' data-options='{{ {"reloadOnSuccess": true}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+            <i class="bi bi-person-x me-2"></i>Deconnecter les autres
+        </button>
+        <button class="btn btn-outline-danger" data-url="{{ url_for('maintenance.revoke_all_sessions') }}" data-result-id="sessions-result" data-payload='{{ {"include_current": true}|tojson }}' data-options='{{ {"reloadOnSuccess": true}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+            <i class="bi bi-shield-lock me-2"></i>Deconnecter tout le monde
+        </button>
+    </div>
+</div>
+
+<div id="sessions-result" class="result-box"></div>
+
+<div class="tech-card">
+    {% if sessions %}
+    <div class="table-responsive">
+        <table class="tech-table">
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Acces</th>
+                    <th>IP</th>
+                    <th>Appareil</th>
+                    <th>Dernier passage</th>
+                    <th>Statut</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in sessions %}
+                <tr>
+                    <td>
+                        {{ item.user.nom_complet if item.user else 'Utilisateur supprime' }}
+                        <div class="small text-secondary">{{ item.user.email if item.user else '-' }}</div>
+                    </td>
+                    <td>{{ item.role_snapshot }}</td>
+                    <td>{{ item.ip_address or '-' }}</td>
+                    <td style="word-break: break-word;">{{ item.user_agent or '-' }}</td>
+                    <td>{{ item.last_seen_at.strftime('%d/%m/%Y a %H:%M') if item.last_seen_at else '-' }}</td>
+                    <td>{{ 'Active' if item.is_active else 'Fermee' }}</td>
+                    <td>
+                        {% if item.is_active %}
+                        <button class="btn btn-outline-danger btn-sm" data-url="{{ url_for('maintenance.revoke_user_sessions', user_id=item.user_id) }}" data-result-id="sessions-result" data-payload='{{ {}|tojson }}' data-options='{{ {"reloadOnSuccess": true}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                            Deconnecter
+                        </button>
+                        {% else %}
+                        <span class="text-secondary">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="text-secondary">Aucune connexion en cours pour le moment.</div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance en cours | LabeeB Arabic</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --text: #0f172a;
+            --muted: #64748b;
+            --panel: rgba(255, 255, 255, 0.94);
+            --border: rgba(15, 23, 42, 0.08);
+            --accent: #0f766e;
+            --accent-soft: rgba(15, 118, 110, 0.12);
+        }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background:
+                radial-gradient(circle at top, rgba(15, 118, 110, 0.18), transparent 28%),
+                linear-gradient(180deg, #fbfdff 0%, var(--bg) 100%);
+            color: var(--text);
+            font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+        }
+        .shell {
+            width: min(100%, 720px);
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 32px;
+            padding: 40px 36px;
+            box-shadow: 0 30px 80px rgba(15, 23, 42, 0.12);
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 18px;
+        }
+        h1 {
+            margin: 0 0 14px;
+            font-size: clamp(2rem, 3vw, 3rem);
+            line-height: 1.1;
+        }
+        p {
+            color: var(--muted);
+            line-height: 1.7;
+            font-size: 1.02rem;
+        }
+        .note {
+            margin: 22px 0;
+            padding: 16px 18px;
+            border-radius: 18px;
+            background: rgba(254, 243, 199, 0.74);
+            border: 1px solid rgba(180, 83, 9, 0.12);
+            color: #92400e;
+        }
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 18px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .btn-primary {
+            background: #0f172a;
+            color: #ffffff;
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.14);
+        }
+        .btn-secondary {
+            background: #ffffff;
+            color: var(--accent);
+            border: 1px solid rgba(15, 118, 110, 0.18);
+        }
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+    </style>
+</head>
+<body>
+    <section class="shell">
+        <div class="badge">Mise a jour en cours</div>
+        <h1>Nous revenons tres vite</h1>
+        <p>Le site est momentanement indisponible pendant une operation de maintenance. Tout est en cours pour remettre le service en ligne dans les meilleures conditions.</p>
+        {% if maintenance_payload and maintenance_payload.note %}
+        <div class="note">{{ maintenance_payload.note }}</div>
+        {% endif %}
+        <p>Merci de revenir dans quelques instants. Les comptes administrateur et maintenance peuvent toujours acceder a la connexion si besoin.</p>
+        <div class="actions">
+            <a class="btn btn-primary" href="{{ url_for('main.login') }}">Acceder a la connexion</a>
+            <a class="btn btn-secondary" href="{{ url_for('main.index') }}">Retour a l accueil</a>
+        </div>
+    </section>
+</body>
+</html>

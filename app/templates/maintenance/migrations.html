@@ -1,0 +1,35 @@
+{% extends "maintenance/base_maintenance.html" %}
+
+{% block title %}Migrations | Maintenance{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="h3 mb-1">Historique Alembic</h1>
+        <p class="text-secondary mb-0">Revision active : {{ current_revision or 'inconnue' }}</p>
+    </div>
+    <a class="btn btn-outline-light" href="{{ url_for('maintenance.sante') }}" target="_blank">
+        <i class="bi bi-heart-pulse me-2"></i>Sante JSON
+    </a>
+</div>
+
+<div class="d-flex flex-column gap-3">
+    {% for migration in migrations %}
+    <div class="tech-card">
+        <div class="d-flex justify-content-between flex-wrap gap-2">
+            <div>
+                <div class="text-secondary small">{{ migration.filename }}</div>
+                <div class="fw-semibold">{{ migration.title }}</div>
+            </div>
+            <div class="text-end">
+                <div class="small text-secondary">Revision</div>
+                <div>{{ migration.revision or '-' }}</div>
+            </div>
+        </div>
+        <div class="small text-secondary mt-3">Revision precedente : {{ migration.down_revision or 'none' }}</div>
+    </div>
+    {% else %}
+    <div class="tech-card text-secondary">Aucune migration detectee.</div>
+    {% endfor %}
+</div>
+{% endblock %}

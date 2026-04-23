@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} | LabeeB Arabic{% endblock %}
+
+{% block extra_css %}
+<style>
+.support-shell {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.9fr);
+}
+
+.support-thread {
+    display: grid;
+    gap: 1rem;
+}
+
+.support-message-list {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.support-message {
+    border: 1px solid rgba(108, 60, 225, 0.12);
+    border-radius: 20px;
+    background: #fff;
+    padding: 1rem 1.1rem;
+}
+
+.support-message--admin {
+    border-color: rgba(47, 111, 237, 0.2);
+}
+
+.support-message--student {
+    border-color: rgba(12, 155, 107, 0.2);
+}
+
+.support-message--system {
+    background: rgba(108, 60, 225, 0.06);
+}
+
+.support-message__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.support-sidebar-card {
+    border: 1px solid rgba(108, 60, 225, 0.12);
+    border-radius: 22px;
+    background: #fff;
+    padding: 1rem 1.1rem;
+}
+
+@media (max-width: 992px) {
+    .support-shell {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="support-page-shell">
+    <div class="page-header mb-4">
+        <div>
+            <h1 class="h3 fw-bold mb-1">{{ page_title }}</h1>
+            <p class="text-muted mb-0">
+                {% if viewer_mode == 'admin' %}
+                    Echangez avec l etudiant puis accordez une reinitialisation si besoin.
+                {% else %}
+                    Gardez ici vos echanges avec l administration et les autorisations de reinitialisation.
+                {% endif %}
+            </p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ back_url }}" class="btn btn-outline-platform">
+                <i class="bi bi-arrow-left me-2"></i>Retour
+            </a>
+            {% if grant_reset_url %}
+                <form method="POST" action="{{ grant_reset_url }}" class="m-0">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary-platform">
+                        <i class="bi bi-shield-check me-2"></i>Accorder 30 min
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="support-shell">
+        <section class="support-thread">
+            <div class="card-platform p-4">
+                <div class="page-header mb-3">
+                    <div>
+                        <h2 class="h5 fw-bold mb-1">Discussion</h2>
+                        <p class="text-muted mb-0">Un seul fil clair, garde au moins 3 mois.</p>
+                    </div>
+                </div>
+
+                <div class="support-message-list">
+                    {% if support_messages %}
+                        {% for message in support_messages %}
+                            <article class="support-message support-message--{{ message.author_role }}">
+                                <div class="support-message__meta">
+                                    <div>
+                                        <div class="fw-semibold">{{ message.author_label }}</div>
+                                        <div class="small text-muted">{{ message.created_label }}</div>
+                                    </div>
+                                    <span class="badge text-bg-light">{{ message.message_type }}</span>
+                                </div>
+                                <p class="mb-0">{{ message.body }}</p>
+
+                                {% if message.reset_url %}
+                                    <div class="mt-3">
+                                        <a href="{{ message.reset_url }}" class="btn btn-sm btn-primary-platform">
+                                            Definir un nouveau mot de passe
+                                        </a>
+                                    </div>
+                                {% elif message.message_type == 'reset_granted' and message.reset_status %}
+                                    <div class="small text-muted mt-3">
+                                        {% if viewer_mode == 'admin' %}
+                                            Le lien est visible seulement cote etudiant.
+                                        {% elif message.reset_status.used %}
+                                            Ce lien a deja ete utilise.
+                                        {% elif message.reset_status.expired %}
+                                            Ce lien a expire.
+                                        {% else %}
+                                            Lien actif jusqu au {{ message.reset_status.expires_at }}.
+                                        {% endif %}
+                                    </div>
+                                {% endif %}
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                        <div class="notification-empty">
+                            <i class="bi bi-chat-left-text fs-1 d-block mb-2 opacity-25"></i>
+                            Aucun message pour le moment.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-platform p-4">
+                <div class="page-header mb-3">
+                    <div>
+                        <h2 class="h5 fw-bold mb-1">Envoyer un message</h2>
+                        <p class="text-muted mb-0">Expliquez simplement votre besoin ou posez votre question.</p>
+                    </div>
+                </div>
+                <form method="POST" action="{{ message_post_url }}" class="d-grid gap-3">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <textarea
+                        class="form-control"
+                        name="message"
+                        rows="4"
+                        maxlength="2000"
+                        placeholder="{% if viewer_mode == 'admin' %}Ecrivez votre reponse a l etudiant{% else %}Ecrivez votre message a l administration{% endif %}"
+                        required
+                    ></textarea>
+                    <button type="submit" class="btn btn-primary-platform">
+                        <i class="bi bi-send me-2"></i>Envoyer
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <aside class="d-grid gap-3">
+            <div class="support-sidebar-card">
+                <div class="fw-semibold mb-2">Fiche rapide</div>
+                <div class="small text-muted mb-2">Etudiant</div>
+                <div class="fw-semibold">{{ thread_summary.student_name }}</div>
+                <div class="small text-muted">{{ thread_summary.student_email }}</div>
+                <div class="small text-muted mt-3">Derniere activite: {{ thread_summary.last_activity_label }}</div>
+                <div class="small text-muted mt-1">Statut du fil: {{ thread_summary.status }}</div>
+                <div class="small text-muted mt-1">
+                    {% if thread_summary.has_active_grant %}
+                        Une autorisation de reset est encore active.
+                    {% elif thread_summary.pending_request %}
+                        Une demande de reset attend une decision.
+                    {% else %}
+                        Aucun reset en attente.
+                    {% endif %}
+                </div>
+            </div>
+
+            {% if latest_reset_request %}
+                <div class="support-sidebar-card">
+                    <div class="fw-semibold mb-2">Derniere demande de reset</div>
+                    <div class="small text-muted">IP</div>
+                    <div class="mb-2">{{ latest_reset_request.request_ip or 'Indisponible' }}</div>
+                    <div class="small text-muted">Appareil</div>
+                    <div>{{ latest_reset_request.request_user_agent or 'Indisponible' }}</div>
+                </div>
+            {% endif %}
+        </aside>
+    </div>
+</section>
+{% endblock %}
