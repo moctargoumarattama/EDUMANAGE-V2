@@ -2,7 +2,7 @@
 <html lang="{{ session.get('langue', 'fr') }}">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#6C3CE1">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -18,10 +18,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json', v='20260422-premium-loader-v1') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/icon-192.png', v='20260422-premium-loader-v1') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png', v='20260422-premium-loader-v1') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css', v='20260422-premium-loader-v1') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json', v='20260424-placement-admin-v1') }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/icon-192.png', v='20260424-placement-admin-v1') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png', v='20260424-placement-admin-v1') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css', v='20260424-placement-admin-v1') }}">
     <style data-premium-loader-critical>
         .app-premium-loader {
             position: fixed;
@@ -129,7 +129,7 @@
     <meta data-app-head-boundary="end">
 </head>
 <body>
-    {% set asset_version = '20260422-premium-loader-v1' %}
+    {% set asset_version = '20260424-placement-admin-v1' %}
     {% set endpoint = request.endpoint or '' %}
     {% set notification_unread = notification_summary['unread_count'] if notification_summary else 0 %}
     {% set notification_items = notification_summary['items'] if notification_summary else [] %}
@@ -209,7 +209,7 @@
                                 </li>
                             {% endif %}
 
-                            {% if current_user.role in ['eleve', 'admin'] %}
+                            {% if current_user.role == 'eleve' %}
                                 <li class="nav-item">
                                     <a class="nav-link {% if endpoint == 'progress.dashboard_eleve' %}active{% endif %}" href="{{ url_for('progress.dashboard_eleve') }}">
                                         <i class="bi bi-graph-up-arrow"></i>
@@ -451,6 +451,7 @@
             "uiStrings": {
                 "translationLabel": {{ _('Translation')|tojson }},
                 "listen": {{ _('Listen')|tojson }},
+                "pronounce": {{ _('Pronounce')|tojson }},
                 "example": {{ _('Example')|tojson }},
                 "unavailable": {{ _('Unavailable')|tojson }},
                 "pronunciationUnavailable": {{ _('Pronunciation unavailable on this device.')|tojson }}
@@ -470,12 +471,18 @@
         let activeDicoRequestController = null;
         let activeDicoRequestToken = 0;
         let removeDicoDragListeners = null;
+        let dicoTouchCandidate = null;
+        let dictionnaireInitScheduled = false;
+        let dicoMutationObserver = null;
+        let lastDicoTouchActivation = { mot: '', time: 0 };
         let premiumLoaderMode = 'boot';
         let premiumLoaderVisible = true;
         let premiumLoaderShownAt = Date.now();
         let premiumLoaderHideTimer = null;
         let premiumBootReady = false;
         let premiumPageReady = document.readyState === 'complete';
+        const ARABIC_TEXT_PATTERN = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+/;
+        const ARABIC_TEXT_SPLIT_PATTERN = /([\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]+)/g;
 
         function getPremiumLoader() {
             return document.getElementById('app-premium-loader');
@@ -613,6 +620,22 @@
                 || null;
         }
 
+        function langueDemandeVoixArabe(langue) {
+            return String(langue || 'ar').toLowerCase().startsWith('ar');
+        }
+
+        function navigateurPeutPrononcer(langue) {
+            if (!('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') {
+                return false;
+            }
+
+            if (!langueDemandeVoixArabe(langue)) {
+                return true;
+            }
+
+            return Boolean(choisirVoixArabe());
+        }
+
         function prononcerTexte(texte, langue, ui) {
             const content = String(texte || '').trim();
             if (!content) {
@@ -631,9 +654,39 @@
                 utterance.rate = 0.9;
                 utterance.pitch = 1;
                 const voice = choisirVoixArabe();
+                if (langueDemandeVoixArabe(utterance.lang) && !voice) {
+                    window.alert((ui && ui.pronunciationUnavailable) || (ui && ui.unavailable) || 'Pronunciation unavailable.');
+                    return false;
+                }
                 if (voice) {
                     utterance.voice = voice;
                 }
+
+                let started = false;
+                const failSafely = () => {
+                    if (started) {
+                        return;
+                    }
+                    try {
+                        window.speechSynthesis.cancel();
+                    } catch (_) {
+                        // Ignore cancel failures and keep the user feedback.
+                    }
+                    window.alert((ui && ui.pronunciationUnavailable) || (ui && ui.unavailable) || 'Pronunciation unavailable.');
+                };
+                const startTimer = window.setTimeout(failSafely, 1600);
+                utterance.onstart = () => {
+                    started = true;
+                    window.clearTimeout(startTimer);
+                };
+                utterance.onend = () => {
+                    window.clearTimeout(startTimer);
+                };
+                utterance.onerror = () => {
+                    window.clearTimeout(startTimer);
+                    failSafely();
+                };
+
                 window.speechSynthesis.speak(utterance);
                 return true;
             } catch (_) {
@@ -642,8 +695,47 @@
             }
         }
 
+        function modeAudioDico(data) {
+            if (!data) {
+                return 'none';
+            }
+            if (data.audio_mode === 'file' || data.audio_mode === 'browser' || data.audio_mode === 'none') {
+                return data.audio_mode;
+            }
+            if (data.audio_url) {
+                return 'file';
+            }
+            if (data.pronunciation_text || data.mot) {
+                return 'browser';
+            }
+            return 'none';
+        }
+
         function peutPrononcerDico(data) {
-            return Boolean(data && (data.audio_url || data.pronunciation_text || data.mot));
+            if (!data) {
+                return false;
+            }
+            if (modeAudioDico(data) === 'file') {
+                return Boolean(data.audio_url);
+            }
+
+            const fallbackText = data.pronunciation_text || data.mot || '';
+            const fallbackLang = data.pronunciation_lang || 'ar';
+            return modeAudioDico(data) === 'browser' && Boolean(fallbackText) && navigateurPeutPrononcer(fallbackLang);
+        }
+
+        function libelleAudioDico(data, ui) {
+            if (modeAudioDico(data) === 'browser') {
+                return (ui && ui.pronounce) || 'Pronounce';
+            }
+            return (ui && ui.listen) || 'Listen';
+        }
+
+        function noteAudioDico(data, ui) {
+            if (!data || modeAudioDico(data) !== 'browser' || peutPrononcerDico(data)) {
+                return '';
+            }
+            return `<div class="small text-muted mt-2">${escapeHtml((ui && ui.pronunciationUnavailable) || 'Pronunciation unavailable on this device.')}</div>`;
         }
 
         function jouerPrononciationDico(data, ui) {
@@ -677,13 +769,27 @@
             span.className = 'mot-arabe-cliquable';
             span.textContent = word;
             span.dataset.motArabe = word;
+            span.setAttribute('role', 'button');
+            span.setAttribute('tabindex', '0');
+            span.setAttribute('lang', 'ar');
+            span.setAttribute('aria-label', `Ouvrir le dictionnaire pour ${word}`);
             return span;
+        }
+
+        function targetElementFromNode(target) {
+            if (target instanceof Element) {
+                return target;
+            }
+            if (target && target.nodeType === Node.TEXT_NODE) {
+                return target.parentElement;
+            }
+            return target?.parentElement || null;
         }
 
         function wrapArabicWords(container) {
             const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
                 acceptNode(node) {
-                    if (!node.nodeValue || !/[\u0600-\u06FF]+/.test(node.nodeValue)) {
+                    if (!node.nodeValue || !ARABIC_TEXT_PATTERN.test(node.nodeValue)) {
                         return NodeFilter.FILTER_REJECT;
                     }
                     if (!node.parentElement || node.parentElement.closest('.mot-arabe-cliquable, #dico-popup')) {
@@ -700,12 +806,12 @@
 
             textNodes.forEach(node => {
                 const fragment = document.createDocumentFragment();
-                const parts = node.nodeValue.split(/([\u0600-\u06FF]+)/g);
+                const parts = node.nodeValue.split(ARABIC_TEXT_SPLIT_PATTERN);
                 parts.forEach(part => {
                     if (!part) {
                         return;
                     }
-                    if (/^[\u0600-\u06FF]+$/.test(part)) {
+                    if (ARABIC_TEXT_PATTERN.test(part)) {
                         fragment.appendChild(buildArabicWordSpan(part));
                     } else {
                         fragment.appendChild(document.createTextNode(part));
@@ -715,17 +821,119 @@
             });
         }
 
-        function initDictionnaire() {
+        function dictionnaireContainers(scope = document) {
+            const root = scope instanceof Element || scope instanceof Document ? scope : document;
+            const selector = '.arabic-text, .arabic-content, [lang="ar"]';
+            const containers = [];
+
+            if (root instanceof Element && root.matches(selector)) {
+                containers.push(root);
+            }
+            root.querySelectorAll?.(selector).forEach(container => {
+                containers.push(container);
+            });
+
+            return containers;
+        }
+
+        function initDictionnaire(scope = document) {
             if (!window.APP_VOCAB_URL_TEMPLATE) {
                 return;
             }
-            document.querySelectorAll('.arabic-text, .arabic-content, [lang="ar"]').forEach(container => {
-                if (container.dataset.dicoReady === 'true') {
-                    return;
-                }
+            dictionnaireContainers(scope).forEach(container => {
                 wrapArabicWords(container);
-                container.dataset.dicoReady = 'true';
             });
+        }
+
+        function scheduleDictionnaireInit(scope = document) {
+            if (dictionnaireInitScheduled) {
+                return;
+            }
+            dictionnaireInitScheduled = true;
+            window.requestAnimationFrame(() => {
+                window.requestAnimationFrame(() => {
+                    dictionnaireInitScheduled = false;
+                    initDictionnaire(scope);
+                });
+            });
+        }
+
+        function nodeMayNeedDictionnaireInit(node) {
+            if (!node) {
+                return false;
+            }
+            if (node.nodeType === Node.TEXT_NODE) {
+                return ARABIC_TEXT_PATTERN.test(node.nodeValue || '');
+            }
+            if (!(node instanceof Element)) {
+                return false;
+            }
+            if (node.closest('#dico-popup') || node.matches('.mot-arabe-cliquable')) {
+                return false;
+            }
+            if (node.matches('.arabic-text, .arabic-content, [lang="ar"]')) {
+                return true;
+            }
+            if (node.querySelector('.arabic-text, .arabic-content, [lang="ar"]')) {
+                return true;
+            }
+            return ARABIC_TEXT_PATTERN.test(node.textContent || '');
+        }
+
+        function ensureDictionnaireObserver() {
+            if (dicoMutationObserver || typeof MutationObserver !== 'function') {
+                return;
+            }
+            dicoMutationObserver = new MutationObserver(mutations => {
+                const shouldRefresh = mutations.some(mutation => {
+                    if (mutation.type === 'characterData') {
+                        return nodeMayNeedDictionnaireInit(mutation.target);
+                    }
+                    return Array.from(mutation.addedNodes || []).some(nodeMayNeedDictionnaireInit);
+                });
+                if (shouldRefresh) {
+                    scheduleDictionnaireInit(document.getElementById('app-main') || document);
+                }
+            });
+            dicoMutationObserver.observe(document.body, {
+                childList: true,
+                subtree: true,
+                characterData: true
+            });
+        }
+
+        function dicoTriggerFromTarget(target) {
+            const element = targetElementFromNode(target);
+            return element instanceof Element ? element.closest('.mot-arabe-cliquable') : null;
+        }
+
+        function motDepuisDicoTrigger(trigger) {
+            const mot = trigger?.dataset?.motArabe || '';
+            return String(mot).trim();
+        }
+
+        function enregistrerActivationTactileDico(mot) {
+            lastDicoTouchActivation = {
+                mot,
+                time: Date.now()
+            };
+        }
+
+        function clicDicoEstDupliqueParTouch(mot) {
+            return Boolean(
+                mot
+                && lastDicoTouchActivation.mot === mot
+                && (Date.now() - lastDicoTouchActivation.time) < 900
+            );
+        }
+
+        function ouvrirDicoDepuisTrigger(trigger) {
+            const mot = motDepuisDicoTrigger(trigger);
+            if (!mot) {
+                return false;
+            }
+            ouvrirDico(mot);
+            return true;
         }
 
         function cleanupDicoRuntime(options = {}) {
@@ -829,14 +1037,14 @@
                         ${data.translitteration ? `<div class="dico-translit">${escapeHtml(data.translitteration)}</div>` : ''}
                         <div class="dico-section-label">${escapeHtml(ui.translationLabel || 'Translation')}</div>
                         <div class="dico-traduction">${escapeHtml(data.traduction || ui.unavailable || 'Unavailable')}</div>
-                        ${peutPrononcerDico(data) ? `<button class="dico-audio" type="button">${escapeHtml(ui.listen || 'Listen')}</button>` : ''}
+                        ${peutPrononcerDico(data) ? `<button class="dico-audio" type="button">${escapeHtml(libelleAudioDico(data, ui))}</button>` : noteAudioDico(data, ui)}
                         ${data.exemple ? `<div class="dico-section-label">${escapeHtml(ui.example || 'Example')}</div><div class="dico-exemple arabic-text">${escapeHtml(data.exemple)}</div>` : ''}
                     </div>
                 `);
                 if (peutPrononcerDico(data)) {
                     popup.querySelector('.dico-audio')?.addEventListener('click', () => jouerPrononciationDico(data, ui));
                 }
-                initDictionnaire();
+                initDictionnaire(popup);
             } catch (error) {
                 if (error.name === 'AbortError' || requestToken !== activeDicoRequestToken) {
                     return;
@@ -973,10 +1181,15 @@
         window.addEventListener('pageshow', () => {
             document.body.classList.remove('app-is-navigating');
             stopNavProgress();
+            scheduleDictionnaireInit(document.getElementById('app-main') || document);
             premiumPageReady = true;
             if (!premiumBootReady) {
                 maybeHideBootPremiumLoader();
             }
+        });
+
+        window.addEventListener('load', () => {
+            scheduleDictionnaireInit(document.getElementById('app-main') || document);
         });
 
         window.addEventListener('app:navigation-start', () => {
@@ -987,19 +1200,67 @@
         window.addEventListener('app:navigation-stop', () => {
             document.body.classList.remove('app-is-navigating');
             stopNavProgress();
+            scheduleDictionnaireInit(document.getElementById('app-main') || document);
             hidePremiumLoader();
         });
 
         document.addEventListener('click', event => {
-            const trigger = event.target instanceof Element ? event.target.closest('.mot-arabe-cliquable') : null;
+            const trigger = dicoTriggerFromTarget(event.target);
+            const mot = motDepuisDicoTrigger(trigger);
+            if (!mot || clicDicoEstDupliqueParTouch(mot)) {
+                return;
+            }
+            ouvrirDicoDepuisTrigger(trigger);
+        });
+
+        document.addEventListener('touchstart', event => {
+            const trigger = dicoTriggerFromTarget(event.target);
+            const touch = event.touches?.[0];
+            if (!trigger || !touch) {
+                dicoTouchCandidate = null;
+                return;
+            }
+
+            dicoTouchCandidate = {
+                mot: motDepuisDicoTrigger(trigger),
+                x: touch.clientX,
+                y: touch.clientY
+            };
+        }, { passive: true });
+
+        document.addEventListener('touchend', event => {
+            const trigger = dicoTriggerFromTarget(event.target);
+            const touch = event.changedTouches?.[0];
+            const candidate = dicoTouchCandidate;
+            dicoTouchCandidate = null;
+            if (!trigger || !touch || !candidate) {
+                return;
+            }
+
+            const mot = motDepuisDicoTrigger(trigger);
+            const moved = Math.abs(touch.clientX - candidate.x) > 14 || Math.abs(touch.clientY - candidate.y) > 14;
+            if (moved || !mot || candidate.mot !== mot) {
+                return;
+            }
+
+            enregistrerActivationTactileDico(mot);
+            ouvrirDicoDepuisTrigger(trigger);
+        }, { passive: true });
+
+        document.addEventListener('touchcancel', () => {
+            dicoTouchCandidate = null;
+        }, { passive: true });
+
+        document.addEventListener('keydown', event => {
+            if (event.key !== 'Enter' && event.key !== ' ') {
+                return;
+            }
+            const trigger = dicoTriggerFromTarget(event.target);
             if (!trigger) {
                 return;
             }
-            const mot = trigger.dataset.motArabe;
-            if (!mot) {
-                return;
-            }
-            ouvrirDico(mot);
+            event.preventDefault();
+            ouvrirDicoDepuisTrigger(trigger);
         });
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -1018,8 +1279,10 @@
                     }, { once: true });
                 }
             }
-            initDictionnaire();
+            ensureDictionnaireObserver();
             window.appRunPageInitializers?.(document);
+            initDictionnaire(document.getElementById('app-main') || document);
+            scheduleDictionnaireInit(document.getElementById('app-main') || document);
             premiumPageReady = true;
             maybeHideBootPremiumLoader();
         });

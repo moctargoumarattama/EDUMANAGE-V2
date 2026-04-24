@@ -25,6 +25,9 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  overflow-x: clip;
 }
 
 @view-transition {
@@ -37,6 +40,7 @@ body {
   color: var(--text-main);
   min-height: 100vh;
   padding-top: var(--app-shell-offset);
+  overflow-x: clip;
 }
 
 .app-nav-progress {
@@ -2094,6 +2098,10 @@ button,
   min-width: 0;
 }
 
+.placement-admin-panel {
+  min-width: 0;
+}
+
 .vocab-entry-word {
   min-width: 0;
   word-break: break-word;
@@ -2127,7 +2135,10 @@ button,
 
 #vocab-results,
 #vocab-pagination-top,
-#vocab-pagination-bottom {
+#vocab-pagination-bottom,
+#placement-results,
+#placement-pagination-top,
+#placement-pagination-bottom {
   scroll-margin-top: 92px;
 }
 
@@ -2140,11 +2151,17 @@ button,
   transition: opacity 120ms ease, transform 120ms ease;
 }
 
+.placement-admin-panel {
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+
+.placement-admin-panel.is-updating [data-placement-results-region="true"],
 .vocab-admin-panel.is-updating [data-vocab-results-region="true"] {
   opacity: 0.72;
   transform: translateY(2px);
 }
 
+[data-placement-results-region="true"],
 [data-vocab-results-region="true"] {
   transition: opacity 120ms ease, transform 120ms ease;
 }
@@ -2153,6 +2170,7 @@ button,
   white-space: nowrap;
 }
 
+.placement-admin-panel .spin,
 .vocab-filter-form .spin {
   animation: vocab-spin 0.75s linear infinite;
 }
@@ -2722,6 +2740,8 @@ button,
   border-bottom: 1px dashed var(--primary);
   transition: color 0.15s ease, border-color 0.15s ease;
   display: inline-block;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mot-arabe-cliquable:hover {
@@ -2813,6 +2833,8 @@ button,
   color: #0369a1;
   cursor: pointer;
   margin-bottom: 12px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .dico-exemple {
@@ -2833,6 +2855,8 @@ button,
   font-size: 1.2rem;
   cursor: pointer;
   color: var(--text-muted);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @media (min-width: 769px) {
@@ -2979,6 +3003,10 @@ button,
 
   .navbar-platform-collapse {
     margin-top: 0.85rem;
+    max-height: calc(100vh - var(--app-shell-offset) - 1.25rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
   .navbar-mobile-panel {
@@ -3047,6 +3075,10 @@ button,
     width: max-content;
   }
 
+  .nav-utility-cluster .nav-notification-wrapper.dropdown {
+    width: 100%;
+  }
+
   .nav-notification-wrapper,
   .nav-notification-wrapper .dropdown-menu,
   .nav-notification-toggle {
@@ -3055,6 +3087,14 @@ button,
 
   .nav-notification-toggle {
     justify-content: space-between;
+  }
+
+  .nav-notification-menu {
+    max-width: 100%;
+  }
+
+  .nav-notification-list {
+    max-height: min(30vh, 220px);
   }
 
   .nav-profile-card {
@@ -3187,6 +3227,49 @@ button,
   .home-hero-panel {
     background-size: 100% 100%;
     background-position: center;
+  }
+
+  .home-hero-panel .btn.btn-lg {
+    padding: 0.72rem 1rem !important;
+    font-size: 0.98rem;
+    border-radius: 10px;
+  }
+
+  .home-hero-panel .surface-card {
+    padding: 1rem !important;
+  }
+
+  #niveaux .card-platform {
+    padding: 1.15rem !important;
+    border-radius: 14px;
+  }
+
+  #niveaux .fw-semibold {
+    font-size: 1rem;
+  }
+
+  #niveaux .text-muted.small {
+    font-size: 0.82rem;
+    line-height: 1.45;
+  }
+
+  .feature-card {
+    padding: 0.88rem;
+  }
+
+  .feature-card .eyebrow {
+    margin-bottom: 0.65rem !important;
+    padding: 0.3rem 0.55rem;
+    font-size: 0.7rem;
+  }
+
+  .feature-card h3 {
+    font-size: 0.95rem;
+  }
+
+  .feature-card p {
+    font-size: 0.82rem;
+    line-height: 1.4;
   }
 
   .feature-pyramid {

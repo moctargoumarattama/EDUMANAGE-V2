@@ -245,8 +245,10 @@
     replaceById(nextDoc, "app-flash-stack");
     replaceById(nextDoc, "app-main");
     document.title = nextDoc.title;
-    window.initDictionnaire?.();
-    window.appRunPageInitializers?.(document.getElementById("app-main") || document);
+    const mainRoot = document.getElementById("app-main") || document;
+    window.appRunPageInitializers?.(mainRoot);
+    window.initDictionnaire?.(mainRoot);
+    window.scheduleDictionnaireInit?.(mainRoot);
     return true;
   }
 

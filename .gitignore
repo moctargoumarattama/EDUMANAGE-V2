@@ -12,3 +12,7 @@ instance/
 
 # Env
 .env
+
+.venv/
+__pycache__/
+media/uploads/audios/

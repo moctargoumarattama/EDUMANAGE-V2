@@ -84,7 +84,7 @@ def _course_stats_payload(cours):
 @login_required
 def dashboard_eleve():
     if current_user.role != "eleve":
-        abort(403)
+        return redirect(url_for("main.dashboard"))
 
     inscriptions = (
         Inscription.query.options(joinedload(Inscription.cours).selectinload(Cours.lecons))

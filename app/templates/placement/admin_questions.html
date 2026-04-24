@@ -2,7 +2,7 @@
 {% block title %}Questions de placement | LabeeB Arabic{% endblock %}
 
 {% block content %}
-<section class="form-shell placement-admin-shell admin-page-shell">
+<section class="form-shell placement-admin-shell admin-page-shell" data-placement-admin-page="true">
     <div class="page-header">
         <div class="admin-page-heading">
             <h1 class="h3 fw-bold mb-1">Questions du placement test</h1>
@@ -19,7 +19,7 @@
                 <h2 class="form-panel-title">Nouvelle question</h2>
                 <p class="text-muted mb-4">Utilisez exactement une bonne reponse parmi les 4 choix.</p>
 
-                <form method="post" action="{{ url_for('placement.nouvelle_question') }}" class="row g-3">
+                <form id="placement-admin-form" method="post" action="{{ url_for('placement.nouvelle_question') }}" class="row g-3">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <div class="col-12">
@@ -68,8 +68,8 @@
                     {% endfor %}
 
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary-platform w-100">
-                            <i class="bi bi-plus-circle me-2"></i>Ajouter la question
+                        <button type="submit" class="btn btn-primary-platform w-100" data-placement-submit-button="true">
+                            <i class="bi bi-plus-circle me-2" data-placement-submit-icon="true"></i><span data-placement-submit-label="true">Ajouter la question</span>
                         </button>
                     </div>
                 </form>
@@ -77,58 +77,9 @@
         </div>
 
         <div class="col-12 col-xl-7">
-            <div class="card-platform p-4">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="h5 fw-bold mb-0">Questions existantes</h2>
-                    <span class="badge-role badge-role-admin">{{ test.questions|length }} question(s)</span>
-                </div>
-
-                <div class="soft-list">
-                    {% for question in test.questions %}
-                    <div class="card-platform p-3 placement-question-card">
-                        <div class="d-flex justify-content-between align-items-start gap-3 mb-3 placement-question-head">
-                            <div class="admin-text-safe">
-                                <div class="d-flex flex-wrap gap-2 align-items-center mb-2">
-                                    <span class="badge-niveau badge-{{ 'A2' if question.type_question == 'choisir_image' else 'A1' }}">{{ question.type_question }}</span>
-                                    <span class="text-muted small">Ordre {{ question.ordre }}</span>
-                                </div>
-                                <div class="{% if text_is_arabic(question.texte) %}arabic-text{% endif %} fw-semibold">
-                                    {{ question.texte }}
-                                </div>
-                            </div>
-                            <form method="post" action="{{ url_for('placement.supprimer_question', question_id=question.id) }}">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button class="btn btn-sm btn-outline-danger" type="submit">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-
-                        <div class="row g-2">
-                            {% for choix in question.choix %}
-                            <div class="col-12 col-md-6">
-                                <div class="soft-list-item">
-                                    <div class="admin-text-safe">
-                                        <div class="{% if text_is_arabic(choix.texte) %}arabic-text{% endif %}">{{ choix.texte }}</div>
-                                        {% if choix.image_url %}
-                                        <div class="small text-muted mt-1">Image disponible</div>
-                                        {% endif %}
-                                    </div>
-                                    <span class="badge-role {{ 'badge-role-eleve' if choix.est_correct else 'badge-role-maintenance' }}">
-                                        {{ 'Correct' if choix.est_correct else 'Distracteur' }}
-                                    </span>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    </div>
-                    {% else %}
-                    <div class="empty-state">
-                        <i class="bi bi-ui-checks-grid d-block fs-1 mb-3 opacity-25"></i>
-                        Aucune question de placement n'est configuree pour le moment.
-                    </div>
-                    {% endfor %}
-                </div>
+            <div class="card-platform p-4 placement-admin-panel">
+                <div class="d-none mb-3" data-placement-admin-feedback="true"></div>
+                {% include "partials/_placement_questions_region.html" %}
             </div>
         </div>
     </div>

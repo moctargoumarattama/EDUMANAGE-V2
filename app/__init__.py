@@ -360,6 +360,8 @@ def _bootstrap_runtime_data(app):
             db.session.rollback()
 
     try:
+        from .pedagogical_seed import seed_pedagogical_content
+
         if not PlacementTest.query.first():
             test = PlacementTest()
             db.session.add(test)
@@ -726,6 +728,7 @@ def _bootstrap_runtime_data(app):
                 lecon.audio_url = lesson_data["audio_url"]
                 lecon.duree_minutes = lesson_data["duree_minutes"]
                 lecon.points_recompense = lesson_data["points_recompense"]
+                lecon.est_publie = lesson_data.get("est_publie", True)
 
                 existing_questions = {question.ordre: question for question in lecon.questions}
                 desired_orders = set()
@@ -733,7 +736,11 @@ def _bootstrap_runtime_data(app):
                     desired_orders.add(question_data["ordre"])
                     question = existing_questions.get(question_data["ordre"])
                     if question is None:
-                        question = Question(lecon_id=lecon.id, ordre=question_data["ordre"])
+                        question = Question(
+                            lecon_id=lecon.id,
+                            ordre=question_data["ordre"],
+                            texte=question_data["texte"],
+                        )
                         db.session.add(question)
                         db.session.flush()
 
@@ -943,6 +950,7 @@ def _bootstrap_runtime_data(app):
 
                 lecon.titre = lesson_data["titre"]
                 lecon.contenu_texte = lesson_data["contenu_texte"]
+                lecon.est_publie = True
 
                 existing_questions = {question.ordre: question for question in lecon.questions}
                 for question_order, question_data in lesson_data["questions"].items():
@@ -1009,6 +1017,8 @@ def _bootstrap_runtime_data(app):
                     progression.vue = True
                     progression.date_vue = progression.date_vue or datetime.utcnow()
                     progression.score_quiz = progression.score_quiz if progression.score_quiz is not None else 0.75
+
+        seed_pedagogical_content(enseignant_demo=enseignant_demo)
 
         db.session.commit()
     except IntegrityError:

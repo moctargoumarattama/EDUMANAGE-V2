@@ -14,6 +14,7 @@ from app.utils import serialize_placement_questions, text_is_arabic
 placement_bp = Blueprint("placement", __name__)
 MAX_PLACEMENT_QUESTION_COUNT = 10
 MIN_PLACEMENT_QUESTION_COUNT = 3
+PLACEMENT_ADMIN_PER_PAGE = 10
 
 
 def _active_test():
@@ -45,6 +46,43 @@ def _test_is_ready(test):
 
 def placement_test_is_ready():
     return _test_is_ready(_active_test())
+
+
+def _is_ajax_request():
+    return request.headers.get("X-Requested-With") == "XMLHttpRequest"
+
+
+def _coerce_positive_page(value, default=1):
+    try:
+        page = int(value)
+    except (TypeError, ValueError):
+        page = default
+    return max(page, 1)
+
+
+def _placement_questions_query(test_id):
+    return (
+        PlacementQuestion.query.options(selectinload(PlacementQuestion.choix))
+        .filter_by(test_id=test_id)
+        .order_by(PlacementQuestion.ordre.asc(), PlacementQuestion.id.asc())
+    )
+
+
+def _placement_admin_page_context(test, requested_page=None):
+    query = _placement_questions_query(test.id)
+    total_count = query.count()
+    requested_page = _coerce_positive_page(
+        requested_page if requested_page is not None else request.args.get("page", 1)
+    )
+    last_page = max((total_count + PLACEMENT_ADMIN_PER_PAGE - 1) // PLACEMENT_ADMIN_PER_PAGE, 1)
+    current_page = min(requested_page, last_page)
+    pagination = query.paginate(page=current_page, per_page=PLACEMENT_ADMIN_PER_PAGE, error_out=False)
+    return {
+        "pagination": pagination,
+        "questions": pagination.items,
+        "requested_page": requested_page,
+        "total_count": total_count,
+    }
 
 
 def _ensure_student():
@@ -163,7 +201,24 @@ def complete():
 @admin_required
 def admin_questions():
     test = _get_or_create_test()
-    return render_template("placement/admin_questions.html", test=test, text_is_arabic=text_is_arabic)
+    page_context = _placement_admin_page_context(test)
+
+    if not _is_ajax_request() and page_context["requested_page"] != page_context["pagination"].page:
+        return redirect(url_for("placement.admin_questions", page=page_context["pagination"].page))
+
+    template_name = (
+        "partials/_placement_questions_region.html"
+        if _is_ajax_request()
+        else "placement/admin_questions.html"
+    )
+    return render_template(
+        template_name,
+        pagination=page_context["pagination"],
+        questions=page_context["questions"],
+        test=test,
+        text_is_arabic=text_is_arabic,
+        total_count=page_context["total_count"],
+    )
 
 
 @placement_bp.route("/admin/nouvelle-question", methods=["POST"])
@@ -189,15 +244,24 @@ def nouvelle_question():
     ]
 
     if not texte:
-        flash(_("Le texte de la question est obligatoire."), "danger")
+        message = _("Le texte de la question est obligatoire.")
+        if _is_ajax_request():
+            return jsonify({"success": False, "message": message}), 400
+        flash(message, "danger")
         return redirect(url_for("placement.admin_questions"))
 
     if correct_index not in {"1", "2", "3", "4"}:
-        flash(_("Vous devez designer exactement une bonne reponse."), "danger")
+        message = _("Vous devez designer exactement une bonne reponse.")
+        if _is_ajax_request():
+            return jsonify({"success": False, "message": message}), 400
+        flash(message, "danger")
         return redirect(url_for("placement.admin_questions"))
 
     if sum(1 for value in choice_texts if value) < 2:
-        flash(_("Ajoutez au moins deux choix pour la question."), "danger")
+        message = _("Ajoutez au moins deux choix pour la question.")
+        if _is_ajax_request():
+            return jsonify({"success": False, "message": message}), 400
+        flash(message, "danger")
         return redirect(url_for("placement.admin_questions"))
 
     question = PlacementQuestion(
@@ -224,8 +288,12 @@ def nouvelle_question():
         )
 
     db.session.commit()
-    flash(_("Question de placement ajoutee avec succes."), "success")
-    return redirect(url_for("placement.admin_questions"))
+    message = _("Question de placement ajoutee avec succes.")
+    redirect_url = url_for("placement.admin_questions", page=1)
+    if _is_ajax_request():
+        return jsonify({"message": message, "redirect_url": redirect_url, "success": True})
+    flash(message, "success")
+    return redirect(redirect_url)
 
 
 @placement_bp.route("/admin/supprimer-question/<int:question_id>", methods=["POST"])
@@ -233,7 +301,16 @@ def nouvelle_question():
 @admin_required
 def supprimer_question(question_id):
     question = PlacementQuestion.query.filter_by(id=question_id).first_or_404()
+    test_id = question.test_id
+    requested_page = _coerce_positive_page(request.form.get("page"), default=1)
     db.session.delete(question)
     db.session.commit()
-    flash(_("Question supprimee."), "success")
-    return redirect(url_for("placement.admin_questions"))
+    remaining_count = PlacementQuestion.query.filter_by(test_id=test_id).count()
+    last_page = max((remaining_count + PLACEMENT_ADMIN_PER_PAGE - 1) // PLACEMENT_ADMIN_PER_PAGE, 1)
+    redirect_page = min(requested_page, last_page)
+    message = _("Question supprimee.")
+    redirect_url = url_for("placement.admin_questions", page=redirect_page)
+    if _is_ajax_request():
+        return jsonify({"message": message, "redirect_url": redirect_url, "success": True})
+    flash(message, "success")
+    return redirect(redirect_url)

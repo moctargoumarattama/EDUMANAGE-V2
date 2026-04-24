@@ -8,7 +8,7 @@
     <div class="admin-page-heading">
         <h1 class="h3 fw-bold mb-1">Tableau de bord</h1>
         <p class="text-muted mb-0">
-            <i class="bi bi-shield-check me-1"></i>Administration pédagogique
+            <i class="bi bi-shield-check me-1"></i>Administration pedagogique
         </p>
     </div>
     <a href="{{ url_for('courses.nouveau') }}" class="btn btn-primary-platform">
@@ -44,27 +44,16 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-number">{{ stats.total_eleves }}</div>
-                    <div class="stat-label">Élèves inscrits</div>
+                    <div class="stat-label">Eleves inscrits</div>
                 </div>
                 <i class="bi bi-mortarboard-fill stat-icon"></i>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-sm-6 col-xl-3">
-        <div class="stat-card stat-card-maintenance">
-            <div class="d-flex justify-content-between align-items-start">
-                <div>
-                    <div class="stat-number">{{ stats.total_cours }}</div>
-                    <div class="stat-label">Cours actifs</div>
-                </div>
-                <i class="bi bi-book-fill stat-icon"></i>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row g-3">
-    <div class="col-12 col-lg-4">
+    <div class="col-12">
         <div class="card-platform p-4 h-100">
             <h2 class="h6 fw-bold mb-3">
                 <i class="bi bi-lightning-charge me-2 text-warning"></i>Actions rapides
@@ -74,10 +63,10 @@
                     <i class="bi bi-people me-2"></i>Voir les utilisateurs
                 </a>
                 <a href="{{ url_for('main.creer_utilisateur') }}" class="btn btn-outline-platform text-start">
-                    <i class="bi bi-person-plus me-2"></i>Créer un utilisateur
+                    <i class="bi bi-person-plus me-2"></i>Creer un utilisateur
                 </a>
                 <a href="{{ url_for('courses.liste') }}" class="btn btn-outline-platform text-start">
-                    <i class="bi bi-book me-2"></i>Gérer les cours
+                    <i class="bi bi-book me-2"></i>Gerer les cours
                 </a>
                 <a href="{{ request.script_root ~ '/admin/gamification' }}" class="btn btn-outline-platform text-start">
                     <i class="bi bi-award me-2"></i>Badges & notifications
@@ -86,64 +75,6 @@
                     <i class="bi bi-graph-up me-2"></i>Voir les progressions
                 </a>
             </div>
-        </div>
-    </div>
-
-    <div class="col-12 col-lg-4">
-        <div class="card-platform p-4 h-100">
-            <h2 class="h6 fw-bold mb-3">
-                <i class="bi bi-clock-history me-2 text-primary"></i>Derniers utilisateurs
-            </h2>
-            {% if utilisateurs %}
-                <div class="soft-list">
-                    {% for utilisateur in utilisateurs %}
-                        {% set display_name = ((utilisateur.prenom or '') ~ ' ' ~ (utilisateur.nom or '')).strip() %}
-                        {% set initials_source = utilisateur.prenom or utilisateur.nom or utilisateur.email %}
-                        {% set role_class = 'badge-role-admin' if utilisateur.role == 'admin' else 'badge-role-enseignant' if utilisateur.role == 'enseignant' else 'badge-role-maintenance' if utilisateur.role == 'maintenance' else 'badge-role-eleve' %}
-                        <div class="soft-list-item">
-                            <div class="d-flex align-items-center gap-3 admin-inline-safe">
-                                <span class="avatar-chip">{{ initials_source[:1]|upper }}</span>
-                                <div class="admin-text-safe">
-                                    <div class="fw-semibold">{{ display_name or utilisateur.email }}</div>
-                                    <div class="small text-muted">{{ utilisateur.email }}</div>
-                                </div>
-                            </div>
-                            <span class="badge-role {{ role_class }}">{{ utilisateur.role }}</span>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <i class="bi bi-people fs-1 d-block mb-2 opacity-25"></i>
-                    Aucun utilisateur récent.
-                </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="col-12 col-lg-4">
-        <div class="card-platform p-4 h-100">
-            <h2 class="h6 fw-bold mb-3">
-                <i class="bi bi-book me-2 text-success"></i>Cours actifs
-            </h2>
-            {% if cours %}
-                <div class="soft-list">
-                    {% for cours_item in cours %}
-                        <a href="{{ url_for('courses.detail', cours_id=cours_item.id) }}" class="soft-list-item text-decoration-none">
-                            <div class="admin-text-safe">
-                                <div class="fw-semibold text-dark">{{ cours_item.nom }}</div>
-                                <div class="small text-muted">{{ lesson_counts.get(cours_item.id, 0) }} leçon(s)</div>
-                            </div>
-                            <span class="badge-niveau badge-{{ cours_item.niveau or 'A1' }}">{{ cours_item.niveau or 'A1' }}</span>
-                        </a>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="empty-state">
-                    <i class="bi bi-journal-richtext fs-1 d-block mb-2 opacity-25"></i>
-                    Aucun cours actif pour l'instant.
-                </div>
-            {% endif %}
         </div>
     </div>
 </div>

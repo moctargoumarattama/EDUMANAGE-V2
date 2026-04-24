@@ -386,6 +386,14 @@ def _popup_audio_url(term, vocabulaire):
     )
 
 
+def _popup_audio_mode(audio_url, pronunciation_text):
+    if audio_url:
+        return "file"
+    if pronunciation_text:
+        return "browser"
+    return "none"
+
+
 def resolve_vocab_popup_payload(term):
     normalized = normalize_arabic_lookup(term)
     langue = get_translation_language()
@@ -405,11 +413,13 @@ def resolve_vocab_popup_payload(term):
                 source_term=normalized,
             )
 
+    audio_url = _popup_audio_url(normalized, vocabulaire)
     return {
         "mot": normalized,
         "translitteration": vocabulaire.translitteration if vocabulaire is not None else None,
         "traduction": best_available_translation(vocabulaire, langue),
-        "audio_url": _popup_audio_url(normalized, vocabulaire),
+        "audio_url": audio_url,
+        "audio_mode": _popup_audio_mode(audio_url, pronunciation_text),
         "pronunciation_text": pronunciation_text,
         "pronunciation_lang": "ar" if pronunciation_text else None,
         "exemple": vocabulaire.exemple_phrase if vocabulaire is not None else None,

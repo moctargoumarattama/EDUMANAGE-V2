@@ -795,6 +795,254 @@
     });
   }
 
+  function initPlacementAdminPage(root) {
+    const page = root.querySelector('[data-placement-admin-page="true"]');
+    if (!page || page.dataset.jsBound === "true") {
+      return;
+    }
+
+    page.dataset.jsBound = "true";
+
+    const createForm = page.querySelector("#placement-admin-form");
+    const feedbackBox = page.querySelector('[data-placement-admin-feedback="true"]');
+    const adminPanel = page.querySelector(".placement-admin-panel");
+    const submitButton = createForm?.querySelector('[data-placement-submit-button="true"]');
+    const submitLabel = createForm?.querySelector('[data-placement-submit-label="true"]');
+    const submitIcon = createForm?.querySelector('[data-placement-submit-icon="true"]');
+    let activeRequest = null;
+
+    const getNavbarOffset = () => {
+      const navbar = document.querySelector(".navbar-platform");
+      return (navbar ? navbar.offsetHeight : 72) + 16;
+    };
+
+    const scrollToHashTarget = (hash) => {
+      if (!hash) {
+        return;
+      }
+      const target = document.querySelector(hash);
+      if (!target) {
+        return;
+      }
+      const top = target.getBoundingClientRect().top + window.scrollY - getNavbarOffset();
+      window.scrollTo({ top: Math.max(top, 0), behavior: "auto" });
+    };
+
+    const setPanelUpdating = (value) => {
+      if (adminPanel) {
+        adminPanel.classList.toggle("is-updating", value);
+      }
+    };
+
+    const setCreateSubmitting = (value) => {
+      if (createForm) {
+        createForm.classList.toggle("is-submitting", value);
+      }
+      if (submitButton) {
+        submitButton.disabled = value;
+      }
+      if (submitLabel) {
+        submitLabel.textContent = value ? "Ajout..." : "Ajouter la question";
+      }
+      if (submitIcon) {
+        submitIcon.classList.toggle("bi-plus-circle", !value);
+        submitIcon.classList.toggle("bi-arrow-repeat", value);
+        submitIcon.classList.toggle("spin", value);
+      }
+    };
+
+    const renderFeedback = (variant, message) => {
+      if (!feedbackBox) {
+        return;
+      }
+      feedbackBox.classList.remove("d-none");
+      feedbackBox.innerHTML = `<div class="alert alert-${variant} mb-0">${message}</div>`;
+    };
+
+    const clearFeedback = () => {
+      if (!feedbackBox) {
+        return;
+      }
+      feedbackBox.innerHTML = "";
+      feedbackBox.classList.add("d-none");
+    };
+
+    const replaceResultsRegion = async (nextUrl, options = {}) => {
+      const targetUrl = new URL(nextUrl, window.location.origin);
+      const hash = options.hash !== undefined ? options.hash : targetUrl.hash;
+      targetUrl.hash = "";
+
+      if (activeRequest) {
+        activeRequest.abort();
+      }
+
+      const controller = new AbortController();
+      activeRequest = controller;
+      setPanelUpdating(true);
+
+      try {
+        const response = await fetch(targetUrl.toString(), {
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          credentials: "same-origin",
+          signal: controller.signal,
+        });
+
+        if (!response.ok) {
+          throw new Error("Fragment request failed");
+        }
+
+        const html = await response.text();
+        const wrapper = document.createElement("div");
+        wrapper.innerHTML = html.trim();
+        const incomingRegion = wrapper.querySelector('[data-placement-results-region="true"]');
+        const currentRegion = document.querySelector('[data-placement-results-region="true"]');
+
+        if (!incomingRegion || !currentRegion) {
+          window.location.href = nextUrl;
+          return;
+        }
+
+        currentRegion.replaceWith(incomingRegion);
+
+        if (options.pushState) {
+          window.history.pushState({ placementAdminAjax: true }, "", nextUrl);
+        } else {
+          window.history.replaceState({ placementAdminAjax: true }, "", nextUrl);
+        }
+
+        if (hash) {
+          scrollToHashTarget(hash);
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") {
+          window.location.href = nextUrl;
+        }
+      } finally {
+        if (activeRequest === controller) {
+          activeRequest = null;
+          setPanelUpdating(false);
+        }
+      }
+    };
+
+    if (createForm) {
+      createForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        clearFeedback();
+        setCreateSubmitting(true);
+
+        try {
+          const response = await fetch(createForm.action, {
+            method: "POST",
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
+            },
+            body: new FormData(createForm),
+            credentials: "same-origin",
+          });
+          const data = await response.json();
+
+          if (!response.ok || !data.success) {
+            renderFeedback("danger", data.message || "Impossible d'ajouter la question.");
+            return;
+          }
+
+          renderFeedback("success", data.message || "Question ajoutee avec succes.");
+          createForm.reset();
+          const defaultRadio = createForm.querySelector('input[name="correct_index"][value="1"]');
+          if (defaultRadio) {
+            defaultRadio.checked = true;
+          }
+          await replaceResultsRegion(data.redirect_url || "/placement/admin/questions?page=1");
+        } catch (error) {
+          renderFeedback("danger", "Une erreur reseau est survenue. Reessayez.");
+        } finally {
+          setCreateSubmitting(false);
+        }
+      });
+    }
+
+    const paginationHandler = (event) => {
+      const link = event.target.closest("#placement-results-region .placement-pagination-bar a");
+      if (!link || !page.contains(link)) {
+        return;
+      }
+      event.preventDefault();
+      replaceResultsRegion(link.href, {
+        pushState: true,
+        hash: new URL(link.href, window.location.origin).hash,
+      });
+    };
+
+    const deleteHandler = async (event) => {
+      const form = event.target.closest('[data-placement-delete-form="true"]');
+      if (!form || !page.contains(form)) {
+        return;
+      }
+
+      event.preventDefault();
+      clearFeedback();
+
+      const deleteButton = form.querySelector('button[type="submit"]');
+      if (deleteButton) {
+        deleteButton.disabled = true;
+      }
+      setPanelUpdating(true);
+
+      try {
+        const response = await fetch(form.action, {
+          method: "POST",
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+          },
+          body: new FormData(form),
+          credentials: "same-origin",
+        });
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          renderFeedback("danger", data.message || "Impossible de supprimer la question.");
+          return;
+        }
+
+        renderFeedback("success", data.message || "Question supprimee.");
+        await replaceResultsRegion(data.redirect_url || window.location.href);
+      } catch (error) {
+        renderFeedback("danger", "Une erreur reseau est survenue. Reessayez.");
+      } finally {
+        if (deleteButton) {
+          deleteButton.disabled = false;
+        }
+        setPanelUpdating(false);
+      }
+    };
+
+    const popstateHandler = () => {
+      if (!window.location.pathname.includes("/placement/admin/questions")) {
+        return;
+      }
+      replaceResultsRegion(window.location.href, {
+        pushState: false,
+        hash: window.location.hash,
+      });
+    };
+
+    document.addEventListener("click", paginationHandler);
+    document.addEventListener("submit", deleteHandler);
+    window.addEventListener("popstate", popstateHandler);
+
+    window.appRegisterCleanup(() => {
+      document.removeEventListener("click", paginationHandler);
+      document.removeEventListener("submit", deleteHandler);
+      window.removeEventListener("popstate", popstateHandler);
+      if (activeRequest) {
+        activeRequest.abort();
+      }
+    });
+  }
+
   window.appRunPageInitializers = function appRunPageInitializers(root = document) {
     initCourseListPage(root);
     initLoginPage(root);
@@ -803,6 +1051,7 @@
     initStudentProgressPage(root);
     initTeacherDashboardPage(root);
     initNotificationCenter(root);
+    initPlacementAdminPage(root);
     initVocabAdminPage(root);
   };
 })();

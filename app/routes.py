@@ -764,10 +764,6 @@ def vocabulaire_admin():
     niveau = (request.args.get("niveau") or "").strip().upper()
     pedagogique = (request.args.get("pedagogique") or "").strip()
     traduits = (request.args.get("traduits") or "").strip()
-    if "pedagogique" not in request.args and not q and not niveau:
-        pedagogique = "1"
-    if "traduits" not in request.args and not q and not niveau:
-        traduits = "1"
     page = request.args.get("page", 1, type=int)
 
     query = Vocabulaire.query
