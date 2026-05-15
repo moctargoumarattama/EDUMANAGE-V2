@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#6C3CE1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/lesson.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/lesson.css', v=asset_version) }}" rel="stylesheet">
 </head>
 <body>
     <div id="progress-bar-container">
@@ -30,35 +30,49 @@
         <button id="btn-continuer" onclick="questionSuivante()">{{ _('Continuer') }}</button>
     </div>
 
-    <script>
-        const QUESTIONS = {{ questions_json|safe }};
-        const CSRF_TOKEN = {{ csrf_token()|tojson }};
-        const PLACEMENT_COMPLETE_URL = {{ url_for('placement.complete')|tojson }};
-        const COURSES_URL = {{ url_for('courses.liste')|tojson }};
-        window.PLACEMENT_I18N = {
-            chooseAnswer: {{ _('Choisissez la bonne réponse')|tojson }},
-            chooseImage: {{ _('Choisissez la bonne image')|tojson }},
-            putInOrder: {{ _("Remettez les mots dans l'ordre")|tojson }},
-            listen: {{ _('Écouter')|tojson }},
-            correct: {{ _('Correct.')|tojson }},
-            continueText: {{ _('Continue.')|tojson }},
-            rightStructure: {{ _('Bonne structure.')|tojson }},
-            rightImage: {{ _('Bonne image.')|tojson }},
-            wrongForm: {{ _('Pas tout à fait, essayez de retenir cette forme.')|tojson }},
-            wrongImage: {{ _('La bonne image est maintenant surlignée.')|tojson }},
-            analyzing: {{ _('Analyse du niveau en cours...')|tojson }},
-            provisionalScore: {{ _('Score provisoire')|tojson }},
-            assignedLevel: {{ _('Niveau assigné')|tojson }},
-            correctCount: {{ _('Correctes')|tojson }},
-            errorCount: {{ _('Erreurs')|tojson }},
-            score: {{ _('Score')|tojson }},
-            startLearning: {{ _("Commencer l'apprentissage")|tojson }},
-            saveErrorTitle: {{ _("Le test n'a pas pu être enregistré")|tojson }},
-            backToCourses: {{ _('Retour aux cours')|tojson }},
-            quitConfirm: {{ _('Quitter le test de niveau ? Vos réponses ne seront pas conservées.')|tojson }}
-        };
+    <script id="placement-bootstrap-data" type="application/json">
+        {
+            "questions": {{ questions_json|safe }},
+            "csrfToken": {{ csrf_token()|tojson }},
+            "placementCompleteUrl": {{ url_for('placement.complete')|tojson }},
+            "coursesUrl": {{ url_for('courses.liste')|tojson }},
+            "assetVersion": {{ asset_version|tojson }},
+            "i18n": {
+                "chooseAnswer": {{ _('Choisissez la bonne réponse')|tojson }},
+                "chooseImage": {{ _('Choisissez la bonne image')|tojson }},
+                "putInOrder": {{ _("Remettez les mots dans l'ordre")|tojson }},
+                "listen": {{ _('Écouter')|tojson }},
+                "correct": {{ _('Correct.')|tojson }},
+                "continueText": {{ _('Continue.')|tojson }},
+                "rightStructure": {{ _('Bonne structure.')|tojson }},
+                "rightImage": {{ _('Bonne image.')|tojson }},
+                "wrongForm": {{ _('Pas tout à fait, essayez de retenir cette forme.')|tojson }},
+                "wrongImage": {{ _('La bonne image est maintenant surlignée.')|tojson }},
+                "analyzing": {{ _('Analyse du niveau en cours...')|tojson }},
+                "provisionalScore": {{ _('Score provisoire')|tojson }},
+                "assignedLevel": {{ _('Niveau assigné')|tojson }},
+                "correctCount": {{ _('Correctes')|tojson }},
+                "errorCount": {{ _('Erreurs')|tojson }},
+                "score": {{ _('Score')|tojson }},
+                "startLearning": {{ _("Commencer l'apprentissage")|tojson }},
+                "saveErrorTitle": {{ _("Le test n'a pas pu être enregistré")|tojson }},
+                "backToCourses": {{ _('Retour aux cours')|tojson }},
+                "quitConfirm": {{ _('Quitter le test de niveau ? Vos réponses ne seront pas conservées.')|tojson }}
+            }
+        }
     </script>
-    <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/placement.js') }}"></script>
+    <script>
+        const placementBootstrapData = JSON.parse(
+            document.getElementById('placement-bootstrap-data')?.textContent || '{}'
+        );
+        const QUESTIONS = placementBootstrapData.questions || [];
+        const CSRF_TOKEN = placementBootstrapData.csrfToken || '';
+        const PLACEMENT_COMPLETE_URL = placementBootstrapData.placementCompleteUrl || '';
+        const COURSES_URL = placementBootstrapData.coursesUrl || '';
+        window.APP_ASSET_VERSION = placementBootstrapData.assetVersion || 'dev';
+        window.PLACEMENT_I18N = placementBootstrapData.i18n || {};
+    </script>
+    <script src="{{ url_for('static', filename='js/pwa.js', v=asset_version) }}"></script>
+    <script src="{{ url_for('static', filename='js/placement.js', v=asset_version) }}"></script>
 </body>
 </html>

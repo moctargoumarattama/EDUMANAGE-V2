@@ -114,3 +114,4 @@ class Config:
     ERROR_SPIKE_THRESHOLD = int(os.environ.get("ERROR_SPIKE_THRESHOLD", "5"))
 
     VERSION = "2.4.0"
+    ASSET_VERSION = os.environ.get("ASSET_VERSION", "20260514-home-mobile-board-v4")

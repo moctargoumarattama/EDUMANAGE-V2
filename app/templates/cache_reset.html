@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Reset cache en cours</title>
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            font-family: Inter, Arial, sans-serif;
+            background: linear-gradient(180deg, #f5f8ff 0%, #eef4ff 100%);
+            color: #14233b;
+        }
+
+        .panel {
+            width: min(92vw, 520px);
+            padding: 1.2rem 1.1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(110, 133, 167, 0.26);
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 18px 36px rgba(21, 43, 73, 0.14);
+        }
+
+        h1 {
+            margin: 0 0 0.55rem;
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin: 0;
+            line-height: 1.45;
+            color: #415574;
+        }
+    </style>
+</head>
+<body>
+    <section class="panel">
+        <h1>Mise a jour en cours...</h1>
+        <p>Votre navigateur supprime l ancien cache. Redirection automatique dans quelques secondes.</p>
+    </section>
+    <script>
+        (async () => {
+            try {
+                if ("serviceWorker" in navigator) {
+                    const registrations = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(registrations.map((registration) => registration.unregister()));
+                }
+            } catch (_) {}
+
+            try {
+                if ("caches" in window) {
+                    const keys = await caches.keys();
+                    await Promise.all(keys.map((key) => caches.delete(key)));
+                }
+            } catch (_) {}
+
+            try {
+                window.localStorage?.clear();
+            } catch (_) {}
+
+            try {
+                window.sessionStorage?.clear();
+            } catch (_) {}
+
+            window.setTimeout(() => {
+                window.location.replace("/?cache_reset=1");
+            }, 850);
+        })();
+    </script>
+</body>
+</html>

@@ -267,7 +267,7 @@
                         {% if badge_history %}
                             {% for earned in badge_history %}
                                 <div class="badge-history-item">
-                                    <img src="{{ earned.badge.image_url or url_for('static', filename='icons/icon-192.png') }}" alt="">
+                                    <img src="{{ earned.badge.image_url or url_for('static', filename='icons/icon-192.png', v=asset_version) }}" alt="">
                                     <div>
                                         <div class="fw-semibold">{{ earned.badge.name }}</div>
                                         <div class="small text-muted">{{ earned.badge.description }}</div>

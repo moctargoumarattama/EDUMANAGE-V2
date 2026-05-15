@@ -91,8 +91,35 @@
 
     try {
       await migrateLegacyServiceWorkersOnce();
+      const swVersion = window.APP_ASSET_VERSION || "dev";
+      const registration = await navigator.serviceWorker.register(
+        `/sw.js?v=${encodeURIComponent(swVersion)}`,
+        { updateViaCache: "none" }
+      );
 
-      return await navigator.serviceWorker.register("/sw.js");
+      try {
+        await registration.update();
+      } catch (_) {
+        // Keep registration resilient even if update probing fails.
+      }
+
+      if (registration.waiting) {
+        registration.waiting.postMessage({ type: "SKIP_WAITING" });
+      }
+
+      registration.addEventListener("updatefound", () => {
+        const installingWorker = registration.installing;
+        if (!installingWorker) {
+          return;
+        }
+        installingWorker.addEventListener("statechange", () => {
+          if (installingWorker.state === "installed" && navigator.serviceWorker.controller) {
+            installingWorker.postMessage({ type: "SKIP_WAITING" });
+          }
+        });
+      });
+
+      return registration;
     } catch (error) {
       console.log("SW error", error);
       return null;

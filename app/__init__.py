@@ -1173,6 +1173,7 @@ def create_app():
         return {
             "available_languages": app.config.get("LANGUAGES", {}),
             "google_oauth_enabled": app.config.get("GOOGLE_OAUTH_ENABLED", False),
+            "asset_version": app.config.get("ASSET_VERSION", app.config.get("VERSION", "dev")),
             "asset_url": build_asset_url,
             "notification_summary": notification_summary,
             "notification_stream_enabled": notification_stream_enabled,

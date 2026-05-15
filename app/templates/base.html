@@ -18,10 +18,10 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json', v='20260424-placement-admin-v1') }}">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/icon-192.png', v='20260424-placement-admin-v1') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png', v='20260424-placement-admin-v1') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css', v='20260424-placement-admin-v1') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json', v=asset_version) }}">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='icons/icon-192.png', v=asset_version) }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png', v=asset_version) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css', v=asset_version) }}">
     <style data-premium-loader-critical>
         .app-premium-loader {
             position: fixed;
@@ -129,7 +129,6 @@
     <meta data-app-head-boundary="end">
 </head>
 <body>
-    {% set asset_version = '20260424-placement-admin-v1' %}
     {% set endpoint = request.endpoint or '' %}
     {% set notification_unread = notification_summary['unread_count'] if notification_summary else 0 %}
     {% set notification_items = notification_summary['items'] if notification_summary else [] %}
@@ -147,7 +146,7 @@
             <span class="app-premium-loader__ring"></span>
             <span class="app-premium-loader__shine"></span>
             <span class="app-premium-loader__logo-shell">
-                <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg') }}" alt="" class="app-premium-loader__logo-image">
+                <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg', v=asset_version) }}" alt="" class="app-premium-loader__logo-image">
             </span>
             <span class="app-premium-loader__brand">LabeeB Arabic</span>
             <span class="app-premium-loader__tagline">Version 4.0 · Luxe dore</span>
@@ -161,7 +160,7 @@
             <span class="app-premium-loader__ring"></span>
             <span class="app-premium-loader__shine"></span>
             <span class="app-premium-loader__logo-shell app-premium-loader__logo-shell--nav">
-                <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg') }}" alt="" class="app-premium-loader__logo-image">
+                <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg', v=asset_version) }}" alt="" class="app-premium-loader__logo-image">
             </span>
             <span class="app-premium-loader__brand app-premium-loader__brand--nav">LabeeB Arabic</span>
         </div>
@@ -171,11 +170,11 @@
         <div class="container-fluid px-4">
             <a class="navbar-brand brand-signature d-flex align-items-center gap-3" href="{{ url_for('main.index') }}">
                 <span class="brand-mark" aria-hidden="true">
-                    <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg') }}" alt="" class="brand-mark-image">
+                    <img src="{{ url_for('static', filename='icons/labeeb-logo-round.svg', v=asset_version) }}" alt="" class="brand-mark-image">
                 </span>
                 <span class="brand-copy">
                     <span class="brand-title">LabeeB <span class="brand-title-accent">Arabic</span></span>
-                    <span class="brand-tagline">apprendre avec douceur</span>
+                    <span class="brand-tagline">{{ _('apprendre avec douceur') }}</span>
                 </span>
             </a>
 
@@ -244,7 +243,7 @@
                                 <li class="nav-item">
                                     <a class="nav-link {% if endpoint == 'main.valider_comptes' %}active{% endif %}" href="{{ url_for('main.valider_comptes') }}">
                                         <i class="bi bi-shield-check"></i>
-                                        <span>Validations</span>
+                                        <span>{{ _('Validations') }}</span>
                                     </a>
                                 </li>
                                 <li class="nav-item">
@@ -290,17 +289,17 @@
                                         <span class="nav-notification-icon">
                                             <i class="bi bi-bell"></i>
                                         </span>
-                                        <span class="nav-notification-label">Notifications</span>
+                                        <span class="nav-notification-label">{{ _('Notifications') }}</span>
                                         <span class="nav-notification-count {% if not notification_unread %}is-hidden{% endif %}" data-notification-count>{{ notification_unread }}</span>
                                     </button>
                                     <div class="dropdown-menu dropdown-menu-end nav-notification-menu p-0">
                                         <div class="nav-notification-menu__header">
                                             <div>
-                                                <div class="fw-semibold">Notifications</div>
-                                                <div class="small text-muted"><span data-notification-count-label="true">{{ notification_unread }}</span> non lues</div>
+                                                <div class="fw-semibold">{{ _('Notifications') }}</div>
+                                                <div class="small text-muted"><span data-notification-count-label="true">{{ notification_unread }}</span> {{ _('non lues') }}</div>
                                             </div>
                                             <button type="button" class="btn btn-sm btn-link text-decoration-none" data-mark-all-notifications="true">
-                                                Tout lire
+                                                {{ _('Tout lire') }}
                                             </button>
                                         </div>
                                         <div class="nav-notification-list" data-notification-preview-list="true">
@@ -319,12 +318,12 @@
                                             {% else %}
                                                 <div class="nav-notification-empty" data-notification-empty-state="true">
                                                     <i class="bi bi-bell-slash"></i>
-                                                    <span>Aucune notification</span>
+                                                    <span>{{ _('Aucune notification') }}</span>
                                                 </div>
                                             {% endif %}
                                         </div>
                                         <div class="nav-notification-menu__footer">
-                                            <a href="{{ url_for('notifications.inbox') }}" class="btn btn-outline-platform btn-sm w-100">Ouvrir l'inbox</a>
+                                            <a href="{{ url_for('notifications.inbox') }}" class="btn btn-outline-platform btn-sm w-100">{{ _("Ouvrir l'inbox") }}</a>
                                         </div>
                                     </div>
                                 </li>
@@ -391,7 +390,7 @@
                             <li class="nav-item">
                                 <a class="nav-link {% if endpoint == 'main.register' %}active{% endif %}" href="{{ url_for('main.register') }}">
                                     <i class="bi bi-person-plus"></i>
-                                    <span>Inscription</span>
+                                    <span>{{ _('Register') }}</span>
                                 </a>
                             </li>
                         </ul>
@@ -447,6 +446,7 @@
     <script id="app-bootstrap-data" type="application/json">
         {
             "csrfToken": {{ csrf_token()|tojson }},
+            "assetVersion": {{ asset_version|tojson }},
             "vocabUrlTemplate": {% if current_user.is_authenticated and current_user.role in ['admin', 'enseignant', 'eleve'] %}{{ url_for('courses.api_vocabulaire', mot_arabe='__MOT__')|tojson }}{% else %}null{% endif %},
             "uiStrings": {
                 "translationLabel": {{ _('Translation')|tojson }},
@@ -464,6 +464,7 @@
         );
 
         window.APP_CSRF_TOKEN = appBootstrapData.csrfToken || '';
+        window.APP_ASSET_VERSION = appBootstrapData.assetVersion || 'dev';
         window.APP_VOCAB_URL_TEMPLATE = appBootstrapData.vocabUrlTemplate ?? null;
         window.APP_UI_STRINGS = appBootstrapData.uiStrings || {};
         const PREMIUM_BOOT_MIN_MS = 980;

@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Créer un utilisateur | LabeeB Arabic{% endblock %}
+{% block title %}{{ _('Creer un utilisateur') }} | LabeeB Arabic{% endblock %}
 
 {% block content %}
 <div class="form-shell">
     <div class="page-header">
         <div>
-            <h1 class="h3 fw-bold mb-1">Créer un utilisateur</h1>
-            <p class="text-muted mb-0">Ajoutez un nouveau compte avec l’un des quatre rôles officiels de la plateforme.</p>
+            <h1 class="h3 fw-bold mb-1">{{ _('Creer un utilisateur') }}</h1>
+            <p class="text-muted mb-0">{{ _('Ajoutez un nouveau compte avec l un des quatre roles officiels de la plateforme.') }}</p>
         </div>
         <a href="{{ url_for('main.gestion_utilisateurs') }}" class="btn btn-outline-platform">
-            <i class="bi bi-arrow-left me-2"></i>Retour à la liste
+            <i class="bi bi-arrow-left me-2"></i>{{ _('Retour a la liste') }}
         </a>
     </div>
 
     <div class="row g-4">
         <div class="col-12 col-lg-8">
             <div class="form-panel">
-                <div class="form-panel-title">Informations du compte</div>
-                <p class="text-muted mb-4">Les identifiants sont utilisés directement pour la connexion à la plateforme.</p>
+                <div class="form-panel-title">{{ _('Informations du compte') }}</div>
+                <p class="text-muted mb-4">{{ _('Les identifiants sont utilises directement pour la connexion a la plateforme.') }}</p>
 
                 <form method="POST">
                     {{ form.hidden_tag() }}
@@ -55,7 +55,7 @@
 
                     <div class="d-flex gap-2 mt-4">
                         {{ form.submit(class="btn btn-primary-platform") }}
-                        <a href="{{ url_for('main.gestion_utilisateurs') }}" class="btn btn-outline-platform">Annuler</a>
+                        <a href="{{ url_for('main.gestion_utilisateurs') }}" class="btn btn-outline-platform">{{ _('Annuler') }}</a>
                     </div>
                 </form>
             </div>
@@ -63,24 +63,24 @@
 
         <div class="col-12 col-lg-4">
             <div class="form-panel">
-                <div class="form-panel-title">Rôles disponibles</div>
-                <p class="text-muted mb-3">Chaque rôle ouvre un périmètre clair dans la plateforme.</p>
+                <div class="form-panel-title">{{ _('Roles disponibles') }}</div>
+                <p class="text-muted mb-3">{{ _('Chaque role ouvre un perimetre clair dans la plateforme.') }}</p>
                 <div class="role-legend">
                     <div class="role-legend-item">
                         <span class="badge-role badge-role-admin">admin</span>
-                        <p>Gère les contenus, les utilisateurs et les vues globales.</p>
+                        <p>{{ _('Gere les contenus, les utilisateurs et les vues globales.') }}</p>
                     </div>
                     <div class="role-legend-item">
                         <span class="badge-role badge-role-enseignant">enseignant</span>
-                        <p>Crée et suit ses cours, leçons et progressions.</p>
+                        <p>{{ _('Cree et suit ses cours, lecons et progressions.') }}</p>
                     </div>
                     <div class="role-legend-item">
                         <span class="badge-role badge-role-eleve">eleve</span>
-                        <p>Suit les cours, réalise les exercices et voit sa progression.</p>
+                        <p>{{ _('Suit les cours, realise les exercices et voit sa progression.') }}</p>
                     </div>
                     <div class="role-legend-item">
                         <span class="badge-role badge-role-maintenance">maintenance</span>
-                        <p>Accède uniquement aux outils techniques et de supervision.</p>
+                        <p>{{ _('Accede uniquement aux outils techniques et de supervision.') }}</p>
                     </div>
                 </div>
             </div>

@@ -431,6 +431,24 @@ msgstr "Suivi visuel"
 msgid "Des tableaux de bord simples pour voir les leçons vues, les scores et la dynamique d’apprentissage."
 msgstr "Des tableaux de bord simples pour voir les leçons vues, les scores et la dynamique d’apprentissage."
 
+msgid "Des séquences courtes avec texte, vidéo et PDF pour avancer sans se perdre."
+msgstr "Des séquences courtes avec texte, vidéo et PDF pour avancer sans se perdre."
+
+msgid "Cours guidés"
+msgstr "Cours guidés"
+
+msgid "Des QCM rapides avec correction claire pour reprendre les notions fragiles."
+msgstr "Des QCM rapides avec correction claire pour reprendre les notions fragiles."
+
+msgid "Feedback immédiat"
+msgstr "Feedback immédiat"
+
+msgid "Scores et progression visibles pour savoir exactement quoi travailler ensuite."
+msgstr "Scores et progression visibles pour savoir exactement quoi travailler ensuite."
+
+msgid "Parcours clair"
+msgstr "Parcours clair"
+
 #: app/templates/login.html:3
 msgid "Connexion"
 msgstr "Connexion"

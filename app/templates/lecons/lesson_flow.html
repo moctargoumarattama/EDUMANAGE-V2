@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#6C3CE1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
-    <link href="{{ url_for('static', filename='css/lesson.css') }}" rel="stylesheet">
+    <link href="{{ url_for('static', filename='css/lesson.css', v=asset_version) }}" rel="stylesheet">
 </head>
 <body>
     <header id="progress-bar-container">
@@ -44,58 +44,74 @@
         <button id="btn-continuer" onclick="questionSuivante()">{{ _('Continuer') }}</button>
     </div>
 
-    <script>
-        const QUESTIONS = {{ questions_json|safe }};
-        const LECON_ID = {{ lecon.id }};
-        const POINTS_RECOMPENSE = {{ lecon.points_recompense or 10 }};
-        const CSRF_TOKEN = {{ csrf_token()|tojson }};
-        const COURSES_URL = {{ url_for('courses.liste')|tojson }};
-        const COURSE_DETAIL_URL = {{ url_for('courses.detail', cours_id=cours.id)|tojson }};
-        window.APP_CSRF_TOKEN = CSRF_TOKEN;
-        window.LESSON_I18N = {
-            chooseAnswer: {{ _('Choisissez la bonne réponse')|tojson }},
-            listenChoose: {{ _('Écoutez et choisissez')|tojson }},
-            putInOrder: {{ _("Remettez les mots dans l'ordre")|tojson }},
-            dictationPrompt: {{ _('Écoutez et écrivez ce que vous entendez')|tojson }},
-            listenWord: {{ _('Écouter le mot')|tojson }},
-            repeat: {{ _('Répéter')|tojson }},
-            writeHere: {{ _('Écrivez ici...')|tojson }},
-            validate: {{ _('Valider')|tojson }},
-            correct: {{ _('Correct !')|tojson }},
-            incorrect: {{ _('Pas tout à fait.')|tojson }},
-            lessonDone: {{ _('Leçon terminée !')|tojson }},
-            keepGoing: {{ _('Continue comme ça !')|tojson }},
-            correctCount: {{ _('Correctes')|tojson }},
-            errorCount: {{ _('Erreurs')|tojson }},
-            score: {{ _('Score')|tojson }},
-            totalXp: {{ _('XP total')|tojson }},
-            streak: {{ _('Série')|tojson }},
-            nextLesson: {{ _('Leçon suivante')|tojson }},
-            backToCourses: {{ _('Retour aux cours')|tojson }},
-            viewCourse: {{ _('Voir le cours')|tojson }},
-            quitConfirm: {{ _('Quitter la leçon ? Ta progression sera perdue.')|tojson }},
-            goodAnswerPrefix: {{ _('Bonne réponse :')|tojson }},
-            speakingPrompt: {{ _('Prononcez cette phrase')|tojson }},
-            speakingChromeOnly: {{ _("La reconnaissance vocale n'est disponible que sur Chrome. Essayez sur Chrome Android ou Chrome Desktop.")|tojson }},
-            skipQuestion: {{ _('Passer cette question')|tojson }},
-            listenExample: {{ _("Écouter l'exemple")|tojson }},
-            pressToSpeak: {{ _('Appuyez pour parler')|tojson }},
-            speakNow: {{ _('Parlez maintenant...')|tojson }},
-            pronunciationGood: {{ _('Bonne prononciation !')|tojson }},
-            retry: {{ _('Réessayez')|tojson }},
-            expectedLabel: {{ _('Attendu :')|tojson }},
-            noSpeechDetected: {{ _('Aucune voix détectée. Réessayez.')|tojson }},
-            micDenied: {{ _("Accès au microphone refusé. Autorisez le micro dans les paramètres du navigateur.")|tojson }},
-            speechUnavailable: {{ _('Reconnaissance vocale indisponible sur ce navigateur.')|tojson }},
-            youSaidPrefix: {{ _('Vous avez dit :')|tojson }},
-            questionCount: {{ _('Question')|tojson }},
-            tapHint: {{ _('Touchez la bonne carte pour continuer.')|tojson }},
-            listenHint: {{ _('Écoutez, puis choisissez la bonne réponse.')|tojson }},
-            orderHint: {{ _('Glissez ou touchez les mots pour reformer la phrase.')|tojson }},
-            dictationHint: {{ _('Écoutez, écrivez, puis validez.')|tojson }}
-        };
+    <script id="lesson-bootstrap-data" type="application/json">
+        {
+            "questions": {{ questions_json|safe }},
+            "leconId": {{ lecon.id|tojson }},
+            "pointsRecompense": {{ (lecon.points_recompense or 10)|tojson }},
+            "csrfToken": {{ csrf_token()|tojson }},
+            "coursesUrl": {{ url_for('courses.liste')|tojson }},
+            "courseDetailUrl": {{ url_for('courses.detail', cours_id=cours.id)|tojson }},
+            "assetVersion": {{ asset_version|tojson }},
+            "i18n": {
+                "chooseAnswer": {{ _('Choisissez la bonne réponse')|tojson }},
+                "listenChoose": {{ _('Écoutez et choisissez')|tojson }},
+                "putInOrder": {{ _("Remettez les mots dans l'ordre")|tojson }},
+                "dictationPrompt": {{ _('Écoutez et écrivez ce que vous entendez')|tojson }},
+                "listenWord": {{ _('Écouter le mot')|tojson }},
+                "repeat": {{ _('Répéter')|tojson }},
+                "writeHere": {{ _('Écrivez ici...')|tojson }},
+                "validate": {{ _('Valider')|tojson }},
+                "correct": {{ _('Correct !')|tojson }},
+                "incorrect": {{ _('Pas tout à fait.')|tojson }},
+                "lessonDone": {{ _('Leçon terminée !')|tojson }},
+                "keepGoing": {{ _('Continue comme ça !')|tojson }},
+                "correctCount": {{ _('Correctes')|tojson }},
+                "errorCount": {{ _('Erreurs')|tojson }},
+                "score": {{ _('Score')|tojson }},
+                "totalXp": {{ _('XP total')|tojson }},
+                "streak": {{ _('Série')|tojson }},
+                "nextLesson": {{ _('Leçon suivante')|tojson }},
+                "backToCourses": {{ _('Retour aux cours')|tojson }},
+                "viewCourse": {{ _('Voir le cours')|tojson }},
+                "quitConfirm": {{ _('Quitter la leçon ? Ta progression sera perdue.')|tojson }},
+                "goodAnswerPrefix": {{ _('Bonne réponse :')|tojson }},
+                "speakingPrompt": {{ _('Prononcez cette phrase')|tojson }},
+                "speakingChromeOnly": {{ _("La reconnaissance vocale n'est disponible que sur Chrome. Essayez sur Chrome Android ou Chrome Desktop.")|tojson }},
+                "skipQuestion": {{ _('Passer cette question')|tojson }},
+                "listenExample": {{ _("Écouter l'exemple")|tojson }},
+                "pressToSpeak": {{ _('Appuyez pour parler')|tojson }},
+                "speakNow": {{ _('Parlez maintenant...')|tojson }},
+                "pronunciationGood": {{ _('Bonne prononciation !')|tojson }},
+                "retry": {{ _('Réessayez')|tojson }},
+                "expectedLabel": {{ _('Attendu :')|tojson }},
+                "noSpeechDetected": {{ _('Aucune voix détectée. Réessayez.')|tojson }},
+                "micDenied": {{ _("Accès au microphone refusé. Autorisez le micro dans les paramètres du navigateur.")|tojson }},
+                "speechUnavailable": {{ _('Reconnaissance vocale indisponible sur ce navigateur.')|tojson }},
+                "youSaidPrefix": {{ _('Vous avez dit :')|tojson }},
+                "questionCount": {{ _('Question')|tojson }},
+                "tapHint": {{ _('Touchez la bonne carte pour continuer.')|tojson }},
+                "listenHint": {{ _('Écoutez, puis choisissez la bonne réponse.')|tojson }},
+                "orderHint": {{ _('Glissez ou touchez les mots pour reformer la phrase.')|tojson }},
+                "dictationHint": {{ _('Écoutez, écrivez, puis validez.')|tojson }}
+            }
+        }
     </script>
-    <script src="{{ url_for('static', filename='js/pwa.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/lesson.js') }}"></script>
+    <script>
+        const lessonBootstrapData = JSON.parse(
+            document.getElementById('lesson-bootstrap-data')?.textContent || '{}'
+        );
+        const QUESTIONS = lessonBootstrapData.questions || [];
+        const LECON_ID = lessonBootstrapData.leconId;
+        const POINTS_RECOMPENSE = lessonBootstrapData.pointsRecompense || 10;
+        const CSRF_TOKEN = lessonBootstrapData.csrfToken || '';
+        const COURSES_URL = lessonBootstrapData.coursesUrl || '';
+        const COURSE_DETAIL_URL = lessonBootstrapData.courseDetailUrl || '';
+        window.APP_CSRF_TOKEN = CSRF_TOKEN;
+        window.APP_ASSET_VERSION = lessonBootstrapData.assetVersion || 'dev';
+        window.LESSON_I18N = lessonBootstrapData.i18n || {};
+    </script>
+    <script src="{{ url_for('static', filename='js/pwa.js', v=asset_version) }}"></script>
+    <script src="{{ url_for('static', filename='js/lesson.js', v=asset_version) }}"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-const STATIC_CACHE_NAME = "arabic-static-v12";
-const RUNTIME_CACHE_NAME = "arabic-runtime-v12";
+const STATIC_CACHE_NAME = "arabic-static-v13";
+const RUNTIME_CACHE_NAME = "arabic-runtime-v13";
 const OFFLINE_URL = "/offline";
 const CACHEABLE_NAVIGATION_PATHS = [
   "/",
@@ -94,6 +94,12 @@ self.addEventListener("activate", (event) => {
       ))
       .then(() => self.clients.claim())
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("fetch", (event) => {

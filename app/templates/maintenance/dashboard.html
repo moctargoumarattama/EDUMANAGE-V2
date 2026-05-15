@@ -166,6 +166,11 @@
                     <i class="bi bi-x-octagon me-2"></i>Tout nettoyer
                 </button>
             </div>
+            <div class="action-row mb-3">
+                <button class="btn btn-outline-primary" data-url="{{ request.script_root }}/maintenance/purge-cache-client" data-result-id="maintenance-actions-result" data-payload='{{ {}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">
+                    <i class="bi bi-arrow-repeat me-2"></i>Generer lien purge client
+                </button>
+            </div>
             <div class="action-row">
                 {% if stats.maintenance_mode.enabled %}
                 <button class="btn btn-outline-success" data-url="{{ url_for('maintenance.toggle_maintenance_mode') }}" data-result-id="maintenance-actions-result" data-payload='{{ {"enabled": false}|tojson }}' onclick="return postMaintenanceActionFromButton(this);">

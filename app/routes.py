@@ -5,7 +5,7 @@ import os
 import secrets
 from datetime import datetime
 
-from flask import Blueprint, abort, current_app, flash, jsonify, redirect, render_template, request, send_file, send_from_directory, session, url_for
+from flask import Blueprint, abort, current_app, flash, jsonify, make_response, redirect, render_template, request, send_file, send_from_directory, session, url_for
 from flask_babel import gettext as _
 from flask_login import current_user, login_required, login_user, logout_user
 from sqlalchemy import and_, or_, text
@@ -308,12 +308,32 @@ def changer_langue(code):
 
 @main.route("/sw.js")
 def service_worker():
-    return send_from_directory("static", "sw.js", mimetype="application/javascript")
+    response = send_from_directory("static", "sw.js", mimetype="application/javascript")
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0, private"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Service-Worker-Allowed"] = "/"
+    return response
 
 
 @main.route("/service-worker.js")
 def legacy_service_worker():
-    return send_from_directory("static", "sw.js", mimetype="application/javascript")
+    response = send_from_directory("static", "sw.js", mimetype="application/javascript")
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0, private"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Service-Worker-Allowed"] = "/"
+    return response
+
+
+@main.route("/cache-reset")
+def cache_reset():
+    response = make_response(render_template("cache_reset.html"))
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0, private"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    response.headers["Clear-Site-Data"] = '"cache", "storage", "cookies"'
+    return response
 
 
 @main.route("/media/<path:filename>")
@@ -470,13 +490,13 @@ def register():
             prenom=form.prenom.data.strip() if form.prenom.data else None,
             email=normalized_email,
             role="eleve",
-            statut="en_attente",
+            statut="actif",
             mot_de_passe="placeholder",
         )
         utilisateur.set_mot_de_passe(form.password.data)
         db.session.add(utilisateur)
         db.session.commit()
-        flash(_("Compte cree. Un administrateur doit maintenant le valider."), "success")
+        flash(_("Compte cree avec succes. Vous pouvez vous connecter maintenant."), "success")
         return redirect(url_for("main.login"))
 
     return render_template("register.html", form=form)

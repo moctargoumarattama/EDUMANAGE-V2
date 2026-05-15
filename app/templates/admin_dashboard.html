@@ -1,18 +1,18 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard Admin | LabeeB Arabic{% endblock %}
+{% block title %}{{ _('Dashboard Admin') }} | LabeeB Arabic{% endblock %}
 
 {% block content %}
 <section class="admin-dashboard-shell admin-page-shell">
 <div class="page-header">
     <div class="admin-page-heading">
-        <h1 class="h3 fw-bold mb-1">Tableau de bord</h1>
+        <h1 class="h3 fw-bold mb-1">{{ _('Tableau de bord') }}</h1>
         <p class="text-muted mb-0">
-            <i class="bi bi-shield-check me-1"></i>Administration pedagogique
+            <i class="bi bi-shield-check me-1"></i>{{ _('Administration pedagogique') }}
         </p>
     </div>
     <a href="{{ url_for('courses.nouveau') }}" class="btn btn-primary-platform">
-        <i class="bi bi-plus-lg me-2"></i>Nouveau cours
+        <i class="bi bi-plus-lg me-2"></i>{{ _('Nouveau cours') }}
     </a>
 </div>
 
@@ -22,7 +22,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-number">{{ stats.total_utilisateurs }}</div>
-                    <div class="stat-label">Utilisateurs</div>
+                    <div class="stat-label">{{ _('Utilisateurs') }}</div>
                 </div>
                 <i class="bi bi-people-fill stat-icon text-primary"></i>
             </div>
@@ -33,7 +33,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-number">{{ stats.total_enseignants }}</div>
-                    <div class="stat-label">Enseignants</div>
+                    <div class="stat-label">{{ _('Enseignants') }}</div>
                 </div>
                 <i class="bi bi-person-workspace stat-icon"></i>
             </div>
@@ -44,7 +44,7 @@
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <div class="stat-number">{{ stats.total_eleves }}</div>
-                    <div class="stat-label">Eleves inscrits</div>
+                    <div class="stat-label">{{ _('Eleves inscrits') }}</div>
                 </div>
                 <i class="bi bi-mortarboard-fill stat-icon"></i>
             </div>
@@ -56,23 +56,23 @@
     <div class="col-12">
         <div class="card-platform p-4 h-100">
             <h2 class="h6 fw-bold mb-3">
-                <i class="bi bi-lightning-charge me-2 text-warning"></i>Actions rapides
+                <i class="bi bi-lightning-charge me-2 text-warning"></i>{{ _('Actions rapides') }}
             </h2>
             <div class="d-flex flex-column gap-2">
                 <a href="{{ url_for('main.gestion_utilisateurs') }}" class="btn btn-primary-platform text-start">
-                    <i class="bi bi-people me-2"></i>Voir les utilisateurs
+                    <i class="bi bi-people me-2"></i>{{ _('Voir les utilisateurs') }}
                 </a>
                 <a href="{{ url_for('main.creer_utilisateur') }}" class="btn btn-outline-platform text-start">
-                    <i class="bi bi-person-plus me-2"></i>Creer un utilisateur
+                    <i class="bi bi-person-plus me-2"></i>{{ _('Creer un utilisateur') }}
                 </a>
                 <a href="{{ url_for('courses.liste') }}" class="btn btn-outline-platform text-start">
-                    <i class="bi bi-book me-2"></i>Gerer les cours
+                    <i class="bi bi-book me-2"></i>{{ _('Gerer les cours') }}
                 </a>
                 <a href="{{ request.script_root ~ '/admin/gamification' }}" class="btn btn-outline-platform text-start">
-                    <i class="bi bi-award me-2"></i>Badges & notifications
+                    <i class="bi bi-award me-2"></i>{{ _('Badges & notifications') }}
                 </a>
                 <a href="{{ url_for('progress.dashboard_enseignant') }}" class="btn btn-outline-platform text-start">
-                    <i class="bi bi-graph-up me-2"></i>Voir les progressions
+                    <i class="bi bi-graph-up me-2"></i>{{ _('Voir les progressions') }}
                 </a>
             </div>
         </div>

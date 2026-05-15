@@ -237,7 +237,7 @@ msgstr "Mi progreso"
 
 #: app/templates/base.html:70
 msgid "My students"
-msgstr "Mis alumnos"
+msgstr "Mis estudiantes"
 
 #: app/templates/base.html:78
 msgid "Users"
@@ -245,7 +245,7 @@ msgstr "Usuarios"
 
 #: app/templates/base.html:83
 msgid "Placement"
-msgstr "Nivel"
+msgstr "Nivelación"
 
 #: app/templates/base.html:88
 msgid "Dictionary"
@@ -261,7 +261,7 @@ msgstr "Mantenimiento"
 
 #: app/templates/base.html:129
 msgid "Logout"
-msgstr "Cerrar sesion"
+msgstr "Cerrar sesión"
 
 #: app/templates/base.html:147
 msgid "Home"
@@ -269,7 +269,7 @@ msgstr "Inicio"
 
 #: app/templates/base.html:152
 msgid "Login"
-msgstr "Iniciar sesion"
+msgstr "Iniciar sesión"
 
 #: app/templates/base.html:169
 msgid "Close"
@@ -321,15 +321,15 @@ msgstr "Continuar en español"
 
 #: app/templates/index.html:3
 msgid "Apprendre l'arabe"
-msgstr "Aprender arabe"
+msgstr "Aprender árabe"
 
 #: app/templates/index.html:10 app/templates/login.html:11
 msgid "Plateforme e-learning arabe"
-msgstr "Plataforma de aprendizaje de arabe"
+msgstr "Plataforma de e-learning de árabe"
 
 #: app/templates/courses/liste.html:9 app/templates/index.html:12
 msgid "Apprenez l'arabe à votre rythme"
-msgstr "Apprenez l'arabe à votre rythme"
+msgstr "Aprende árabe a tu ritmo"
 
 #: app/templates/index.html:14
 msgid ""
@@ -381,27 +381,27 @@ msgstr "Una progresión clara centrada en los niveles A1 y A2."
 
 #: app/templates/index.html:58
 msgid "Débutant"
-msgstr "Débutant"
+msgstr "Principiante"
 
 #: app/templates/index.html:58
 msgid "Les bases : alphabet, salutations, chiffres"
-msgstr "Les bases : alphabet, salutations, chiffres"
+msgstr "Lo básico: alfabeto, saludos, números"
 
 #: app/templates/index.html:59
 msgid "Élémentaire"
-msgstr "Élémentaire"
+msgstr "Elemental"
 
 #: app/templates/index.html:59
 msgid "Conversations simples du quotidien"
-msgstr "Conversations simples du quotidien"
+msgstr "Conversaciones simples del día a día"
 
 #: app/templates/index.html:79
 msgid "Apprendre"
-msgstr "Apprendre"
+msgstr "Aprender"
 
 #: app/templates/index.html:81
 msgid "Leçons immersives"
-msgstr "Leçons immersives"
+msgstr "Lecciones inmersivas"
 
 #: app/templates/index.html:82
 msgid "Chaque cours peut combiner texte, vidéo et support PDF pour une progression souple et efficace."
@@ -409,11 +409,11 @@ msgstr "Chaque cours peut combiner texte, vidéo et support PDF pour une progres
 
 #: app/templates/index.html:88
 msgid "S'évaluer"
-msgstr "S'évaluer"
+msgstr "Autoevaluarse"
 
 #: app/templates/index.html:90
 msgid "Quiz interactifs"
-msgstr "Quiz interactifs"
+msgstr "Cuestionarios interactivos"
 
 #: app/templates/index.html:91
 msgid "Des QCM rapides pour valider la compréhension et donner un retour immédiat à l'apprenant."
@@ -421,19 +421,37 @@ msgstr "Des QCM rapides pour valider la compréhension et donner un retour immé
 
 #: app/templates/index.html:97
 msgid "Progresser"
-msgstr "Progresser"
+msgstr "Progresar"
 
 #: app/templates/index.html:99
 msgid "Suivi visuel"
-msgstr "Suivi visuel"
+msgstr "Seguimiento visual"
 
 #: app/templates/index.html:100
 msgid "Des tableaux de bord simples pour voir les leçons vues, les scores et la dynamique d’apprentissage."
 msgstr "Des tableaux de bord simples pour voir les leçons vues, les scores et la dynamique d’apprentissage."
 
+msgid "Des séquences courtes avec texte, vidéo et PDF pour avancer sans se perdre."
+msgstr "Secuencias cortas con texto, video y PDF para avanzar sin perderte."
+
+msgid "Cours guidés"
+msgstr "Cursos guiados"
+
+msgid "Des QCM rapides avec correction claire pour reprendre les notions fragiles."
+msgstr "Cuestionarios rápidos con corrección clara para repasar los puntos débiles."
+
+msgid "Feedback immédiat"
+msgstr "Comentarios inmediatos"
+
+msgid "Scores et progression visibles pour savoir exactement quoi travailler ensuite."
+msgstr "Puntuaciones y progreso visibles para saber exactamente qué trabajar después."
+
+msgid "Parcours clair"
+msgstr "Ruta clara"
+
 #: app/templates/login.html:3
 msgid "Connexion"
-msgstr "Inicio de sesion"
+msgstr "Iniciar sesión"
 
 #: app/templates/login.html:13
 msgid "Connexion à l'espace LabeeB Arabic"
@@ -449,7 +467,7 @@ msgstr ""
 
 #: app/templates/login.html:24
 msgid "Se connecter"
-msgstr "Iniciar sesion"
+msgstr "Iniciar sesión"
 
 #: app/templates/login.html:30
 msgid "Email ou téléphone"
@@ -457,11 +475,11 @@ msgstr "Email ou téléphone"
 
 #: app/templates/login.html:35
 msgid "Mot de passe"
-msgstr "Contrasena"
+msgstr "Contraseña"
 
 #: app/templates/login.html:46
 msgid "Mot de passe oublié"
-msgstr "Mot de passe oublié"
+msgstr "Contraseña olvidada"
 
 #: app/templates/login.html:52
 msgid "ou"
@@ -489,7 +507,7 @@ msgstr "Prénom"
 
 #: app/templates/profile.html:20
 msgid "Email"
-msgstr "Email"
+msgstr "Correo electrónico"
 
 #: app/templates/profile.html:24
 msgid "Rôle"
@@ -517,7 +535,7 @@ msgstr "Entrez votre email pour recevoir un lien de réinitialisation."
 
 #: app/templates/reset_password.html:3
 msgid "Nouveau mot de passe"
-msgstr "Nueva contrasena"
+msgstr "Nueva contraseña"
 
 #: app/templates/reset_password.html:9
 msgid "Définir un nouveau mot de passe"
@@ -539,8 +557,8 @@ msgstr "Ce cours sera enrichi avec des leçons, des supports et des quiz."
 #, python-format
 msgid "%(count)s leçon"
 msgid_plural "%(count)s leçons"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%(count)s lección"
+msgstr[1] "%(count)s lecciones"
 
 #: app/templates/courses/detail.html:45
 msgid "Leçons du cours"
@@ -561,7 +579,7 @@ msgstr "%(minutes)s min"
 
 #: app/templates/courses/detail.html:72 app/templates/progression/dashboard_eleve.html:235
 msgid "Durée libre"
-msgstr "Durée libre"
+msgstr "Duración libre"
 
 #: app/templates/courses/detail.html:78
 msgid "Ouvrir"
@@ -589,11 +607,11 @@ msgstr "La progression s'affiche pour les apprenants inscrits."
 
 #: app/templates/courses/detail.html:111
 msgid "Niveau"
-msgstr "Niveau"
+msgstr "Nivel"
 
 #: app/templates/courses/detail.html:115
 msgid "Enseignant"
-msgstr "Enseignant"
+msgstr "Profesor"
 
 #: app/templates/courses/detail.html:119
 msgid "Leçons"
@@ -613,7 +631,7 @@ msgstr "Gestion du cours"
 
 #: app/templates/courses/detail.html:143
 msgid "Modifier"
-msgstr "Modifier"
+msgstr "Editar"
 
 #: app/templates/courses/detail.html:148
 msgid "Supprimer le cours"
@@ -657,7 +675,7 @@ msgstr "Cancelar"
 
 #: app/templates/courses/liste.html:3
 msgid "Cours"
-msgstr "Cours"
+msgstr "Cursos"
 
 #: app/templates/courses/liste.html:8
 msgid "Catalogue des cours"
@@ -669,7 +687,7 @@ msgstr "Todos"
 
 #: app/templates/courses/liste.html:55
 msgid "Aucune description pour le moment."
-msgstr "Aucune description pour le moment."
+msgstr "No hay descripción por el momento."
 
 #: app/templates/courses/liste.html:70 app/templates/lecons/lesson_flow.html:61
 msgid "Voir le cours"
@@ -934,15 +952,15 @@ msgstr "Quitter le test de niveau ? Vos réponses ne seront pas conservées."
 
 #: app/templates/progression/dashboard_eleve.html:3
 msgid "Ma progression"
-msgstr "Ma progression"
+msgstr "Mi progreso"
 
 #: app/templates/progression/dashboard_eleve.html:128
 msgid "Mon parcours d'apprentissage"
-msgstr "Mon parcours d'apprentissage"
+msgstr "Mi ruta de aprendizaje"
 
 #: app/templates/progression/dashboard_eleve.html:130
 msgid "Continue tes leçons, garde ta série active et débloque les étapes suivantes."
-msgstr "Continue tes leçons, garde ta série active et débloque les étapes suivantes."
+msgstr "Sigue tus lecciones, mantén tu racha activa y desbloquea las siguientes etapas."
 
 #: app/templates/progression/dashboard_eleve.html:137
 msgid "Points XP"
@@ -950,11 +968,11 @@ msgstr "Puntos XP"
 
 #: app/templates/progression/dashboard_eleve.html:143
 msgid "Jours consécutifs"
-msgstr "Jours consécutifs"
+msgstr "Días consecutivos"
 
 #: app/templates/progression/dashboard_eleve.html:149
 msgid "Leçons terminées"
-msgstr "Leçons terminées"
+msgstr "Lecciones completadas"
 
 #: app/templates/progression/dashboard_eleve.html:160
 msgid "Mes cours inscrits"
@@ -962,7 +980,7 @@ msgstr "Mis cursos inscritos"
 
 #: app/templates/progression/dashboard_eleve.html:161
 msgid "Chaque chemin avance de leçon en leçon, comme une carte de progression."
-msgstr "Chaque chemin avance de leçon en leçon, comme une carte de progression."
+msgstr "Cada ruta avanza lección por lección, como un mapa de progreso."
 
 #: app/templates/progression/dashboard_eleve.html:164
 msgid "Voir les cours"
@@ -971,7 +989,7 @@ msgstr "Ver cursos"
 #: app/templates/progression/dashboard_eleve.html:182
 #, python-format
 msgid "%(seen)s/%(total)s leçons vues"
-msgstr "%(seen)s/%(total)s leçons vues"
+msgstr "%(seen)s/%(total)s lecciones vistas"
 
 #: app/templates/progression/dashboard_eleve.html:184
 msgid "Score moyen"
@@ -979,23 +997,23 @@ msgstr "Puntuacion media"
 
 #: app/templates/progression/dashboard_eleve.html:198
 msgid "Leçon terminée"
-msgstr "Leçon terminée"
+msgstr "Lección completada"
 
 #: app/templates/progression/dashboard_eleve.html:198
 msgid "Leçon en cours"
-msgstr "Leçon en cours"
+msgstr "Lección en curso"
 
 #: app/templates/progression/dashboard_eleve.html:198
 msgid "Leçon débloquée"
-msgstr "Leçon débloquée"
+msgstr "Lección desbloqueada"
 
 #: app/templates/progression/dashboard_eleve.html:211
 msgid "Termine d’abord la leçon précédente"
-msgstr "Termine d’abord la leçon précédente"
+msgstr "Termina primero la lección anterior"
 
 #: app/templates/progression/dashboard_eleve.html:225
 msgid "Terminé"
-msgstr "Terminé"
+msgstr "Completado"
 
 #: app/templates/progression/dashboard_eleve.html:227
 msgid "En cours"
@@ -1003,19 +1021,19 @@ msgstr "En curso"
 
 #: app/templates/progression/dashboard_eleve.html:229
 msgid "Débloqué"
-msgstr "Débloqué"
+msgstr "Desbloqueado"
 
 #: app/templates/progression/dashboard_eleve.html:231
 msgid "Verrouillé"
-msgstr "Verrouillé"
+msgstr "Bloqueado"
 
 #: app/templates/progression/dashboard_eleve.html:247
 msgid "Ce cours n'a pas encore de leçons."
-msgstr "Ce cours n'a pas encore de leçons."
+msgstr "Este curso todavía no tiene lecciones."
 
 #: app/templates/progression/dashboard_eleve.html:256
 msgid "Vous n'êtes inscrit à aucun cours pour le moment."
-msgstr "Vous n'êtes inscrit à aucun cours pour le moment."
+msgstr "No estás inscrito en ningún curso por el momento."
 
 #: app/templates/quiz/form_question.html:3
 msgid "Nouvelle question"
@@ -1076,3 +1094,359 @@ msgstr "Bonne réponse"
 #: app/templates/quiz/form_question.html:70
 msgid "Ajouter la question"
 msgstr "Ajouter la question"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "apprendre avec douceur"
+msgstr "aprender con suavidad"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Register"
+msgstr "Registro"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Validations"
+msgstr "Validaciones"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Notifications"
+msgstr "Notificaciones"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "non lues"
+msgstr "sin leer"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Tout lire"
+msgstr "Marcar todo como leído"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Aucune notification"
+msgstr "No hay notificaciones"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Ouvrir l'inbox"
+msgstr "Abrir bandeja"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Choisir un niveau"
+msgstr "Elegir un nivel"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Connectez-vous a LabeeB Arabic"
+msgstr "Inicia sesión en LabeeB Arabic"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Retrouvez vos cours et votre progression en un seul endroit."
+msgstr "Encuentra tus cursos y tu progreso en un solo lugar."
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Utilisez votre adresse email et votre mot de passe pour acceder directement a vos cours."
+msgstr "Usa tu correo electrónico y tu contraseña para acceder directamente a tus cursos."
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Se souvenir de moi"
+msgstr "Recordarme"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Mot de passe oublie"
+msgstr "Contraseña olvidada"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Pas encore de compte etudiant ?"
+msgstr "¿Aún no tienes cuenta de estudiante?"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Creer mon compte etudiant"
+msgstr "Crear mi cuenta de estudiante"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Creer mon compte"
+msgstr "Crear mi cuenta"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Dashboard Admin"
+msgstr "Panel de administración"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Tableau de bord"
+msgstr "Panel"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Administration pedagogique"
+msgstr "Administración pedagógica"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Utilisateurs"
+msgstr "Usuarios"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Enseignants"
+msgstr "Profesores"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Eleves inscrits"
+msgstr "Alumnos inscritos"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Actions rapides"
+msgstr "Acciones rápidas"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Voir les utilisateurs"
+msgstr "Ver usuarios"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Creer un utilisateur"
+msgstr "Crear un usuario"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Creer utilisateur"
+msgstr "Crear usuario"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Gerer les cours"
+msgstr "Gestionar cursos"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Badges & notifications"
+msgstr "Insignias y notificaciones"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Voir les progressions"
+msgstr "Ver progresos"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Administrateur"
+msgstr "Administrador"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Eleve"
+msgstr "Alumno"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Maintenance technique"
+msgstr "Mantenimiento técnico"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Prenom"
+msgstr "Nombre"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Confirmer le mot de passe"
+msgstr "Confirmar contraseña"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Telephone"
+msgstr "Teléfono"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Role"
+msgstr "Rol"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Enregistrer les modifications"
+msgstr "Guardar cambios"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Supprimer"
+msgstr "Eliminar"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Photo de profil"
+msgstr "Foto de perfil"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Enregistrer le profil"
+msgstr "Guardar perfil"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Titre"
+msgstr "Título"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Description"
+msgstr "Descripción"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Image du cours"
+msgstr "Imagen del curso"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Publier ce cours"
+msgstr "Publicar este curso"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Enregistrer le cours"
+msgstr "Guardar curso"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Ordre"
+msgstr "Orden"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Contenu texte"
+msgstr "Contenido de texto"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "URL video"
+msgstr "URL del video"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "PDF de la lecon"
+msgstr "PDF de la lección"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Audio de la lecon"
+msgstr "Audio de la lección"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Duree (minutes)"
+msgstr "Duración (minutos)"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Publier cette lecon"
+msgstr "Publicar esta lección"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Enregistrer la lecon"
+msgstr "Guardar lección"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Contacter l administrateur"
+msgstr "Contactar al administrador"
+
+#: app/templates/base.html app/templates/login.html app/templates/admin_dashboard.html app/templates/index.html app/forms.py
+msgid "Reinitialiser"
+msgstr "Restablecer"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Inscription etudiant"
+msgstr "Registro de estudiante"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Nouveau compte etudiant"
+msgstr "Nueva cuenta de estudiante"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Creez votre acces a LabeeB Arabic"
+msgstr "Crea tu acceso a LabeeB Arabic"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Inscrivez-vous avec votre email et commencez vos cours immediatement."
+msgstr "Regístrate con tu correo y empieza tus cursos inmediatamente."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Ce formulaire est reserve aux etudiants. Les comptes enseignant et admin sont crees par un administrateur."
+msgstr "Este formulario está reservado para estudiantes. Las cuentas de profesor y administrador las crea un administrador."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "J ai deja un compte"
+msgstr "Ya tengo una cuenta"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Utilisateurs de la plateforme"
+msgstr "Usuarios de la plataforma"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Gerez les comptes admin, enseignant, eleve et maintenance dans une vue coherente."
+msgstr "Gestiona las cuentas de administrador, profesor, estudiante y mantenimiento en una vista coherente."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Valider les comptes"
+msgstr "Validar cuentas"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Statut"
+msgstr "Estado"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Cree le"
+msgstr "Creado el"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Compte protege"
+msgstr "Cuenta protegida"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Debloquer cet utilisateur ?"
+msgstr "¿Desbloquear este usuario?"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Bloquer cet utilisateur ? Il ne pourra plus se connecter tant qu il n est pas debloque."
+msgstr "¿Bloquear este usuario? No podrá iniciar sesión hasta que sea desbloqueado."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Debloquer"
+msgstr "Desbloquear"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Bloquer"
+msgstr "Bloquear"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Supprimer definitivement cet utilisateur ? Cette action est irreversible."
+msgstr "¿Eliminar definitivamente este usuario? Esta acción es irreversible."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Aucun utilisateur trouve."
+msgstr "No se encontró ningún usuario."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Comptes etudiants a valider"
+msgstr "Cuentas de estudiantes por validar"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Les nouveaux etudiants apparaissent ici en attente. Une fois valides, ils peuvent se connecter avec leur email et leur mot de passe."
+msgstr "Los nuevos estudiantes aparecen aquí en espera. Una vez validados, pueden iniciar sesión con su correo y contraseña."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Retour aux utilisateurs"
+msgstr "Volver a usuarios"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "inscrit le"
+msgstr "registrado el"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Aucun compte etudiant en attente pour le moment."
+msgstr "No hay ninguna cuenta de estudiante pendiente por ahora."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Ajoutez un nouveau compte avec l un des quatre roles officiels de la plateforme."
+msgstr "Agrega una nueva cuenta con uno de los cuatro roles oficiales de la plataforma."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Retour a la liste"
+msgstr "Volver a la lista"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Informations du compte"
+msgstr "Información de la cuenta"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Les identifiants sont utilises directement pour la connexion a la plateforme."
+msgstr "Las credenciales se usan directamente para iniciar sesión en la plataforma."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Roles disponibles"
+msgstr "Roles disponibles"
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Chaque role ouvre un perimetre clair dans la plateforme."
+msgstr "Cada rol abre un alcance claro dentro de la plataforma."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Gere les contenus, les utilisateurs et les vues globales."
+msgstr "Gestiona contenidos, usuarios y vistas globales."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Cree et suit ses cours, lecons et progressions."
+msgstr "Crea y sigue sus cursos, lecciones y progresos."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Suit les cours, realise les exercices et voit sa progression."
+msgstr "Sigue cursos, realiza ejercicios y ve su progreso."
+
+#: app/templates/register.html app/templates/gestion_utilisateurs.html app/templates/valider_comptes.html app/templates/creer_utilisateur.html
+msgid "Accede uniquement aux outils techniques et de supervision."
+msgstr "Accede solo a herramientas técnicas y de supervisión."

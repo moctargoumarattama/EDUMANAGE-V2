@@ -4,7 +4,7 @@ import shutil
 from datetime import datetime, timedelta
 from importlib import metadata
 
-from flask import Blueprint, current_app, jsonify, render_template, request, session
+from flask import Blueprint, current_app, jsonify, render_template, request, session, url_for
 from flask_login import current_user, login_required
 from sqlalchemy import inspect, text
 from sqlalchemy.engine import make_url
@@ -427,6 +427,27 @@ def vider_cache():
         details=f"zone={zone}; removed={total}",
     )
     return jsonify({"success": True, "zone": zone, "removed": removed, "total_removed": total})
+
+
+@maintenance_bp.route("/purge-cache-client", methods=["POST"])
+@login_required
+@maintenance_required
+def purge_cache_client():
+    purge_url = url_for("main.cache_reset", _external=True)
+    log_action(
+        module="maintenance",
+        action="Lien purge cache client genere",
+        level="INFO",
+        user_id=current_user.id,
+        details=f"url={purge_url}",
+    )
+    return jsonify(
+        {
+            "success": True,
+            "purge_url": purge_url,
+            "message": "Envoyez ce lien a l utilisateur impacte pour forcer la purge locale du cache.",
+        }
+    )
 
 
 @maintenance_bp.route("/sessions/user/<int:user_id>/revoke", methods=["POST"])
